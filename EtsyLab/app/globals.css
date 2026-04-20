@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Custom scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #C9B899; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #B09878; }
+
+/* ── Component layer ─────────────────────────────────────────────────────── */
+@layer components {
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-2xl border border-bark-100 shadow-warm;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full px-4 py-2.5 bg-bark-50 border border-bark-200 rounded-xl text-sm
+           text-bark-900 placeholder-bark-400 transition-all outline-none
+           focus:border-brand-400 focus:ring-2 focus:ring-brand-100;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-brand-500 hover:bg-brand-600
+           text-white text-sm font-semibold rounded-xl transition-all shadow-brand-sm
+           hover:shadow-brand active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-bark-100 hover:bg-bark-200
+           text-bark-800 text-sm font-semibold rounded-xl transition-all
+           active:scale-[0.97] disabled:opacity-50;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-2 px-4 py-2 border border-brand-300 text-brand-600
+           hover:bg-brand-50 text-sm font-semibold rounded-xl transition-all active:scale-[0.97];
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-bark-500 hover:text-bark-900
+           hover:bg-bark-100 text-xs font-medium rounded-lg transition-all;
+  }
+
+  /* Upload zones */
+  .drop-zone {
+    @apply border-2 border-dashed border-bark-200 rounded-xl p-8 text-center cursor-pointer
+           transition-all duration-200 hover:border-brand-300 hover:bg-brand-50/50;
+  }
+  .drop-zone.active {
+    @apply border-brand-400 bg-brand-50 scale-[1.01]
+           ring-4 ring-brand-100;
+  }
+  .drop-zone.filled {
+    @apply border-brand-300 border-solid bg-brand-50/60 p-4;
+  }
+
+  /* Section header */
+  .section-header {
+    @apply px-8 py-6 border-b border-bark-100 bg-white/60 backdrop-blur-sm sticky top-0 z-10;
+  }
+
+  /* Tags */
+  .tag-chip {
+    @apply inline-flex items-center px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200
+           rounded-full text-xs font-medium;
+  }
+
+  /* Status badges */
+  .badge-listed  { @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold; }
+  .badge-pending { @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-bark-100 text-bark-600 border border-bark-200 rounded-full text-xs font-semibold; }
+  .badge-today   { @apply inline-flex items-center gap-1 px-2.5 py-0.5 bg-brand-50 text-brand-700 border border-brand-200 rounded-full text-xs font-semibold; }
+
+  /* Premium effects */
+  .card-glass {
+    @apply bg-white/70 backdrop-blur-md rounded-2xl border border-white/50 shadow-warm;
+  }
+
+}
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.animate-fade-in { animation: fadeIn 0.5s ease-out both; }
+
+.spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid rgba(241,100,30,0.25);
+  border-top-color: #F1641E;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+.spinner-white {
+  border-color: rgba(255,255,255,0.3);
+  border-top-color: white;
+}
+
+/* ── Paper grain texture on sidebar ──────────────────────────────────────── */
+.sidebar-texture {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(241,100,30,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(241,100,30,0.04) 0%, transparent 50%);
+}

@@ -1,0 +1,6 @@
+flask==3.1.0
+pikepdf==8.10.1
+Pillow==11.2.1
+posthog
+python-dotenv
+resend

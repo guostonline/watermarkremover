@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Clean Tools</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0B0F0C;--surface:#141A16;--surface2:#101512;--border:#1F2A23;
+--text:#EAFBE7;--text2:#A8B3AC;--text3:#5F6B64;
+--accent:#A3FF3F;--accent-hover:#8BEA2F;--accent-glow:rgba(163,255,63,0.2);
+--success:#4ADE80;--warning:#FACC15;--error:#F87171;--info:#38BDF8;
+--font:'Onest',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;--r:12px;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+::selection{background:var(--accent);color:var(--bg)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;flex-shrink:0;background:rgba(20,26,22,0.75);backdrop-filter:blur(12px);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar-brand{padding:20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-brand a{display:flex;align-items:center;gap:10px;text-decoration:none}
+.sidebar-brand img{width:32px;height:32px;border-radius:8px}
+.sidebar-brand span{font-weight:700;font-size:1.1rem}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-group{margin-bottom:20px}
+.nav-group-label{font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:8px 12px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;font-size:0.85rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.2s;margin-bottom:2px}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(163,255,63,0.1);color:var(--accent);border:1px solid rgba(163,255,63,0.2)}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.main-content{flex:1;overflow-y:auto;background:var(--bg)}
+.page{max-width:900px;margin:0 auto;padding:32px}
+
+.page-header{padding:0 0 24px 0;margin-bottom:28px;border-bottom:1px solid var(--border)}
+.page-title{font-size:1.75rem;font-weight:700}
+.page-subtitle{font-size:0.9rem;color:var(--text3);margin-top:6px}
+
+.tool-card{background:rgba(20,26,22,0.75);backdrop-filter:blur(12px);border:1px solid rgba(163,255,63,0.08);border-radius:16px;margin-bottom:20px}
+.tool-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tool-title{font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text2)}
+.tool-meta{font-size:0.75rem;color:var(--text3)}
+.tool-body{padding:24px}
+
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:0.75rem;color:var(--text3);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em}
+.form-input{width:100%;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:0.9rem;transition:all 0.2s}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.form-select{width:100%;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:0.9rem}
+textarea.form-input{resize:vertical;min-height:100px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:var(--r);font-family:var(--font);font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;border:none}
+.btn-primary{background:linear-gradient(135deg,#B6FF5C,#6DFF7A);color:#0B0F0C}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 20px var(--accent-glow)}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);background:rgba(163,255,63,0.05)}
+
+.drop-zone{padding:48px;border:2px dashed var(--border);border-radius:16px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(16,21,18,0.5)}
+.drop-zone:hover{border-color:var(--accent);background:rgba(163,255,63,0.05)}
+.drop-zone-icon{font-size:3rem;margin-bottom:12px}
+.drop-zone-text{font-size:0.95rem;color:var(--text3)}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{background:var(--surface2);border:1px solid var(--border);padding:6px 12px;border-radius:20px;font-size:0.75rem;color:var(--text2)}
+
+.output-section{margin-top:20px;padding:20px;background:var(--surface2);border-radius:12px;display:none}
+.output-section.visible{display:block}
+
+.hidden{display:none}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){
+.layout{flex-direction:column}
+.sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+.page{padding:20px}
+}
+</style>
+</head>
+<body>
+<div style="position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden">
+<div style="position:absolute;width:500px;height:500px;top:-200px;left:-100px;background:radial-gradient(circle,rgba(163,255,63,0.08) 0%,transparent 70%)"></div>
+<div style="position:absolute;width:400px;height:400px;bottom:-100px;right:-50px;background:radial-gradient(circle,rgba(109,255,122,0.05) 0%,transparent 70%)"></div>
+</div>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-brand">
+<a href="/">
+<img src="/static/logo-28.png" alt="PDF Clean">
+<span>PDF Clean</span>
+</a>
+</div>
+<nav class="sidebar-nav" id="sidebar"></nav>
+</aside>
+<main class="main-content">
+<div class="page" id="page"></div>
+</main>
+</div>
+
+<script>
+let currentTool='remove';
+let frontFile=null,backFile=null;
+let splitResults=[];
+
+const tools=[
+  {id:'remove',label:'Remove Watermark',icon:'🧹',group:'PDF'},
+  {id:'extract',label:'Extract Images',icon:'🖼️',group:'PDF'},
+  {id:'splitter',label:'Image Splitter',icon:'✂️',group:'Utility'},
+  {id:'listing',label:'Listing Generator',icon:'📝',group:'Etsy'},
+  {id:'calendar',label:'Calendar',icon:'📅',group:'Planning'},
+  {id:'cover',label:'Cover Creator',icon:'🎨',group:'Etsy'},
+  {id:'analytics',label:'Analytics',icon:'📊',group:'Etsy'}
+];
+
+function renderSidebar(){
+const groups={};
+tools.forEach(t=>{if(!groups[t.group])groups[t.group]=[];groups[t.group].push(t)});
+let html='';
+for(const group in groups){
+html+=`<div class="nav-group"><div class="nav-group-label">${group}</div>`;
+groups[group].forEach(t=>{
+if(t.href){
+html+=`<a href="${t.href}" class="nav-item" style="text-decoration:none">${t.icon}<span>${t.label}</span></a>`;
+}else{
+html+=`<div class="nav-item ${currentTool===t.id?'active':''}" onclick="switchTool('${t.id}')">${t.icon}<span>${t.label}</span></div>`;
+}
+});
+html+='</div>';
+}
+document.getElementById('sidebar').innerHTML=html;
+}
+
+function switchTool(id){currentTool=id;renderSidebar();renderPage()}
+
+function initDropZone(zoneId,fileVar,previewId){
+const zone=document.getElementById(zoneId);
+const inp=document.createElement('input');
+inp.type='file';
+inp.accept='image/*';
+inp.style.display='none';
+zone.appendChild(inp);
+zone.addEventListener('click',()=>inp.click());
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.style.borderColor='var(--sky)';zone.style.background='rgba(14,165,233,0.1)'});
+zone.addEventListener('dragleave',e=>{e.preventDefault();zone.style.borderColor='';zone.style.background=''});
+zone.addEventListener('drop',e=>{e.preventDefault();zone.style.borderColor='';zone.style.background='';if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0],fileVar,previewId)});
+inp.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0],fileVar,previewId)});
+}
+
+function handleFile(file,fileVar,previewId){
+if(!file.type.startsWith('image/')){alert('Please upload an image');return;}
+if(fileVar==='front')frontFile=file;else backFile=file;
+const zone=document.getElementById(previewId)||document.getElementById(fileVar==='front'?'frontZone':'backZone');
+const reader=new FileReader();
+reader.onload=e=>{
+zone.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:200px;border-radius:4px;object-fit:contain"><div style="margin-top:8px;font-size:0.8rem;color:var(--text2)">${file.name}</div><div style="font-size:0.7rem;color:var(--text3)">Click or drop to change</div>`;
+};
+reader.readAsDataURL(file);
+}
+
+function loadImg(file){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=URL.createObjectURL(file)})}
+
+async function splitImages(){
+if(!frontFile||!backFile){alert('Please upload both front and back images');return;}
+document.getElementById('results').innerHTML='<p style="color:var(--sky);text-align:center;padding:20px">Processing...</p>';
+try{
+const[fi,bi]=await Promise.all([loadImg(frontFile),loadImg(backFile)]);
+const cols=parseInt(document.getElementById('cols').value)||3;
+const rows=parseInt(document.getElementById('rows').value)||2;
+const cellFW=fi.naturalWidth/cols;
+const cellFH=fi.naturalHeight/rows;
+const cellBW=bi.naturalWidth/cols;
+const cellBH=bi.naturalHeight/rows;
+const gap=8;
+splitResults=[];
+let html='';
+for(let r=0;r<rows;r++){
+for(let c=0;c<cols;c++){
+const tH=Math.round(cellFH);
+const ratio=tH/cellBH;
+const scaledBW=Math.round(cellBW*ratio);
+const tW=Math.round(cellFW)+gap+scaledBW;
+const canvas=document.createElement('canvas');
+canvas.width=tW;canvas.height=tH;
+const ctx=canvas.getContext('2d');
+ctx.fillStyle='#F8F6F0';
+ctx.fillRect(0,0,tW,tH);
+ctx.drawImage(fi,c*cellFW,r*cellFH,cellFW,cellFH,0,0,Math.round(cellFW),tH);
+ctx.drawImage(bi,c*cellBW,r*cellBH,cellBW,cellBH,Math.round(cellFW)+gap,0,scaledBW,tH);
+const idx=r*cols+c+1;
+const dataUrl=canvas.toDataURL('image/jpeg',0.92);
+splitResults.push({dataUrl,filename:'model_'+String(idx).padStart(2,'0')+'.jpg'});
+html+=`<div style="background:var(--surface2);border-radius:8px;padding:8px"><img src="${dataUrl}" style="width:100%;border-radius:4px"><div style="text-align:center;font-size:0.7rem;color:var(--text3);margin-top:4px">model_${String(idx).padStart(2,'0')}.jpg</div><a href="${dataUrl}" download="model_${String(idx).padStart(2,'0')}.jpg" style="display:block;text-align:center;margin-top:4px;font-size:0.75rem;color:var(--sky)">Download</a></div>`;
+}
+}
+document.getElementById('results').innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">'+html+'</div><button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="downloadAll()">⬇️ Download All ('+splitResults.length+' images)</button>';
+}catch(e){
+document.getElementById('results').innerHTML='<p style="color:var(--rose);text-align:center;padding:20px">Error: '+e.message+'</p>';
+}
+}
+
+async function downloadAll(){
+const zip=new JSZip();
+for(const item of splitResults){
+const base64=item.dataUrl.split(',')[1];
+zip.file(item.filename,base64,{base64:true});
+}
+const blob=await zip.generateAsync({type:'blob'});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='split_images.zip';
+a.click();
+URL.revokeObjectURL(a.href);
+}
+
+let extractFile=null;
+let extractedImages=[];
+
+function initExtractZone(){
+const zone=document.getElementById('extractZone');
+const inp=document.getElementById('extractInput');
+const btn=document.getElementById('extractBtn');
+zone.addEventListener('click',()=>inp.click());
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.style.borderColor='var(--accent)';zone.style.background='rgba(163,255,63,0.05)'});
+zone.addEventListener('dragleave',e=>{e.preventDefault();zone.style.borderColor='';zone.style.background=''});
+zone.addEventListener('drop',e=>{e.preventDefault();zone.style.borderColor='';zone.style.background='';if(e.dataTransfer.files[0])handleExtractFile(e.dataTransfer.files[0])});
+inp.addEventListener('change',e=>{if(e.target.files[0])handleExtractFile(e.target.files[0])});
+}
+
+function handleExtractFile(f){
+if(!f.name.toLowerCase().endsWith('.pdf')){alert('Please upload a PDF file');return;}
+extractFile=f;
+document.getElementById('extractZoneText').textContent=f.name;
+document.getElementById('extractBtn').disabled=false;
+renderPdfThumbnails(f);
+}
+
+async function renderPdfThumbnails(file){
+const container=document.getElementById('extractPdfPreview');
+if(!container)return;
+container.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:8px 0"><div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite"></div><span style="font-size:0.8rem;color:var(--text3)">Loading preview...</span></div>';
+try{
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const arrayBuffer=await file.arrayBuffer();
+const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+const total=pdf.numPages;
+const maxPages=Math.min(total,20);
+let html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:0.8rem;color:var(--text3)">'+total+' page'+(total>1?'s':'')+'</span></div>';
+html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px">';
+for(let i=1;i<=maxPages;i++){
+const page=await pdf.getPage(i);
+const viewport=page.getViewport({scale:0.3});
+const canvas=document.createElement('canvas');
+canvas.width=viewport.width;
+canvas.height=viewport.height;
+const ctx=canvas.getContext('2d');
+await page.render({canvasContext:ctx,viewport:viewport}).promise;
+const dataUrl=canvas.toDataURL('image/jpeg',0.6);
+html+='<div style="background:var(--surface2);border-radius:8px;overflow:hidden;border:1px solid var(--border)">';
+html+='<img src="'+dataUrl+'" style="width:100%;display:block">';
+html+='<div style="text-align:center;font-size:0.6rem;color:var(--text3);padding:3px 0">'+i+'</div>';
+html+='</div>';
+}
+if(total>maxPages){
+html+='<div style="background:var(--surface2);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;min-height:60px">';
+html+='<span style="font-size:0.7rem;color:var(--text3)">+'+( total-maxPages)+' more</span></div>';
+}
+html+='</div>';
+container.innerHTML=html;
+}catch(e){
+container.innerHTML='<p style="font-size:0.8rem;color:var(--text3)">Preview unavailable</p>';
+}
+}
+
+async function extractImages(){
+if(!extractFile){alert('Please upload a PDF first');return;}
+const statusEl=document.getElementById('extractStatus');
+const resultsEl=document.getElementById('extractResults');
+const btn=document.getElementById('extractBtn');
+statusEl.style.display='block';
+statusEl.innerHTML='<div style="display:flex;align-items:center;gap:10px"><div class="spinner" style="width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite"></div><span style="color:var(--text2);font-size:0.85rem">Extracting images...</span></div>';
+resultsEl.innerHTML='';
+btn.disabled=true;
+try{
+const fd=new FormData();
+fd.append('file',extractFile);
+const resp=await fetch('/api/extract-images',{method:'POST',body:fd});
+if(!resp.ok){const d=await resp.json().catch(()=>({}));throw new Error(d.error||'Extraction failed')}
+const data=await resp.json();
+extractedImages=data.images;
+if(!extractedImages.length){statusEl.innerHTML='<span style="color:var(--warning)">No images found in this PDF.</span>';btn.disabled=false;return;}
+statusEl.style.display='none';
+let html='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">';
+html+='<div style="display:flex;align-items:center;gap:12px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text2);user-select:none"><input type="checkbox" id="extractSelectAll" checked onchange="toggleExtractSelectAll(this.checked)" style="accent-color:var(--accent);width:16px;height:16px"> Select all</label>';
+html+='<span style="font-size:0.8rem;color:var(--text3)">'+extractedImages.length+' images found</span></div>';
+html+='</div>';
+html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">';
+extractedImages.forEach((img,i)=>{
+html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.2s" class="extract-img-card" data-idx="'+i+'" data-selected="true" onclick="toggleExtractSelect('+i+',this)" onmouseenter="this.style.borderColor=\'rgba(163,255,63,0.3)\';this.style.transform=\'translateY(-2px)\'" onmouseleave="this.style.borderColor=\'var(--border)\';this.style.transform=\'none\'">';
+html+='<div style="position:relative">';
+html+='<img src="'+img.dataUrl+'" style="width:100%;height:150px;object-fit:contain;background:var(--surface2);display:block" loading="lazy">';
+html+='<div style="position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all 0.15s" class="extract-check-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0B0F0C" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>';
+html+='</div>';
+html+='<div style="padding:10px 12px">';
+html+='<div style="font-size:0.78rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500">'+img.filename+'</div>';
+html+='<div style="font-size:0.68rem;color:var(--text3);margin-top:2px">Page '+img.page+' · '+img.width+'×'+img.height+'</div>';
+html+='</div></div>';
+});
+html+='</div>';
+html+='<div style="display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap">';
+html+='<button class="btn btn-primary" style="padding:12px 24px;font-size:0.85rem;border-radius:10px" onclick="downloadExtractedSelected()"><svg style="width:15px;height:15px;margin-right:6px;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Selected</button>';
+html+='<button class="btn btn-secondary" style="padding:12px 24px;font-size:0.85rem;border-radius:10px" onclick="downloadExtractedAll()"><svg style="width:15px;height:15px;margin-right:6px;vertical-align:middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download All as ZIP</button>';
+html+='</div>';
+resultsEl.innerHTML=html;
+btn.disabled=false;
+}catch(err){
+statusEl.innerHTML='<span style="color:var(--error)">'+err.message+'</span>';
+btn.disabled=false;
+}
+}
+
+function toggleExtractSelectAll(checked){
+document.querySelectorAll('.extract-img-card').forEach(card=>{
+card.dataset.selected=checked?'true':'false';
+const badge=card.querySelector('.extract-check-badge');
+const svg=badge.querySelector('svg');
+badge.style.background=checked?'var(--accent)':'var(--border)';
+svg.style.display=checked?'block':'none';
+});
+}
+
+function toggleExtractSelect(idx,card){
+const isSelected=card.dataset.selected==='true';
+card.dataset.selected=isSelected?'false':'true';
+const badge=card.querySelector('.extract-check-badge');
+const svg=badge.querySelector('svg');
+badge.style.background=isSelected?'var(--border)':'var(--accent)';
+svg.style.display=isSelected?'none':'block';
+}
+
+async function downloadExtractedSelected(){
+const selected=[];
+document.querySelectorAll('.extract-img-card[data-selected="true"]').forEach(card=>{
+const idx=parseInt(card.dataset.idx);
+selected.push(extractedImages[idx]);
+});
+if(!selected.length){alert('Select at least one image');return;}
+if(selected.length===1){const a=document.createElement('a');a.href=selected[0].dataUrl;a.download=selected[0].filename;a.click();return;}
+const zip=new JSZip();
+for(const img of selected){
+const base64=img.dataUrl.split(',')[1];
+zip.file(img.filename,base64,{base64:true});
+}
+const blob=await zip.generateAsync({type:'blob'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='extracted_images.zip';a.click();URL.revokeObjectURL(a.href);
+}
+
+async function downloadExtractedAll(){
+const zip=new JSZip();
+for(const img of extractedImages){
+const base64=img.dataUrl.split(',')[1];
+zip.file(img.filename,base64,{base64:true});
+}
+const blob=await zip.generateAsync({type:'blob'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='extracted_images.zip';a.click();URL.revokeObjectURL(a.href);
+}
+
+function renderPage(){
+const p=document.getElementById('page');
+switch(currentTool){
+case'remove':
+p.innerHTML=`<div style="margin:-24px"><iframe src="/remove?embed=1" style="width:100%;height:calc(100vh - 48px);border:none;display:block" id="removeFrame"></iframe></div>`;
+break;
+case'splitter':
+p.innerHTML=`
+<div class="page-header">
+<h1 class="page-title">Image Splitter</h1>
+<p class="page-subtitle">Split grid images into front/back pairs for Etsy listings</p>
+</div>
+<div class="tool-card">
+<div class="tool-header">
+<span class="tool-title">Upload Images</span>
+</div>
+<div class="tool-body">
+<div class="form-group">
+<label class="form-label">Front View Grid</label>
+<div class="drop-zone" id="frontZone">
+<div class="drop-zone-icon">🖼️</div>
+<div class="drop-zone-text">Drop front view image or click to upload</div>
+</div>
+</div>
+<div class="form-group" style="margin-top:16px">
+<label class="form-label">Back View Grid</label>
+<div class="drop-zone" id="backZone">
+<div class="drop-zone-icon">🖼️</div>
+<div class="drop-zone-text">Drop back view image or click to upload</div>
+</div>
+</div>
+<div class="form-group" style="margin-top:16px">
+<div style="display:flex;gap:16px">
+<div style="flex:1"><label class="form-label">Columns</label><input type="number" class="form-input" id="cols" value="3" min="2" max="4"></div>
+<div style="flex:1"><label class="form-label">Rows</label><input type="number" class="form-input" id="rows" value="2" min="1" max="4"></div>
+</div>
+</div>
+<button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="splitImages()">✂️ Split & Combine</button>
+<div id="results"></div>
+</div>
+</div>
+</div>
+`;
+initDropZone('frontZone','front','frontPreview');
+initDropZone('backZone','back','backPreview');
+break;
+case'extract':
+p.innerHTML=`
+<div class="page-header">
+<h1 class="page-title">Extract Images</h1>
+<p class="page-subtitle">Pull all images from a PDF and download them</p>
+</div>
+<div class="tool-card">
+<div class="tool-header">
+<span class="tool-title">Upload PDF</span>
+</div>
+<div class="tool-body">
+<div class="form-group">
+<div class="drop-zone" id="extractZone" style="padding:36px">
+<div class="drop-zone-icon">📄</div>
+<div class="drop-zone-text" id="extractZoneText">Drop your PDF here or click to upload</div>
+<div class="drop-zone-text" style="font-size:0.7rem;margin-top:4px">PDF files only</div>
+</div>
+<input type="file" id="extractInput" accept=".pdf,application/pdf" style="display:none">
+</div>
+<div id="extractPdfPreview" style="margin-top:16px"></div>
+<button class="btn btn-primary" style="width:100%;margin-top:16px" id="extractBtn" onclick="extractImages()" disabled>🖼️ Extract Images</button>
+<div id="extractStatus" style="display:none;margin-top:16px;padding:14px 16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)"></div>
+<div id="extractResults"></div>
+</div>
+</div>
+`;
+initExtractZone();
+break;
+case'listing':
+p.innerHTML=`
+<div class="page-header">
+<h1 class="page-title">Listing Generator</h1>
+<p class="page-subtitle">Generate Etsy-optimized titles, tags and descriptions</p>
+</div>
+<div class="tool-card">
+<div class="tool-header">
+<span class="tool-title">Pattern Details</span>
+</div>
+<div class="tool-body">
+<div class="form-group">
+<label class="form-label">Pattern Name</label>
+<input type="text" class="form-input" id="patternName" placeholder="e.g. Summer Maxi Dress">
+</div>
+<div class="form-group">
+<label class="form-label">Category</label>
+<select class="form-select" id="patternCategory">
+<option value="dress">Dress</option>
+<option value="pants">Pants/Trousers</option>
+<option value="skirt">Skirt</option>
+<option value="shorts">Shorts</option>
+<option value="top">Top/Blouse</option>
+<option value="jacket">Jacket/Coat</option>
+<option value="other">Other</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">Style Keywords</label>
+<input type="text" class="form-input" id="styleKeywords" placeholder="boho, summer, casual">
+</div>
+<button class="btn btn-primary" style="width:100%" onclick="generateListing()">📝 Generate Listing</button>
+<div class="output-section" id="listingOutput">
+<div class="form-group">
+<label class="form-label">Title</label>
+<textarea class="form-input" id="listingTitle" rows="2"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label">Tags (13 max)</label>
+<div class="tags" id="listingTags"></div>
+</div>
+<div class="form-group">
+<label class="form-label">Description</label>
+<textarea class="form-input" id="listingDesc" rows="10"></textarea>
+</div>
+</div>
+</div>
+</div>
+`;
+break;
+case'calendar':
+p.innerHTML=`
+<div class="page-header">
+<h1 class="page-title">Listing Calendar</h1>
+<p class="page-subtitle">Track your 1-pattern-per-day publishing schedule</p>
+</div>
+<div class="tool-card">
+<div class="tool-header">
+<span class="tool-title">Patterns</span>
+</div>
+<div class="tool-body">
+<p style="color:var(--text3);text-align:center;padding:40px">Connect to Etsy API to sync patterns</p>
+</div>
+</div>
+`;
+break;
+case'cover':
+p.innerHTML=`
+<div class="page-header">
+<h1 class="page-title">Cover Creator</h1>
+<p class="page-subtitle">Create 820×1230px Etsy cover images</p>
+</div>
+<div class="tool-card">
+<div class="tool-header">
+<span class="tool-title">Cover Settings</span>
+</div>
+<div class="tool-body">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div>
+<div class="form-group">
+<label class="form-label">Base Template</label>
+<div class="drop-zone">
+<div class="drop-zone-icon">🖼️</div>
+<div class="drop-zone-text">Drop template image</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label">Pattern Name</label>
+<input type="text" class="form-input" id="coverTitle" placeholder="Slip Dress">
+</div>
+<div class="form-group">
+<label class="form-label">Model Photo</label>
+<div class="drop-zone">
+<div class="drop-zone-icon">👗</div>
+<div class="drop-zone-text">Drop model photo</div>
+</div>
+</div>
+</div>
+<div style="background:var(--surface2);border-radius:8px;padding:20px;display:flex;align-items:center;justify-content:center;min-height:400px">
+<p style="color:var(--text3)">Live Preview</p>
+</div>
+</div>
+<button class="btn btn-primary" style="width:100%;margin-top:20px">⬇️ Download Cover PNG</button>
+</div>
+</div>
+`;
+break;
+case'analytics':
+p.innerHTML=`
+<div class="page-header">
+<h1 class="page-title">Analytics</h1>
+<p class="page-subtitle">Revenue and performance tracking</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+<div class="tool-card" style="padding:20px">
+<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Revenue</div>
+<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">$0</div>
+<div style="font-size:0.75rem;color:var(--text3)">/mo</div>
+</div>
+<div class="tool-card" style="padding:20px">
+<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Sales</div>
+<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">0</div>
+<div style="font-size:0.75rem;color:var(--text3)">this month</div>
+</div>
+<div class="tool-card" style="padding:20px">
+<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Conversion</div>
+<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">0%</div>
+</div>
+<div class="tool-card" style="padding:20px">
+<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Avg Order</div>
+<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">$0</div>
+</div>
+</div>
+<div class="tool-card">
+<div class="tool-header">
+<span class="tool-title">Connect to Etsy</span>
+</div>
+<div class="tool-body">
+<p style="color:var(--text3);text-align:center;padding:40px">Etsy API integration coming soon</p>
+</div>
+</div>
+`;
+break;
+}
+}
+
+function generateListing(){
+const name=document.getElementById('patternName').value;
+if(!name){alert('Enter a pattern name');return}
+const cat=document.getElementById('patternCategory').value;
+const style=document.getElementById('styleKeywords').value;
+const title=name+' PDF Sewing Pattern - Instant Download - '+(cat==='dress'?'Dress':cat);
+const tags=[name.toLowerCase(),'pdf','pattern','sewing','digital','instant download',cat,'diy',style.split(',')[0]||name.toLowerCase()].slice(0,13);
+const desc='Digital sewing pattern for '+name+'. Includes full-size pattern templates (A4/Letter), step-by-step instructions, and assembly guide. Instant download, print-at-home, unlimited personal use.';
+document.getElementById('listingTitle').value=title;
+document.getElementById('listingTags').innerHTML=tags.map(t=>'<span class="tag">'+t+'</span>').join('');
+document.getElementById('listingDesc').value=desc;
+document.getElementById('listingOutput').classList.add('visible');
+}
+
+renderSidebar();
+renderPage();
+</script>
+</body>
+</html>

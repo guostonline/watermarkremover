@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "saas-revenue-growth-metrics": {
+      "source": "deanpeters/product-manager-skills",
+      "sourceType": "github",
+      "computedHash": "0853a0da63113aad7c867fd697b066d4fbfaf33d61f53da15ac299442846d639"
+    }
+  }
+}

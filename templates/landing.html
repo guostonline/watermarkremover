@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090b">
+<title>PDF Clean — Remove Watermarks from PDFs Instantly</title>
+<meta name="description" content="Remove watermarks from PDF documents instantly. No signup required, no software to install. Your files stay private.">
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/alpinejs@3/dist/cdn.min.js" defer></script>
+<script>
+!function(t,e){var o,n,p,r,e,a,i,s,c=window,r=document;r.POSTHOG_API_KEY="{{ posthog_key }}";r.POSTHOG_HOST="{{ posthog_host }}";var u=[];c.posthog={APPLICATION_ID:!(0),__loaded:!1};o=["capture","identify","alias","setPersonProperties","getPersonProperties","reset","getSessionId","getDistinctId","setPersonPropertiesForFlags","getPersonPropertiesForFlags"];for(n=0;n<o.length;n++)!function(e){c.posthog[e]=function(){c.__POSTHOG_ENABLE__&&1===r.__POSTHOG_SNIPPET_VERSION__?(c.__POSTHOG_QUEUE__=c.__POSTHOG_QUEUE__||[],c.__POSTHOG_QUEUE__.push([e].concat(Array.prototype.slice.call(arguments,0)))):u.push([e,Array.prototype.slice.call(arguments,0)])}}(o[n]);p=r.createElement("script");p.type="text/javascript";p.async=!0;p.src="https://us.i.posthog.com/static/array.js";e=r.getElementsByTagName("script")[0];e.parentNode.insertBefore(p,e)}();
+posthog.init(r.POSTHOG_API_KEY,{api_host:r.POSTHOG_HOST,capture_pageview:!0,capture_pageleave:!0});
+</script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      colors: {
+        brand: {
+          50: '#f0fbe7',
+          100: '#dafad0',
+          200: '#b6f5a1',
+          300: '#8eeca8',
+          400: '#a3ff3f',
+          500: '#6dff7a',
+          600: '#4ade80',
+          700: '#22c55e',
+          800: '#16a34a',
+          900: '#14532d',
+        },
+        surface: {
+          DEFAULT: '#0B0F0C',
+          50: 'rgba(20,26,22,0.04)',
+          100: 'rgba(20,26,22,0.07)',
+          200: 'rgba(163,255,63,0.12)',
+        },
+      },
+    },
+  },
+}
+</script>
+<style>
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @keyframes pulse-ring{0%{transform:scale(.9);opacity:.6}100%{transform:scale(1.3);opacity:0}}
+  @keyframes gradient-shift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  @keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .animate-float{animation:float 6s ease-in-out infinite}
+  .animate-pulse-ring{animation:pulse-ring 2s ease-out infinite}
+  .animate-gradient{background-size:200% 200%;animation:gradient-shift 8s ease infinite}
+  .animate-fade-up{animation:fade-up .6s ease forwards;opacity:0}
+  .delay-1{animation-delay:.1s}
+  .delay-2{animation-delay:.2s}
+  .delay-3{animation-delay:.3s}
+  .delay-4{animation-delay:.4s}
+  .delay-5{animation-delay:.5s}
+.glass{background:rgba(20,26,22,0.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(163,255,63,0.08)}
+.glass-hover:hover{background:rgba(20,26,22,0.85);border-color:rgba(163,255,63,0.2)}
+  .glow-brand{box-shadow:0 4px 30px rgba(124,92,252,0.25)}
+  .text-gradient{background:linear-gradient(135deg,#f0f0f5 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  ::selection{background:#7c5cfc;color:#fff}
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+  html{scroll-behavior:smooth}
+</style>
+</head>
+<body class="bg-surface text-white font-sans antialiased overflow-x-hidden">
+
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+  <div class="absolute w-[600px] h-[600px] -top-48 -left-32 rounded-full bg-gradient-to-br from-brand-500/15 to-transparent blur-3xl"></div>
+  <div class="absolute w-[500px] h-[500px] -bottom-24 -right-20 rounded-full bg-gradient-to-br from-brand-500/10 to-transparent blur-3xl"></div>
+</div>
+
+<x-data x-data="{ email: '', status: 'idle', message: '' }" class="relative z-10">
+
+<nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 text-xl font-bold tracking-tight">
+      <img src="/static/logo-icon.svg" alt="PDF Clean" class="w-7 h-7 rounded">
+      <span class="text-gradient">PDF Clean</span>
+    </a>
+    <div class="flex items-center gap-6">
+      <a href="#how" class="text-sm text-white/50 hover:text-white/90 transition hidden sm:inline">How it works</a>
+      <a href="#features" class="text-sm text-white/50 hover:text-white/90 transition hidden sm:inline">Features</a>
+      <a href="/app" class="text-sm text-white/50 hover:text-white/90 transition">Tools</a>
+      <a href="/app" class="text-sm font-semibold text-brand-400 hover:text-brand-300 transition">Try it free &rarr;</a>
+    </div>
+  </div>
+</nav>
+
+<section class="pt-32 pb-20 px-5">
+  <div class="max-w-6xl mx-auto text-center">
+    <div class="animate-fade-up">
+      <span class="inline-block text-xs font-semibold tracking-widest uppercase text-brand-400 bg-brand-500/10 border border-brand-500/20 rounded-full px-4 py-1.5 mb-6">Free during beta</span>
+    </div>
+    <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] animate-fade-up delay-1">
+      Remove watermarks<br>from <span class="text-gradient">any PDF</span>
+    </h1>
+    <p class="mt-6 text-lg sm:text-xl text-white/50 max-w-xl mx-auto leading-relaxed animate-fade-up delay-2">
+      Instantly clean watermarks from your PDF documents. No signup, no software install. Your files never leave your server.
+    </p>
+
+    <div class="mt-10 max-w-md mx-auto animate-fade-up delay-3">
+      <form @submit.prevent="
+        status = 'loading';
+        fetch('/api/waitlist', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email: email})
+        })
+        .then(r => r.json())
+        .then(d => {
+          if(d.error) { status='error'; message=d.error; }
+          else { status='success'; message=d.message; var e=email; email=''; posthog.capture('waitlist_signup',{email:e}); posthog.identify(e); }
+        })
+        .catch(() => { status='error'; message='Something went wrong. Try again.'; })
+      " class="flex gap-3">
+        <input
+          type="email"
+          x-model="email"
+          :disabled="status === 'loading'"
+          placeholder="Enter your email"
+          required
+          class="flex-1 px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition font-sans"
+        >
+        <button
+          type="submit"
+          :disabled="status === 'loading'"
+          class="px-6 py-3.5 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-brand-500/20 transition-all hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          <span x-show="status !== 'loading'">Join waitlist</span>
+          <span x-show="status === 'loading'" x-cloak class="flex items-center gap-2">
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            Joining...
+          </span>
+        </button>
+      </form>
+      <div x-show="status === 'success'" x-cloak x-transition class="mt-4 text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3" x-text="message"></div>
+      <div x-show="status === 'error'" x-cloak x-transition class="mt-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3" x-text="message"></div>
+      <p class="mt-3 text-xs text-white/25">No spam. We'll notify you when we launch.</p>
+    </div>
+
+    <div class="mt-14 animate-fade-up delay-4">
+      <a href="/app" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-400 hover:text-brand-300 transition group">
+        Or try the beta now &mdash; no waitlist needed
+        <svg class="w-4 h-4 transition group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section class="py-16 px-5">
+  <div class="max-w-4xl mx-auto">
+    <div class="animate-fade-up delay-5">
+      <video autoplay loop muted playsinline class="w-full rounded-2xl border border-white/10 shadow-2xl shadow-brand-500/10">
+        <source src="/static/demo.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="py-20 px-5">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-14 animate-fade-up delay-1">
+      <span class="text-xs font-semibold tracking-widest uppercase text-brand-400">Why PDF Clean</span>
+      <h2 class="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">Stop fighting watermarks</h2>
+      <p class="mt-3 text-white/40 max-w-lg mx-auto">PDF watermarks make documents look unprofessional and block text. PDF Clean strips them out in seconds.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="glass glass-hover rounded-2xl p-7 transition-all group animate-fade-up delay-2">
+        <div class="w-11 h-11 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Lightning fast</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Process even large PDFs in seconds. No queue, no waiting &mdash; instant results every time.</p>
+      </div>
+
+      <div class="glass glass-hover rounded-2xl p-7 transition-all group animate-fade-up delay-3">
+        <div class="w-11 h-11 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Private & secure</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Your files are processed server-side and immediately deleted. Nothing is stored, shared, or logged.</p>
+      </div>
+
+      <div class="glass glass-hover rounded-2xl p-7 transition-all group animate-fade-up delay-4">
+        <div class="w-11 h-11 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">No install needed</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Works entirely in your browser. No downloads, no accounts, no Adobe required &mdash; just upload and go.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+      <div class="glass glass-hover rounded-2xl p-7 transition-all group animate-fade-up delay-4">
+        <div class="w-11 h-11 rounded-xl bg-brand-600/10 border border-brand-600/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Add your own logo</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Replace watermarks with your own brand. Upload your logo, pick position and opacity, and stamp it on every page.</p>
+      </div>
+
+      <div class="glass glass-hover rounded-2xl p-7 transition-all group animate-fade-up delay-5">
+        <div class="w-11 h-11 rounded-xl bg-brand-600/10 border border-brand-600/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Batch-ready</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Handles documents of any size &mdash; from single-page forms to hundred-page reports. Every page, processed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="py-20 px-5">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-14">
+      <span class="text-xs font-semibold tracking-widest uppercase text-brand-400">How it works</span>
+      <h2 class="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">Three steps. Zero friction.</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center group">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/20 flex items-center justify-center mx-auto mb-5 group-hover:shadow-lg group-hover:shadow-brand-500/10 transition-all">
+          <svg class="w-7 h-7 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <span class="block text-xs font-mono text-brand-400/60 mb-2">01</span>
+        <h3 class="text-lg font-semibold mb-2">Upload your PDF</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Drag and drop or browse. Supports PDFs up to 100 MB.</p>
+      </div>
+
+      <div class="text-center group">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/20 flex items-center justify-center mx-auto mb-5 group-hover:shadow-lg group-hover:shadow-brand-500/10 transition-all">
+          <svg class="w-7 h-7 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="block text-xs font-mono text-brand-400/60 mb-2">02</span>
+        <h3 class="text-lg font-semibold mb-2">Process instantly</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Watermarks are stripped automatically. Optionally add your own logo.</p>
+      </div>
+
+      <div class="text-center group">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/20 flex items-center justify-center mx-auto mb-5 group-hover:shadow-lg group-hover:shadow-brand-500/10 transition-all">
+          <svg class="w-7 h-7 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <span class="block text-xs font-mono text-brand-400/60 mb-2">03</span>
+        <h3 class="text-lg font-semibold mb-2">Download clean PDF</h3>
+        <p class="text-sm text-white/40 leading-relaxed">Get your watermark-free PDF back. Files are deleted from the server immediately.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 px-5">
+  <div class="max-w-4xl mx-auto">
+    <div class="glass rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-brand-600/5 pointer-events-none"></div>
+      <div class="relative z-10">
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">Free during beta</h2>
+        <p class="mt-4 text-white/40 max-w-md mx-auto">PDF Clean is free to use while we're in beta. Join the waitlist to get early access to new features and priority support.</p>
+
+        <div class="mt-8 max-w-sm mx-auto">
+          <form @submit.prevent="
+            status = 'loading';
+            fetch('/api/waitlist', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({email: email})
+            })
+            .then(r => r.json())
+            .then(d => {
+              if(d.error) { status='error'; message=d.error; }
+              else { status='success'; message=d.message; var e=email; email=''; posthog.capture('waitlist_signup',{email:e}); posthog.identify(e); }
+            })
+            .catch(() => { status='error'; message='Something went wrong. Try again.'; })
+          ">
+            <input
+              type="email"
+              x-model="email"
+              :disabled="status === 'loading'"
+              placeholder="your@email.com"
+              required
+              class="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition font-sans"
+            >
+            <button
+              type="submit"
+              :disabled="status === 'loading'"
+              class="w-full mt-3 px-6 py-3.5 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-brand-500/20 transition-all hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <span x-show="status !== 'loading'">Join the waitlist</span>
+              <span x-show="status === 'loading'" x-cloak class="flex items-center justify-center gap-2">
+                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                Joining...
+              </span>
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-xs text-white/25">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            No credit card
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            No spam
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Cancel anytime
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-10 px-5 border-t border-white/5">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/25">
+    <span class="flex items-center gap-1.5 font-semibold text-white/40 tracking-tight">
+      <img src="/static/logo-icon.svg" alt="" class="w-5 h-5 rounded opacity-60">
+      PDF Clean
+    </span>
+    <span>Built with pikepdf &middot; Your files stay private</span>
+    <a href="/app" class="text-brand-400/60 hover:text-brand-400 transition">Try the beta &rarr;</a>
+  </div>
+</footer>
+
+</x-data>
+
+</body>
+</html>

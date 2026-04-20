@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090b">
+<title>PDF Clean — Command</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#09090b;--surface:#111114;--surface2:#1a1a1f;--border:#27272a;
+--text:#fafafa;--text2:#a1a1aa;--text3:#52525b;
+--rose:#f43f5e;--rose-dim:rgba(244,63,94,0.1);--rose-border:rgba(244,63,94,0.2);
+--sky:#0ea5e9;--sky-dim:rgba(14,165,233,0.08);--sky-border:rgba(14,165,233,0.15);
+--lime:#84cc16;--lime-dim:rgba(132,204,22,0.1);
+--amber:#f59e0b;--amber-dim:rgba(245,158,11,0.1);
+--font:'Onest',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;
+--r:2px;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;line-height:1.4}
+::selection{background:var(--rose);color:#fff}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.noise{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.025;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+background-repeat:repeat;background-size:128px}
+
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px 48px}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:28px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:28px;height:28px;background:var(--rose);border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;letter-spacing:-0.05em}
+.logo-text{font-size:1rem;font-weight:700;letter-spacing:-0.03em;color:var(--text)}
+.logo-label{font-size:0.55rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-left:8px;padding:2px 6px;border:1px solid var(--border);border-radius:2px}
+.hdr-actions{display:flex;gap:6px}
+
+.btn{font-family:var(--font);font-size:0.72rem;font-weight:600;padding:7px 14px;border-radius:var(--r);cursor:pointer;transition:all 0.15s;letter-spacing:0.02em;text-transform:uppercase}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--text3);color:var(--text)}
+.btn-fill{background:var(--rose);border:1px solid var(--rose);color:#fff}
+.btn-fill:hover{opacity:0.9}
+.btn-fill:disabled{opacity:0.3;cursor:not-allowed}
+
+.seed{font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:3px 7px;border:1px solid var(--border);border-radius:2px;letter-spacing:0.04em}
+
+.row{display:grid;gap:16px}
+.r4{grid-template-columns:repeat(4,1fr)}
+.r3{grid-template-columns:repeat(3,1fr)}
+.r2{grid-template-columns:1fr 1fr}
+.r1{grid-template-columns:1fr}
+@media(max-width:768px){.r4{grid-template-columns:1fr 1fr}.r3,.r2{grid-template-columns:1fr}}
+
+.kpi{background:var(--surface);border:1px solid var(--border);padding:18px 20px;border-radius:var(--r);position:relative;overflow:hidden;transition:border-color 0.2s}
+.kpi:hover{border-color:var(--text3)}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:1px 0 0 1px}
+.kpi.rose::before{background:var(--rose)}.kpi.sky::before{background:var(--sky)}.kpi.lime::before{background:var(--lime)}.kpi.amber::before{background:var(--amber)}
+.kpi-label{font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.kpi-val{font-family:var(--mono);font-size:1.6rem;font-weight:700;letter-spacing:-0.04em;line-height:1}
+.kpi-sub{font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:4px}
+.kpi-sub .up{color:var(--lime)}.kpi-sub .dn{color:var(--rose)}.kpi-sub .flat{color:var(--amber)}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.panel-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)}
+.panel-hd-title{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2)}
+.panel-hd-meta{font-family:var(--mono);font-size:0.6rem;color:var(--text3)}
+.panel-bd{padding:0}
+
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:var(--mono);font-size:0.55rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);text-align:left;padding:10px 16px;border-bottom:1px solid var(--border)}
+.tbl td{font-size:0.78rem;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text2)}
+.tbl tr:hover td{background:var(--surface2)}
+.tbl .mono{font-family:var(--mono);font-size:0.7rem}
+.tbl .muted{color:var(--text3);font-family:var(--mono);font-size:0.65rem}
+
+.tag{font-family:var(--mono);font-size:0.55rem;font-weight:600;padding:2px 6px;border-radius:2px;letter-spacing:0.04em;display:inline-block;text-transform:uppercase}
+.tag-ok{background:var(--lime-dim);color:var(--lime)}
+.tag-err{background:var(--rose-dim);color:var(--rose)}
+.tag-warn{background:var(--amber-dim);color:var(--amber)}
+.tag-info{background:var(--sky-dim);color:var(--sky)}
+
+.meter{height:3px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:8px}
+.meter div{height:100%;border-radius:1px;transition:width 0.6s ease}
+
+.bars{display:flex;align-items:flex-end;gap:3px;height:72px;padding:0 4px}
+.bar-col{flex:1;display:flex;flex-direction:column;gap:1px;align-items:center;cursor:default}
+.bar-ok{width:100%;min-height:1px;background:var(--sky);border-radius:1px 1px 0 0;transition:height 0.3s}
+.bar-err{width:100%;min-height:1px;background:var(--rose);border-radius:0 0 1px 1px;transition:height 0.3s}
+.bar-labels{display:flex;gap:3px;margin-top:6px}
+.bar-labels span{flex:1;text-align:center;font-family:var(--mono);font-size:0.48rem;color:var(--text3)}
+
+.error-list{padding:4px 0}
+.error-row{display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.02)}
+.error-row:last-child{border-bottom:none}
+.error-text{font-family:var(--mono);font-size:0.68rem;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.error-count{font-family:var(--mono);font-size:0.8rem;font-weight:700;color:var(--rose)}
+
+.funnel-step{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.funnel-step:last-child{border-bottom:none}
+.funnel-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.funnel-bar div{height:100%;border-radius:3px;transition:width 0.5s ease}
+.funnel-label{font-size:0.72rem;color:var(--text3);min-width:130px}
+.funnel-val{font-family:var(--mono);font-size:0.78rem;font-weight:600;min-width:40px;text-align:right}
+.funnel-pct{font-family:var(--mono);font-size:0.6rem;color:var(--text3);min-width:36px;text-align:right}
+
+.empty{padding:32px 20px;text-align:center;color:var(--text3);font-size:0.82rem}
+
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);display:inline-block;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.3}}
+
+@keyframes slide-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:slide-up 0.35s ease forwards;opacity:0}
+.anim-1{animation-delay:0.05s}.anim-2{animation-delay:0.1s}.anim-3{animation-delay:0.15s}.anim-4{animation-delay:0.2s}
+.anim-5{animation-delay:0.25s}.anim-6{animation-delay:0.3s}.anim-7{animation-delay:0.35s}.anim-8{animation-delay:0.4s}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px}
+.login-box h2{font-size:1.1rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}
+.login-box p{font-size:0.78rem;color:var(--text3);margin-bottom:24px;line-height:1.5}
+.login-box input{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:0.82rem;outline:none;transition:border-color 0.15s}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 20px;font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--text);border-bottom-color:var(--rose)}
+
+.action-bar{display:none;align-items:center;gap:12px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px}
+.action-bar.visible{display:flex}
+.action-bar .count{font-family:var(--mono);font-size:0.82rem;font-weight:600;color:var(--text)}
+.action-bar .info{font-size:0.72rem;color:var(--text3);flex:1}
+
+.chk{width:14px;height:14px;appearance:none;-webkit-appearance:none;background:var(--bg);border:1px solid var(--border);border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.1s;flex-shrink:0}
+.chk:checked{background:var(--rose);border-color:var(--rose)}
+.chk:checked::after{content:'';display:block;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin-bottom:2px}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:28px}
+.modal-box h3{font-size:1rem;font-weight:700;margin-bottom:4px}
+.modal-box .sub{font-size:0.78rem;color:var(--text3);margin-bottom:20px}
+
+.email-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:20px;font-size:0.78rem;line-height:1.6}
+.email-preview .ep-from{color:var(--text3);font-family:var(--mono);font-size:0.68rem;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.email-preview .ep-subject{font-weight:600;margin-bottom:16px}
+.email-preview .ep-body{color:var(--text2);white-space:pre-wrap;word-wrap:break-word}
+.email-preview .ep-link{color:var(--sky);font-family:var(--mono);font-size:0.72rem}
+
+.inv-status{font-family:var(--mono);font-size:0.6rem;font-weight:600;padding:2px 6px;border-radius:2px;letter-spacing:0.04em;text-transform:uppercase;display:inline-block}
+.inv-sent{background:var(--sky-dim);color:var(--sky);border:1px solid var(--sky-border)}
+.inv-clicked{background:var(--lime-dim);color:var(--lime);border:1px solid rgba(132,204,22,0.2)}
+.inv-used{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,0.2)}
+.inv-failed{background:var(--rose-dim);color:var(--rose);border:1px solid var(--rose-border)}
+.inv-pending{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.login-box input:focus{border-color:var(--rose)}
+.login-box .err{color:var(--rose);font-size:0.7rem;margin-top:8px;display:none;font-family:var(--mono)}
+.login-box .err.vis{display:block}
+.login-box button{width:100%;margin-top:14px;padding:12px;background:var(--rose);border:none;border-radius:var(--r);color:#fff;font-family:var(--font);font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;text-transform:uppercase;transition:opacity 0.15s}
+.login-box button:hover{opacity:0.9}
+
+@media(max-width:768px){
+  .wrap{padding:0 16px 32px}
+  header{padding:16px 0;margin-bottom:20px}
+  .r4{grid-template-columns:1fr 1fr}
+  .kpi-val{font-size:1.3rem}
+}
+
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:100;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r);font-size:0.82rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:toast-in 0.3s ease}
+.toast-success{border:1px solid rgba(132,204,22,0.3);background:rgba(17,17,20,0.95);color:var(--lime)}
+.toast-error{border:1px solid rgba(244,63,94,0.3);background:rgba(17,17,20,0.95);color:var(--rose)}
+.toast-info{border:1px solid rgba(14,165,233,0.3);background:rgba(17,17,20,0.95);color:var(--sky)}
+@keyframes toast-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar-brand{padding:20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-group{margin-bottom:16px}
+.nav-group-label{font-size:0.55rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:8px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);font-size:0.82rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(244,63,94,0.1);color:var(--rose);border-left:2px solid var(--rose);padding-left:10px}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);text-align:center}
+.sidebar-footer span{font-size:0.6rem;color:var(--text3);letter-spacing:0.05em}
+.main-content{flex:1;overflow-y:auto}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div id="app"></div>
+<script>
+const API='/api/admin';
+const REFRESH=30000;
+const fmtB=b=>{if(!b||b===0)return'0 B';if(b<1024)return b.toFixed(0)+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';if(b<1073741824)return(b/1048576).toFixed(1)+' MB';return(b/1073741824).toFixed(1)+' GB'};
+const fmtT=iso=>{if(!iso)return'—';const d=new Date(iso),n=new Date(),df=n-d;if(df<60000)return'now';if(df<3600000)return Math.floor(df/60000)+'m';if(df<86400000)return Math.floor(df/3600000)+'h';return Math.floor(df/86400000)+'d'};
+const fmtDay=d=>{const x=new Date(d+'T12:00:00Z');return x.toLocaleDateString('en-US',{month:'short',day:'numeric'})};
+function showToast(msg,type='success'){const id=Date.now();toasts.push({id,msg,type});const c=document.getElementById('toastContainer');if(c){c.innerHTML+=`<div class="toast toast-${type}">${type==='success'?'✓':type==='error'?'✕':'ℹ'} ${msg}</div>`;setTimeout(()=>{toasts=toasts.filter(t=>t.id!==id);const el=c.lastChild;if(el)el.remove()},3000)}}
+function switchSection(s){currentSection=s;console.log('switchSection:',s,'ev:',ev?.length);render()}
+let tok=null,d=null,inv=null,selectedEmails=new Set(),currentTab='overview',sending=false,toasts=[];
+async function api(ep,opt={}){const h={'Content-Type':'application/json',...opt.headers};if(tok)h['Authorization']='Bearer '+tok;const r=await fetch(API+ep,{...opt,headers:h});if(r.status===401)return null;return r.json()}
+
+function login(){document.getElementById('app').innerHTML=`<div class="noise"></div><div class="login-wrap"><div class="login-box"><h2>Command</h2><p>PDF Clean operations dashboard</p><input type="password" id="pw" placeholder="Password" autofocus><div class="err" id="e">Access denied</div><button onclick="doLogin()">Authenticate</button></div></div>`;document.getElementById('pw').addEventListener('keydown',x=>{if(x.key==='Enter')doLogin()})}
+async function doLogin(){const p=document.getElementById('pw').value,er=document.getElementById('e');er.classList.remove('vis');const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})});if(!r.ok){er.classList.add('vis');return}const j=await r.json();tok=j.token;localStorage.setItem('admin_token',tok);load()}
+function logout(){tok=null;localStorage.removeItem('admin_token');login()}
+function toggleEmail(email){if(selectedEmails.has(email))selectedEmails.delete(email);else selectedEmails.add(email);render()}
+function toggleAll(){const wl=d?.waitlist||[];if(selectedEmails.size===wl.length)selectedEmails.clear();else wl.forEach(w=>selectedEmails.add(w.email));render()}
+function switchTab(tab){currentTab=tab;selectedEmails.clear();render()}
+async function sendInvites(){if(sending)return;sending=true;const emails=Array.from(selectedEmails);if(!emails.length){sending=false;return}const r=await api('/invite',{method:'POST',body:JSON.stringify({emails})});sending=false;if(!r){login();return}hideModal();selectedEmails.clear();await load()}
+function showModal(){
+  const emails=Array.from(selectedEmails);
+  const preview=document.getElementById('emailPreview');
+  if(preview&&emails.length){
+    const appUrl=d?.stats?.app_url||window.location.origin;
+    const links=emails.map(e=>`${appUrl}/app?invite=[token]`).join('\n');
+    preview.innerHTML=`<div class="ep-from">from: PDF Clean &lt;onboarding@resend.dev&gt;</div><div class="ep-subject">You're in — try PDF Clean</div><div class="ep-body">Hey,\n\nThanks for signing up for PDF Clean!\n\nI just opened up early access and wanted to give you a direct link to try it.\n\nIt removes watermarks from PDFs instantly — just upload and download. No signup needed for now.\n\nI'd love to hear what you think.\n\n— PDF Clean Team\n\n<em style="color:var(--text3)">Sending to: ${emails.join(', ')}</em></div>`;
+  }
+  document.getElementById('inviteModal').classList.add('visible');
+}
+function hideModal(){document.getElementById('inviteModal').classList.remove('visible')}
+async function revokeInvite(token){const r=await api('/invites/revoke',{method:'POST',body:JSON.stringify({token})});if(!r){login();return}await load()}
+
+window.onerror=function(m,u,l,c,e){console.error('Global:',m,l,c,e);return false};
+function render(){
+if(!d){document.getElementById('app').innerHTML='<div class="wrap"><p>Loading...</p></div>';return}
+try{
+const s=d.stats||{},wl=d.waitlist||[],dl=d.daily_chart||[],ev=d.recent_events||[],isum=d.invite_summary||{},il=inv?inv.invites||[]:[];
+console.log('render section:', currentSection, 'ev=', ev?.length || 0);
+const maxD=Math.max(...dl.map(x=>(x.success||0)+(x.error||0)),1);
+const bars=dl.slice().reverse().slice(-14).map(x=>{const ok=(x.success||0)/maxD*100,er=(x.error||0)/maxD*100;return`<div class="bar-col"><div class="bar-ok" style="height:${ok}%"></div><div class="bar-err" style="height:${er}%"></div></div>`}).join('');
+const bLabels=dl.slice().reverse().slice(-14).map(x=>`<span>${fmtDay(x.date)}</span>`).join('');
+const d24=s.processes_today||0,d24e=s.error_today||0,d7=dl.slice(-7).reduce((a,x)=>a+(x.success||0)+(x.error||0),0);
+const pct=s.total_processes>0?(s.success_processes/s.total_processes*100).toFixed(1):'0';
+const logoPct=s.success_processes>0?(s.logo_stamps/s.success_processes*100).toFixed(1):'0';
+const w2t=s.unique_sessions&&wl.length?(s.unique_sessions/wl.length*100).toFixed(0):0;
+const t2p=s.unique_sessions&&s.success_processes?(s.success_processes/s.unique_sessions*100).toFixed(0):0;
+const topErr=(s.top_errors||[]).map(([r,c])=>`<div class="error-row"><span class="error-text" title="${r}">${r}</span><span class="error-count">${c}</span></div>`).join('');
+const recWl=wl.slice(0,25);
+const recEv=ev.slice(0,40);
+
+const navData=[
+  {l:'📊',id:'overview',label:'Overview'},
+  {l:'📋',id:'history',label:'History'},
+  {l:'✉️',id:'invites',label:'Invites'},
+  {l:'⚙️',id:'settings',label:'Settings'}
+];
+let navHtml='';
+for(const g of[{g:'Overview',i:[0,1,2]},{g:'System',i:[3]}]){navHtml+=`<div class="nav-group"><div class="nav-group-label">${g.g}</div>`;for(const idx of g.i){const i=navData[idx];navHtml+=`<div class="nav-item ${currentSection===i.id?'active':''}" onclick="switchSection('${i.id}')">${i.l}<span>${i.label}</span></div>`}navHtml+='</div>'}
+document.getElementById('app').innerHTML=`<div class="noise"></div>
+<div id="toastContainer"></div>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-brand">
+<div style="display:flex;align-items:center;gap:8px">
+<img src="/static/logo-28.png" style="width:22px;height:22px;border-radius:4px">
+<span style="font-weight:700;font-size:0.95rem">PDF Clean</span>
+</div>
+</div>
+<nav class="sidebar-nav">${navHtml}
+</nav>
+<div class="sidebar-footer">
+<span>${d?.stats?.total_processes||0} processes</span>
+</div>
+</aside>
+<main class="main-content">
+<div class="wrap">
+<header>
+  <div class="logo">
+    <img src="/static/logo-icon.svg" alt="PDF Clean" style="width:28px;height:28px;border-radius:3px">
+    <div class="logo-text">PDF Clean</div>
+    <span class="logo-label">Command</span>
+  </div>
+  <div class="hdr-actions">
+    <span class="seed"><span class="live-dot"></span> live</span>
+    <button class="btn btn-ghost" onclick="load()" id="rbtn">&#x21bb;</button>
+    <button class="btn btn-ghost" onclick="logout()">Exit</button>
+  </div>
+</header>
+
+${currentSection==='overview'?`
+
+<div class="action-bar ${selectedEmails.size>0?'visible':''}" id="actionBar">
+  <input type="checkbox" class="chk" id="selectAll" ${selectedEmails.size===wl.length&&wl.length>0?'checked':''} onchange="toggleAll()">
+  <span class="count">${selectedEmails.size} selected</span>
+  <span class="info">from ${wl.length} waitlist entries</span>
+  <button class="btn btn-fill" onclick="showModal()" ${selectedEmails.size===0?'disabled':''}>Send Invites</button>
+</div>
+
+<div class="row r4 anim anim-1">
+  <div class="kpi rose"><div class="kpi-label">Total processes</div><div class="kpi-val">${s.total_processes||0}</div><div class="kpi-sub"><span class="${d24>0?'up':'flat'}">${d24} today</span></div></div>
+  <div class="kpi sky"><div class="kpi-label">Success rate</div><div class="kpi-val">${pct}%</div><div class="kpi-sub">${s.success_processes||0} ok &middot; ${s.error_processes||0} err</div><div class="meter"><div style="width:${pct}%;background:var(--sky)"></div></div></div>
+  <div class="kpi lime"><div class="kpi-label">Waitlist</div><div class="kpi-val">${s.total_waitlist||0}</div><div class="kpi-sub">${d7} this week</div></div>
+  <div class="kpi amber"><div class="kpi-label">Data processed</div><div class="kpi-val">${s.total_bytes_formatted||'0 B'}</div><div class="kpi-sub">${s.bytes_today_formatted||'0 B'} today</div></div>
+</div>
+
+<div class="row r2 anim anim-2" style="margin-top:16px">
+  <div class="row r3" style="gap:16px">
+    <div class="kpi" style="border-left:3px solid var(--sky)"><div class="kpi-label">Unique sessions</div><div class="kpi-val">${s.unique_sessions||0}</div><div class="kpi-sub"><span class="${(s.sessions_today||0)>(s.sessions_yesterday||0)?'up':'flat'}">${s.sessions_today||0} today</span></div></div>
+    <div class="kpi" style="border-left:3px solid var(--rose)"><div class="kpi-label">Errors</div><div class="kpi-val">${s.error_processes||0}</div><div class="kpi-sub">${d24e} today</div></div>
+    <div class="kpi" style="border-left:3px solid var(--lime)"><div class="kpi-label">Logo adoption</div><div class="kpi-val">${logoPct}%</div><div class="kpi-sub">${s.logo_stamps||0} stamped</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hd"><span class="panel-hd-title">Mode breakdown</span><span class="panel-hd-meta">${s.total_processes||0} total</span></div>
+    <div class="panel-bd" style="padding:16px 20px">
+      <div style="display:flex;gap:16px;margin-bottom:16px">
+        <div style="flex:1"><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700">${s.remove_processes||0}</div><div style="font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Remove</div></div>
+        <div style="flex:1"><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700">${s.process_processes||0}</div><div style="font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Process</div></div>
+        <div style="flex:1"><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700">${s.stamp_processes||0}</div><div style="font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Stamp</div></div>
+        <div style="flex:1"><div style="font-family:var(--mono);font-size:1.1rem;font-weight:700">${s.logo_stamps||0}</div><div style="font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px">Logos</div></div>
+      </div>
+      <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--border)">
+        ${s.total_processes>0?`<div style="width:${((s.remove_processes||0)/s.total_processes*100).toFixed(1)}%;background:var(--sky)"></div><div style="width:${((s.process_processes||0)/s.total_processes*100).toFixed(1)}%;background:var(--lime)"></div><div style="width:${((s.stamp_processes||0)/s.total_processes*100).toFixed(1)}%;background:var(--amber)"></div>`:''}
+      </div>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:0.6rem;color:var(--text3)">
+        <span><span style="display:inline-block;width:8px;height:8px;background:var(--sky);border-radius:1px;vertical-align:middle;margin-right:3px"></span>Remove</span>
+        <span><span style="display:inline-block;width:8px;height:8px;background:var(--lime);border-radius:1px;vertical-align:middle;margin-right:3px"></span>Process</span>
+        <span><span style="display:inline-block;width:8px;height:8px;background:var(--amber);border-radius:1px;vertical-align:middle;margin-right:3px"></span>Stamp</span>
+</div>
+  </div>
+</div>
+</div>
+</div>
+` : currentSection==='history'?`
+<div class="row r1">
+  <div class="panel">
+    <div class="panel-hd"><span class="panel-hd-title">Processing History</span><span class="panel-hd-meta">${ev.length} total events</span></div>
+    <div class="panel-bd">
+      ${ev.length===0?'<div class="empty">No processing history yet</div>':`
+      <table class="tbl"><thead><tr><th>Time</th><th>Mode</th><th>Status</th><th>Size</th><th>File</th></tr></thead><tbody>${ev.slice(0,50).map(e=>`<tr><td class="muted">${fmtT(e.ts)}</td><td><span class="tag ${e.mode==='remove'?'tag-info':e.mode==='stamp'?'tag-warn':'tag-ok'}">${e.mode}</span></td><td>${e.success?'<span class="tag tag-ok">OK</span>':'<span class="tag tag-err">ERR</span>'}</td><td class="muted">${fmtB(e.file_size)}</td><td class="mono" style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${e.filename||'—'}</td></tr>`).join('')}</tbody></table>`}
+    </div>
+  </div>
+</div>
+` : `
+<div class="row r4 anim anim-1">
+  <div class="kpi rose"><div class="kpi-label">Total invites</div><div class="kpi-val">${isum.total||0}</div></div>
+  <div class="kpi sky"><div class="kpi-label">Sent</div><div class="kpi-val">${isum.sent||0}</div></div>
+  <div class="kpi lime"><div class="kpi-label">Clicked</div><div class="kpi-val">${isum.clicked||0}</div></div>
+  <div class="kpi amber"><div class="kpi-label">Converted</div><div class="kpi-val">${isum.used||0}</div></div>
+</div>
+
+<div class="row r1 anim anim-2" style="margin-top:16px">
+  <div class="panel">
+    <div class="panel-hd"><span class="panel-hd-title">Invite funnel</span><span class="panel-hd-meta">Sent → Clicked → Used</span></div>
+    <div class="panel-bd" style="padding:16px 20px">
+      <div class="funnel-step">
+        <span class="funnel-label">Sent</span>
+        <div class="funnel-bar"><div style="width:${isum.total?100:0}%;background:var(--sky)"></div></div>
+        <span class="funnel-val">${isum.total||0}</span>
+        <span class="funnel-pct">100%</span>
+      </div>
+      <div class="funnel-step">
+        <span class="funnel-label">Clicked</span>
+        <div class="funnel-bar"><div style="width:${isum.total&&isum.clicked?Math.min(isum.clicked/isum.total*100,100):0}%;background:var(--lime)"></div></div>
+        <span class="funnel-val">${isum.clicked||0}</span>
+        <span class="funnel-pct">${isum.total?((isum.clicked/isum.total)*100).toFixed(1):'0'}%</span>
+      </div>
+      <div class="funnel-step">
+        <span class="funnel-label">Used (converted)</span>
+        <div class="funnel-bar"><div style="width:${isum.total&&isum.used?Math.min(isum.used/isum.total*100,100):0}%;background:var(--amber)"></div></div>
+        <span class="funnel-val">${isum.used||0}</span>
+        <span class="funnel-pct">${isum.total?((isum.used/isum.total)*100).toFixed(1):'0'}%</span>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:0.68rem;color:var(--text3)">
+        Click-through: <strong style="color:var(--lime)">${isum.total?((isum.clicked/isum.total)*100).toFixed(1):'0'}%</strong> &nbsp;&middot;&nbsp; Conversion: <strong style="color:var(--amber)">${isum.total?((isum.used/isum.total)*100).toFixed(1):'0'}%</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row r1 anim anim-3" style="margin-top:16px">
+  <div class="panel">
+    <div class="panel-hd"><span class="panel-hd-title">All invites</span><span class="panel-hd-meta">${il.length} total</span></div>
+    <div class="panel-bd">
+      ${il.length===0?'<div class="empty">No invites yet. Select emails from the Overview tab to send invites.</div>':`
+      <table class="tbl"><thead><tr><th>Email</th><th>Status</th><th>Sent</th><th>Clicked</th><th>Used</th><th></th></tr></thead><tbody>${il.map(i=>{const st=i.used_at?'used':i.clicked_at?'clicked':i.email_sent_at?'sent':'pending';const sc=i.used_at?'inv-used':i.clicked_at?'inv-clicked':i.email_sent_at?'inv-sent':'inv-pending';return`<tr><td class="mono">${i.email}</td><td><span class="inv-status ${sc}">${st}</span></td><td class="muted">${i.email_sent_at?fmtT(i.email_sent_at):'—'}</td><td class="muted">${i.clicked_at?fmtT(i.clicked_at):'—'}</td><td class="muted">${i.used_at?fmtT(i.used_at):'—'}</td><td>${!i.used_at&&i.email_sent_at?`<button class="btn btn-ghost" style="font-size:0.6rem;padding:3px 8px" onclick="revokeInvite('${i.token}')">Revoke</button>`:''}</td></tr>`}).join('')}</tbody></table>`}
+    </div>
+  </div>
+</div>
+`}
+</div>
+
+<div class="modal-overlay" id="inviteModal">
+  <div class="modal-box">
+    <h3>Send Invites</h3>
+    <p class="sub">Review the email before sending</p>
+    <div id="emailPreview" class="email-preview"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="hideModal()">Cancel</button>
+      <button class="btn btn-fill" onclick="sendInvites()">Confirm &amp; Send</button>
+    </div>
+  </div>
+</div>
+
+`}
+}
+catch(e){console.error('Render error:',e);document.getElementById('app').innerHTML='<div class="wrap"><h2 style="color:var(--rose)">Error: '+e.message+'</h2><button onclick="load()">Retry</button></div>'}
+}
+
+}
+async function load(){const btn=document.getElementById('rbtn');if(btn)btn.disabled=true;const r=await api('/stats');if(!r){login();return}d=r;const invData=await api('/invites');if(invData)inv=invData;render();if(btn)btn.disabled=false}
+function init(){tok=localStorage.getItem('admin_token');if(tok){load().catch(()=>{tok=null;localStorage.removeItem('admin_token');login()})}else{login()}setInterval(()=>{if(tok)load()},REFRESH)}
+init();
+</script>
+</body>
+</html>
