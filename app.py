@@ -15,18 +15,38 @@ import time
 import secrets
 from io import BytesIO
 from datetime import datetime, timezone, timedelta
-from flask import Flask, request, jsonify, send_file, render_template, Response, make_response
+from flask import Flask, request, jsonify, send_file, render_template, Response, make_response, has_request_context
 import pikepdf
 from PIL import Image
 from posthog import Posthog
 from dotenv import load_dotenv
+import requests
+import cloudscraper
+try:
+    from curl_cffi import requests as cffi_requests
+    _HAS_CURL_CFFI = True
+except ImportError:
+    _HAS_CURL_CFFI = False
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from bs4 import BeautifulSoup
+from urllib.parse import quote
 
-load_dotenv()
+load_dotenv(override=True)
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+
+from woocommerce_auto_save.app import woo_bp
+app.register_blueprint(woo_bp, url_prefix="/woo")
+
+import sys as _sys
+_sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "article"))
+from article.app import article_bp
+app.register_blueprint(article_bp, url_prefix="/article")
+
 UPLOAD_FOLDER = tempfile.mkdtemp()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WAITLIST_CSV = os.path.join(BASE_DIR, "waitlist.csv")
@@ -39,6 +59,26 @@ POSTHOG_HOST = os.environ.get("POSTHOG_HOST", "https://us.i.posthog.com")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme123")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 APP_URL = os.environ.get("APP_URL", "http://localhost:5000")
+PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "")
+
+SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
+
+def load_settings():
+    defaults = {"pexels_api_key": ""}
+    try:
+        if os.path.exists(SETTINGS_FILE):
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return defaults
+
+def save_settings(settings):
+    try:
+        with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2)
+    except Exception:
+        pass
 
 posthog = Posthog(project_api_key=POSTHOG_KEY, host=POSTHOG_HOST)
 
@@ -49,6 +89,19 @@ def generate_token():
 
 
 ADMIN_TOKEN = generate_token()
+
+
+def parse_form_float(name, default, min_value=None, max_value=None):
+    raw = request.form.get(name, default)
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        raise ValueError(f"{name} must be a number")
+    if min_value is not None and value < min_value:
+        raise ValueError(f"{name} must be at least {min_value}")
+    if max_value is not None and value > max_value:
+        raise ValueError(f"{name} must be at most {max_value}")
+    return value
 
 
 def load_stats():
@@ -137,7 +190,7 @@ def record_event(event_type, session_id="", mode="", filename="", file_size=0,
     save_stats(stats)
 
     if success and session_id:
-        inv_token = request.cookies.get("invite_token", "") if request else ""
+        inv_token = request.cookies.get("invite_token", "") if has_request_context() else ""
         if inv_token:
             invites = load_invites()
             for inv in invites:
@@ -241,6 +294,17 @@ def remove_oc_watermark_layer(data, oc_name_bytes):
     return data
 
 
+def remove_indie_pattern_text(data):
+    # Removes BT...ET blocks containing "Indie" or "Patter"
+    def replacement(match):
+        block = match.group(0)
+        if b"Indie" in block or b"Patter" in block:
+            return b""
+        return block
+
+    return re.sub(rb"BT.*?ET", replacement, data, flags=re.DOTALL)
+
+
 def disable_watermark_ocg(pdf):
     ocprops = pdf.Root.get("/OCProperties")
     if ocprops is None:
@@ -313,10 +377,123 @@ def find_watermark_gs_keys(page):
     return wm_gs_keys
 
 
-def remove_watermark(input_path, output_path):
+def replace_model_images(pdf, front_bytes=None, back_bytes=None):
+    if not front_bytes and not back_bytes:
+        return 0
+
+    replaced_count = 0
+    try:
+        page = pdf.pages[0]
+        
+        def find_images(obj_dict, found_list, seen_objs):
+            if not obj_dict:
+                return
+            for name, obj in obj_dict.items():
+                obj_id = obj.objgen if hasattr(obj, "objgen") else id(obj)
+                if obj_id in seen_objs:
+                    continue
+                seen_objs.add(obj_id)
+                
+                if obj.get("/Subtype") == "/Image":
+                    w = int(obj.get("/Width", 0))
+                    h = int(obj.get("/Height", 0))
+                    if w > 50 and h > 50:  # Filter out small icons/dots
+                        found_list.append({
+                            "name": name,
+                            "parent_dict": obj_dict,
+                            "area": w * h,
+                            "obj": obj,
+                            "w": w,
+                            "h": h
+                        })
+                elif obj.get("/Subtype") == "/Form":
+                    res = obj.get("/Resources")
+                    if res:
+                        find_images(res.get("/XObject"), found_list, seen_objs)
+
+        images_found = []
+        resources = page.get("/Resources")
+        if resources:
+            find_images(resources.get("/XObject"), images_found, set())
+
+        # Sort by area descending to find the main model images
+        images_found.sort(key=lambda x: x["area"], reverse=True)
+
+        replacement_images = []
+        if front_bytes: replacement_images.append(front_bytes)
+        if back_bytes: replacement_images.append(back_bytes)
+
+        # Special case: If 2 images provided but only 1 found, merge them side-by-side
+        if len(replacement_images) == 2 and len(images_found) == 1:
+            target = images_found[0]
+            img1 = Image.open(BytesIO(front_bytes))
+            img2 = Image.open(BytesIO(back_bytes))
+            
+            # Create a side-by-side merge
+            total_w = img1.width + img2.width
+            max_h = max(img1.height, img2.height)
+            merged = Image.new("RGB", (total_w, max_h), (255, 255, 255))
+            merged.paste(img1, (0, 0))
+            merged.paste(img2, (img1.width, 0))
+            
+            buf = BytesIO()
+            merged.save(buf, format="JPEG", quality=85)
+            compressed_data = buf.getvalue()
+            
+            new_image_stream = pikepdf.Stream(pdf, compressed_data)
+            new_image_stream.Type = pikepdf.Name("/XObject")
+            new_image_stream.Subtype = pikepdf.Name("/Image")
+            new_image_stream.Width = merged.width
+            new_image_stream.Height = merged.height
+            new_image_stream.ColorSpace = pikepdf.Name("/DeviceRGB")
+            new_image_stream.BitsPerComponent = 8
+            new_image_stream.Filter = pikepdf.Name("/DCTDecode")
+            
+            target["parent_dict"][target["name"]] = new_image_stream
+            replaced_count = 1
+            log.info(f"Merged 2 images into 1 target {target['name']}")
+        else:
+            for i, img_data in enumerate(replacement_images):
+                if i < len(images_found):
+                    target = images_found[i]
+                    
+                    new_img = Image.open(BytesIO(img_data))
+                    if new_img.mode != "RGB":
+                        new_img = new_img.convert("RGB")
+                    
+                    buf = BytesIO()
+                    new_img.save(buf, format="JPEG", quality=85)
+                    compressed_data = buf.getvalue()
+
+                    new_image_stream = pikepdf.Stream(pdf, compressed_data)
+                    new_image_stream.Type = pikepdf.Name("/XObject")
+                    new_image_stream.Subtype = pikepdf.Name("/Image")
+                    new_image_stream.Width = new_img.width
+                    new_image_stream.Height = new_img.height
+                    new_image_stream.ColorSpace = pikepdf.Name("/DeviceRGB")
+                    new_image_stream.BitsPerComponent = 8
+                    new_image_stream.Filter = pikepdf.Name("/DCTDecode")
+
+                    target["parent_dict"][target["name"]] = new_image_stream
+                    replaced_count += 1
+                    log.info(f"Replaced image {target['name']} (area: {target['area']}) in parent dictionary.")
+
+    except Exception as e:
+        log.error(f"Error replacing model images: {str(e)}")
+        log.error(traceback.format_exc())
+
+    return replaced_count
+
+
+def remove_watermark(input_path, output_path, front_bytes=None, back_bytes=None):
     with pikepdf.open(input_path) as pdf:
         pages_processed = 0
         wm_oc_names = []
+
+        # Replace model images on first page if provided
+        if front_bytes or back_bytes:
+            replaced = replace_model_images(pdf, front_bytes, back_bytes)
+            log.info(f"Replaced {replaced} model images on first page")
 
         ocprops = pdf.Root.get("/OCProperties")
         if ocprops is not None:
@@ -357,6 +534,7 @@ def remove_watermark(input_path, output_path):
                         original = data
 
                         data = remove_artifact_watermark(data)
+                        data = remove_indie_pattern_text(data)
 
                         for wm_name in wm_oc_names:
                             data = remove_oc_watermark_layer(data, wm_name)
@@ -464,6 +642,14 @@ def remove_watermark(input_path, output_path):
                                         if xobj.get("/Subtype") != pikepdf.Name("/Form"):
                                             continue
                                         stream = xobj.read_bytes()
+                                        
+                                        # Also remove indie pattern text from within Form XObjects
+                                        clean_stream = remove_indie_pattern_text(stream)
+                                        if clean_stream != stream:
+                                            xobj.write(clean_stream)
+                                            page_modified = True
+                                            stream = clean_stream
+
                                         is_watermark = False
                                         if b"/GS2 gs" in stream or b"/GS3 gs" in stream:
                                             if b"0.9985809" in stream:
@@ -594,6 +780,11 @@ def tools_page():
     return render_template("tools.html")
 
 
+@app.route("/app/listings/<int:index>")
+def listing_details_page(index):
+    return render_template("listing_details.html", index=index)
+
+
 @app.route("/favicon.ico")
 def favicon():
     return send_file(os.path.join(BASE_DIR, "static", "favicon.svg"), mimetype="image/svg+xml")
@@ -647,6 +838,63 @@ def waitlist():
     sid = get_session_id()
     posthog.capture("waitlist_signup", distinct_id=sid, properties={"email": email})
     return jsonify({"ok": True, "message": "You're on the list! We'll notify you when we launch."})
+
+
+@app.route("/api/settings")
+def get_settings():
+    settings = load_settings()
+    return jsonify({
+        "pexels_api_key": settings.get("pexels_api_key", "")
+    })
+
+
+@app.route("/api/settings", methods=["POST"])
+def update_settings():
+    data = request.get_json(silent=True) or {}
+    settings = load_settings()
+    if "pexels_api_key" in data:
+        settings["pexels_api_key"] = data["pexels_api_key"].strip()
+    save_settings(settings)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/pexels/search")
+def pexels_search():
+    settings = load_settings()
+    pexels_key = settings.get("pexels_api_key") or PEXELS_API_KEY
+    if not pexels_key:
+        return jsonify({"error": "Pexels API key not configured. Add it in Settings."}), 500
+    query = request.args.get("query", "")
+    page = request.args.get("page", 1)
+    per_page = min(int(request.args.get("per_page", 15)), 80)
+    if not query:
+        return jsonify({"error": "Query parameter required"}), 400
+    import urllib.request
+    import urllib.parse
+    params = urllib.parse.urlencode({"query": query, "page": page, "per_page": per_page})
+    url = f"https://api.pexels.com/v1/search?{params}"
+    req = urllib.request.Request(url, headers={"Authorization": pexels_key})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode())
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch from Pexels: {str(e)}"}), 500
+    photos = []
+    for p in data.get("photos", []):
+        photos.append({
+            "id": p.get("id"),
+            "url": p.get("url"),
+            "photographer": p.get("photographer"),
+            "photographer_url": p.get("photographer_url"),
+            "src": p.get("src", {}),
+            "alt": p.get("alt", "")
+        })
+    return jsonify({
+        "photos": photos,
+        "total_results": data.get("total_results", 0),
+        "page": data.get("page", 1),
+        "per_page": data.get("per_page", per_page)
+    })
 
 
 @app.route("/admin")
@@ -871,7 +1119,14 @@ def handle_remove():
     try:
         f.save(input_path)
         file_size = os.path.getsize(input_path)
-        remove_watermark(input_path, output_path)
+        
+        front_file = request.files.get("front_model")
+        back_file = request.files.get("back_model")
+        
+        front_bytes = front_file.read() if front_file else None
+        back_bytes = back_file.read() if back_file else None
+
+        remove_watermark(input_path, output_path, front_bytes, back_bytes)
 
         if not os.path.exists(output_path):
             return jsonify({"error": "Processing failed: no output generated"}), 500
@@ -1086,9 +1341,12 @@ def handle_process():
 
     has_logo = "logo" in request.files and request.files["logo"].filename
     position = request.form.get("position", "bottom-right")
-    scale = float(request.form.get("scale", 0.25))
-    opacity = float(request.form.get("opacity", 0.3))
-    margin = float(request.form.get("margin", 30))
+    try:
+        scale = parse_form_float("scale", 0.25, min_value=0.01, max_value=1.0)
+        opacity = parse_form_float("opacity", 0.3, min_value=0.0, max_value=1.0)
+        margin = parse_form_float("margin", 30, min_value=0)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
     uid = uuid.uuid4().hex[:12]
     input_path = os.path.join(UPLOAD_FOLDER, f"proc_input_{uid}.pdf")
@@ -1101,7 +1359,13 @@ def handle_process():
     try:
         pdf_file.save(input_path)
         file_size = os.path.getsize(input_path)
-        remove_watermark(input_path, mid_path)
+
+        front_file = request.files.get("front_model")
+        back_file = request.files.get("back_model")
+        front_bytes = front_file.read() if front_file else None
+        back_bytes = back_file.read() if back_file else None
+
+        remove_watermark(input_path, mid_path, front_bytes, back_bytes)
 
         if not os.path.exists(mid_path):
             return jsonify({"error": "Watermark removal failed"}), 500
@@ -1268,9 +1532,12 @@ def handle_stamp():
         return jsonify({"error": "Logo must be an image (PNG, JPG, BMP, GIF, TIFF, WEBP)"}), 400
 
     position = request.form.get("position", "bottom-right")
-    scale = float(request.form.get("scale", 0.25))
-    opacity = float(request.form.get("opacity", 0.3))
-    margin = float(request.form.get("margin", 30))
+    try:
+        scale = parse_form_float("scale", 0.25, min_value=0.01, max_value=1.0)
+        opacity = parse_form_float("opacity", 0.3, min_value=0.0, max_value=1.0)
+        margin = parse_form_float("margin", 30, min_value=0)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
     uid = uuid.uuid4().hex[:12]
     input_path = os.path.join(UPLOAD_FOLDER, f"stamp_input_{uid}.pdf")
@@ -1435,6 +1702,187 @@ def handle_stamp():
                 pass
 
 
+_AI_STUDIO_OUTPUT = os.path.join(BASE_DIR, "static", "ai-studio-generated")
+
+def _ais_build_prompts(data):
+    def clean(key, fallback=""):
+        return (data.get(key) or "").strip() or fallback
+
+    name    = clean("productName", "Annie Dress")
+    details = clean("dressDetails", "sewing pattern dress")
+    studio  = clean("studioBackground", "solid warm beige background, seamless")
+    palette = clean("colors", "sage green, ivory, dusty rose, golden mustard, lavender, powder blue")
+    man     = clean("maleOutfit", "ivory linen shirt and beige linen trousers")
+    common  = (
+        f"Use the 2 uploaded images as reference for the same {name} garment style. "
+        f"Preserve the sewing pattern and construction: {details}. "
+        f"Photorealistic fashion catalog quality, clean lighting, realistic anatomy, "
+        f"crisp fabric detail, no text, no logo, no watermark. Background must be {studio}."
+    )
+    return [
+        {"id": "01-front-single",  "title": "Front Single",   "size": "1024x1536",
+         "prompt": f"{common} Create one full-body FRONT VIEW image. Use a different adult female model than the references. Change the dress to a new selling-friendly color. The model faces camera in an elegant relaxed catalog pose."},
+        {"id": "02-back-single",   "title": "Back Single",    "size": "1024x1536",
+         "prompt": f"{common} Create one full-body BACK VIEW image. Use a different adult female model. Change the dress to a new selling-friendly color. Show the back clearly."},
+        {"id": "03-front-collage", "title": "Front 6 Models", "size": "1024x1024",
+         "prompt": f"{common} Create a 2 rows x 3 columns fashion catalog collage with thin white dividers. Six different adult female models, FRONT VIEW each panel, six colors in order: {palette}. Diverse natural models, polished Etsy listing style."},
+        {"id": "04-back-collage",  "title": "Back 6 Models",  "size": "1024x1024",
+         "prompt": f"{common} Create a 2 rows x 3 columns fashion catalog collage with thin white dividers. BACK VIEW each panel, same color order: {palette}. Polished Etsy listing style."},
+        {"id": "05-couple",        "title": "Couple Image",   "size": "1024x1536",
+         "prompt": f"{common} Create one full-body couple fashion catalog image. Female model wears the original {name}. Add a male model beside her wearing {man}. Both stand naturally in a premium summer marketplace pose."},
+    ]
+
+
+@app.route("/api/ai-studio/config", methods=["GET"])
+def ai_studio_config():
+    """Return non-sensitive config values useful for pre-filling the UI."""
+    cfg = _load_woo_config()
+    return jsonify({
+        "or_key":   cfg.get("openrouter_api_key", ""),
+        "or_model": cfg.get("openrouter_model", ""),
+    })
+
+
+@app.route("/api/ai-studio/generate", methods=["POST"])
+def ai_studio_generate():
+    from openai import OpenAI as _OpenAI
+    from io import BytesIO as _BytesIO
+    import base64 as _b64
+
+    provider = (request.form.get("provider") or "openai").strip().lower()
+    api_key  = (request.form.get("apiKey") or "").strip()
+    model    = (request.form.get("model") or "").strip()
+    quality  = (request.form.get("quality") or "medium").strip()
+
+    if not api_key:
+        return jsonify({"error": "API key required."}), 400
+
+    os.makedirs(_AI_STUDIO_OUTPUT, exist_ok=True)
+    prompts = _ais_build_prompts(request.form)
+    results = []
+
+    def _clean_err(e):
+        """Return a short human-readable error, stripping any HTML blob."""
+        msg = str(e)
+        if "<" in msg and len(msg) > 200:
+            # Likely HTML from a bad API response — extract just the status/code part
+            import re as _re
+            code = _re.search(r'"code":\s*"?(\w+)"?', msg)
+            status = _re.search(r'"status":\s*(\d+)', msg)
+            if code:   return f"API error: {code.group(1)}"
+            if status: return f"API error: HTTP {status.group(1)}"
+            return "API returned an unexpected response (not JSON). Check your API key and model name."
+        # Truncate very long messages (e.g. full response dumps)
+        if len(msg) > 400:
+            return msg[:400] + "…"
+        return msg
+
+    try:
+        if provider == "openrouter":
+            # ── OpenRouter: multimodal image generation via chat/completions ──
+            if not model:
+                model = "google/gemini-2.5-flash-image"
+
+            client = _OpenAI(
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1",
+                default_headers={
+                    "HTTP-Referer": "http://localhost:5000",
+                    "X-Title": "EtsyLab AI Studio",
+                },
+            )
+
+            for task in prompts:
+                resp = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": task["prompt"]}],
+                    extra_body={"response_format": {"type": "json_object"}} if False else None,
+                )
+                # Extract image from response — could be base64 URL or external URL in content
+                content = resp.choices[0].message.content or ""
+                img_data_found = False
+
+                # Try to extract image from structured content (list of parts)
+                raw_content = resp.choices[0].message.model_dump().get("content")
+                if isinstance(raw_content, list):
+                    for part in raw_content:
+                        if isinstance(part, dict) and part.get("type") == "image_url":
+                            image_url = part.get("image_url", {}).get("url", "")
+                            filename = f"{int(time.time())}-{task['id']}.png"
+                            filepath = os.path.join(_AI_STUDIO_OUTPUT, filename)
+                            if image_url.startswith("data:"):
+                                b64 = image_url.split(",", 1)[1]
+                                with open(filepath, "wb") as fh:
+                                    fh.write(_b64.b64decode(b64))
+                            else:
+                                r = requests.get(image_url, timeout=60)
+                                with open(filepath, "wb") as fh:
+                                    fh.write(r.content)
+                            results.append({**task, "url": f"/static/ai-studio-generated/{filename}"})
+                            img_data_found = True
+                            break
+
+                if not img_data_found:
+                    # Try to find a URL in text content
+                    import re as _re
+                    urls = _re.findall(r'https?://\S+\.(?:png|jpg|jpeg|webp)', content)
+                    if urls:
+                        filename = f"{int(time.time())}-{task['id']}.png"
+                        filepath = os.path.join(_AI_STUDIO_OUTPUT, filename)
+                        r = requests.get(urls[0], timeout=60)
+                        with open(filepath, "wb") as fh:
+                            fh.write(r.content)
+                        results.append({**task, "url": f"/static/ai-studio-generated/{filename}"})
+                    else:
+                        raise Exception(f"No image found in OpenRouter response for {task['title']}. Response: {content[:200]}")
+
+        else:
+            # ── OpenAI: images.edit with reference images ───────────────
+            if not model:
+                model = "gpt-image-1"
+
+            files = request.files.getlist("images")
+            if len(files) != 2:
+                return jsonify({"error": "Upload exactly 2 reference images for OpenAI mode."}), 400
+
+            client = _OpenAI(api_key=api_key)
+            image_files = [
+                (f.filename or f"image{i}.png", _BytesIO(f.read()), f.mimetype or "image/png")
+                for i, f in enumerate(files)
+            ]
+
+            for task in prompts:
+                resp = client.images.edit(
+                    model=model,
+                    image=image_files,
+                    prompt=task["prompt"],
+                    size=task["size"],
+                    quality=quality,
+                    n=1,
+                )
+                img_data = resp.data[0]
+                filename = f"{int(time.time())}-{task['id']}.png"
+                filepath = os.path.join(_AI_STUDIO_OUTPUT, filename)
+
+                if getattr(img_data, "b64_json", None):
+                    with open(filepath, "wb") as fh:
+                        fh.write(_b64.b64decode(img_data.b64_json))
+                elif getattr(img_data, "url", None):
+                    r = requests.get(img_data.url, timeout=60)
+                    with open(filepath, "wb") as fh:
+                        fh.write(r.content)
+                else:
+                    return jsonify({"error": f"No image data for {task['title']}"}), 500
+
+                results.append({**task, "url": f"/static/ai-studio-generated/{filename}"})
+
+        return jsonify({"results": results})
+
+    except Exception as e:
+        log.error(f"AI Studio generate error: {e}")
+        return jsonify({"error": _clean_err(e)}), 500
+
+
 @app.errorhandler(413)
 def too_large(e):
     return jsonify({"error": "File too large. Maximum size is 100MB."}), 413
@@ -1445,5 +1893,1458 @@ def internal_error(e):
     return jsonify({"error": "Internal server error. Please try again."}), 500
 
 
+def get_sheets_service():
+    sa_path = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if not sa_path or not os.path.exists(sa_path):
+        return None
+    try:
+        scopes = ['https://www.googleapis.com/auth/spreadsheets']
+        creds = service_account.Credentials.from_service_account_file(sa_path, scopes=scopes)
+        return build('sheets', 'v4', credentials=creds)
+    except Exception as e:
+        log.error(f"Error building sheets service: {str(e)}")
+        return None
+
+
+@app.route("/api/listings", methods=["GET"])
+def handle_listings():
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+    tab_name = os.environ.get("GOOGLE_SHEET_TAB", "📋 Listing Tracker")
+    
+    if not api_key or not sheet_id:
+        return jsonify({"error": "Google Sheets configuration missing"}), 500
+        
+    return fetch_listings_from_sheet(api_key, sheet_id, tab_name)
+
+
+COLUMN_MAP = {
+    "#": "#",
+    "Nom du Patron": "Pattern Name",
+    "Catégorie": "Category",
+    "Sous-catégorie": "Sub Category",
+    "Demande": "Demand",
+    "Concurrence": "Competition",
+    "Unicité": "Uniqueness",
+    "Priorité": "Priority",
+    "Statut Etsy": "Status",
+    "Prix (USD)": "Price",
+    "Titre Etsy Suggéré": "Suggested Title (140 chars)",
+    "Tags Principaux": "Suggested Tags (all 13)",
+    "Notes": "Notes",
+    "Dossier Source": "Folder Name",
+    "✅ Match": "Match",
+    "IndiePattern Titre": "IndiePattern Title",
+    "IndiePattern URL": "IndiePattern URL",
+    "IndiePattern Description": "IndiePattern Description",
+    "IndiePattern Keywords": "IndiePattern Keywords",
+    "Statut": "Status",
+    "Date Listed": "Date Listed",
+}
+
+def fetch_listings_from_sheet(api_key, sheet_id, tab_name):
+    # If tab_name is numeric, look up actual sheet name by ID
+    if tab_name.isdigit():
+        meta_url = f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}?key={api_key}"
+        try:
+            meta_resp = requests.get(meta_url, timeout=15)
+            meta = meta_resp.json()
+            for s in meta.get('sheets', []):
+                if str(s['properties'].get('sheetId')) == tab_name:
+                    tab_name = s['properties']['title']
+                    break
+        except:
+            pass
+    
+    encoded_tab_name = quote(tab_name, safe="")
+    url = f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}/values/{encoded_tab_name}?key={api_key}"
+    try:
+        response = requests.get(url, timeout=15)
+        data = response.json()
+        if "values" not in data:
+            return {"listings": [], "total": 0}
+            
+        rows = data.get("values", [])
+        log.info(f"Fetched {len(rows)} rows from sheet. Tab: {tab_name}")
+        if not rows:
+            return {"listings": [], "total": 0}
+            
+        headers = rows[0]
+        listings = []
+        for row in rows[1:]:
+            item = {}
+            for i, header in enumerate(headers):
+                val = row[i] if i < len(row) else ""
+                mapped_key = COLUMN_MAP.get(header, header)
+                item[mapped_key] = val
+            listings.append(item)
+        
+        return {"listings": listings, "total": len(listings)}
+    except Exception as e:
+        log.error(f"Error fetching listings: {e}")
+        return {"error": str(e), "listings": []}
+
+
+@app.route("/api/admin/listings", methods=["GET"])
+def admin_listings():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+    tab_name = os.environ.get("GOOGLE_SHEET_TAB", "📋 Listing Tracker")
+    
+    if not api_key or not sheet_id:
+        return jsonify({"error": "Google Sheets configuration missing"}), 500
+    
+    result = fetch_listings_from_sheet(api_key, sheet_id, tab_name)
+    if "error" in result:
+        return jsonify(result), 500
+    return jsonify(result)
+
+
+@app.route("/api/calendar", methods=["GET"])
+def handle_calendar():
+    return handle_listings()
+
+
+ETSY_SHOP = "PatternsLabCo"
+_SCRAPE_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Cache-Control": "no-cache",
+}
+
+
+_ETSY_CACHE_FILE = os.path.join(BASE_DIR, "etsy_cache.json")
+
+
+def _load_etsy_cache():
+    try:
+        if os.path.exists(_ETSY_CACHE_FILE):
+            with open(_ETSY_CACHE_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return None
+
+
+@app.route("/api/analytics/etsy-scrape", methods=["GET"])
+def etsy_scrape():
+    """Return cached Etsy data (populated via POST /api/analytics/etsy-scrape)."""
+    cached = _load_etsy_cache()
+    if cached:
+        return jsonify(cached)
+    return jsonify({"error": "No Etsy data yet — click Sync in the app to scrape your shop."}), 404
+
+
+@app.route("/api/analytics/etsy-scrape", methods=["POST"])
+def etsy_scrape_save():
+    """Receive browser-scraped Etsy data and cache it."""
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "No data"}), 400
+    data["scraped_at"] = datetime.now(timezone.utc).isoformat()
+    try:
+        with open(_ETSY_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    return jsonify({"ok": True, "listings": len(data.get("listings", []))})
+
+
+@app.route("/api/analytics/etsy-scrape-old", methods=["GET"])
+def etsy_scrape_direct():
+    url = f"https://www.etsy.com/shop/{ETSY_SHOP}"
+    try:
+        if _HAS_CURL_CFFI:
+            resp = cffi_requests.get(url, impersonate="chrome124", timeout=25)
+        else:
+            scraper = cloudscraper.create_scraper(browser={"browser": "chrome", "platform": "windows", "mobile": False})
+            resp = scraper.get(url, timeout=25)
+        resp.raise_for_status()
+    except Exception as e:
+        return jsonify({"error": f"Could not reach Etsy: {e}"}), 502
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    text = soup.get_text(" ", strip=True)
+
+    # ── Shop stats ────────────────────────────────────────────────
+    import re as _re
+    def _int(pattern, src, default=0):
+        m = _re.search(pattern, src, _re.IGNORECASE)
+        return int(m.group(1).replace(",", "")) if m else default
+
+    total_items = _int(r"Search all ([\d,]+) items?", text) or \
+                  _int(r"All\s+([\d,]+)", text)
+    sales       = _int(r"([\d,]+)\s+sales?", text)
+    reviews     = _int(r"([\d,]+)\s+(?:review|sale)s?.*?Star", text)
+    admirers    = _int(r"([\d,]+)\s+[Aa]dmirers?", text)
+
+    # ── Listing cards ─────────────────────────────────────────────
+    seen = set()
+    listings = []
+    for card in soup.select(".v2-listing-card, li[data-listing-id]"):
+        link_tag = card.find("a", href=_re.compile(r"/listing/\d+"))
+        href = link_tag["href"].split("?")[0] if link_tag else None
+        if href in seen:
+            continue
+        if href:
+            seen.add(href)
+
+        title_tag = card.find("h3") or card.find(class_=_re.compile(r"listing-card.*title|v2-listing-card__title"))
+        price_val = card.find(class_="currency-value")
+        price_sym = card.find(class_="currency-symbol")
+        img_tag   = card.find("img")
+
+        listing_id_match = _re.search(r"/listing/(\d+)", href or "")
+        fav_tag = card.find(attrs={"data-wishlist-count": True})
+
+        listings.append({
+            "id":        listing_id_match.group(1) if listing_id_match else None,
+            "title":     title_tag.get_text(strip=True) if title_tag else None,
+            "price":     ((price_sym.get_text(strip=True) if price_sym else "") +
+                          (price_val.get_text(strip=True) if price_val else "")),
+            "url":       href,
+            "img":       img_tag.get("src") or img_tag.get("data-src") if img_tag else None,
+            "favorites": int(fav_tag["data-wishlist-count"]) if fav_tag else None,
+        })
+
+    if not total_items:
+        total_items = len(listings)
+
+    return jsonify({
+        "shop_name": ETSY_SHOP,
+        "shop_url":  url,
+        "shop_id":   "65183353",
+        "stats": {
+            "total_items": total_items,
+            "sales":       sales,
+            "reviews":     reviews,
+            "admirers":    admirers,
+        },
+        "listings": listings,
+    })
+
+
+def _load_woo_config():
+    config_path = os.path.join(BASE_DIR, "woocommerce_auto_save", "config.json")
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+@app.route("/api/analytics/woo", methods=["GET"])
+def woo_analytics():
+    cfg = _load_woo_config()
+    wc_url = cfg.get("wc_url", "").rstrip("/")
+    wc_key = cfg.get("wc_key", "")
+    wc_secret = cfg.get("wc_secret", "")
+    if not wc_url or not wc_key or not wc_secret:
+        return jsonify({"error": "WooCommerce credentials not configured"}), 500
+
+    auth = (wc_key, wc_secret)
+    base = f"{wc_url}/wp-json/wc/v3"
+    out = {"store_url": wc_url}
+
+    try:
+        # Product counts
+        r = requests.get(f"{base}/products", params={"status": "publish", "per_page": 1}, auth=auth, timeout=15)
+        out["published_products"] = int(r.headers.get("X-WP-Total", 0))
+        r2 = requests.get(f"{base}/products", params={"per_page": 1}, auth=auth, timeout=15)
+        out["total_products"] = int(r2.headers.get("X-WP-Total", 0))
+        out["draft_products"] = max(0, out["total_products"] - out["published_products"])
+    except Exception as e:
+        out["products_error"] = str(e)
+
+    try:
+        # Sales last 30 days
+        date_max = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        date_min = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+        sr = requests.get(f"{base}/reports/sales", params={"date_min": date_min, "date_max": date_max}, auth=auth, timeout=15)
+        sd = sr.json()
+        out["sales_30d"] = {
+            "total_sales": sd.get("total_sales", "0"),
+            "net_sales":   sd.get("net_sales", "0"),
+            "total_orders": sd.get("total_orders", 0),
+            "total_items":  sd.get("total_items", 0),
+        }
+    except Exception as e:
+        out["sales_error"] = str(e)
+
+    try:
+        # Top sellers this month
+        tr = requests.get(f"{base}/reports/top_sellers", params={"period": "month"}, auth=auth, timeout=15)
+        sellers = tr.json() if tr.ok else []
+        out["top_sellers"] = [{"name": s.get("title", ""), "quantity": s.get("quantity", 0), "id": s.get("product_id")} for s in sellers[:6]]
+    except Exception as e:
+        out["top_sellers_error"] = str(e)
+
+    try:
+        # Recent orders
+        or_ = requests.get(f"{base}/orders", params={"per_page": 8, "orderby": "date", "order": "desc"}, auth=auth, timeout=15)
+        orders = or_.json() if or_.ok else []
+        out["recent_orders"] = [{
+            "id": o.get("id"),
+            "status": o.get("status"),
+            "total": o.get("total"),
+            "date": (o.get("date_created") or "")[:10],
+            "items": len(o.get("line_items", [])),
+            "customer": o.get("billing", {}).get("first_name", "Guest"),
+        } for o in orders]
+    except Exception as e:
+        out["orders_error"] = str(e)
+
+    return jsonify(out)
+
+
+@app.route("/api/analytics/etsy", methods=["GET"])
+def etsy_analytics():
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+    tab_name = os.environ.get("GOOGLE_SHEET_TAB", "📋 Listing Tracker")
+    if not api_key or not sheet_id:
+        return jsonify({"error": "Google Sheets not configured"}), 500
+
+    result = fetch_listings_from_sheet(api_key, sheet_id, tab_name)
+    listings = result.get("listings", [])
+
+    def norm(raw):
+        s = (raw or "").lower()
+        if ("publié" in s or "publie" in s) and "publier" not in s:
+            return "published"
+        if "publier" in s or "pending" in s:
+            return "pending"
+        return "other"
+
+    prio_counts = {"1": 0, "2": 0, "3": 0, "4": 0, "other": 0}
+    cat_counts = {}
+    published = pending = 0
+
+    for l in listings:
+        st = norm(l.get("Status", ""))
+        if st == "published":
+            published += 1
+        elif st == "pending":
+            pending += 1
+
+        p = l.get("Priority", "")
+        if "1" in p:
+            prio_counts["1"] += 1
+        elif "2" in p:
+            prio_counts["2"] += 1
+        elif "3" in p:
+            prio_counts["3"] += 1
+        elif "4" in p:
+            prio_counts["4"] += 1
+        else:
+            prio_counts["other"] += 1
+
+        cat = (l.get("Category") or "Other").strip()
+        cat_counts[cat] = cat_counts.get(cat, 0) + 1
+
+    has_indie = sum(1 for l in listings if l.get("IndiePattern URL") or l.get("IndiePattern Title"))
+
+    return jsonify({
+        "total": len(listings),
+        "published": published,
+        "pending": pending,
+        "has_indie_data": has_indie,
+        "priority_breakdown": prio_counts,
+        "category_breakdown": dict(sorted(cat_counts.items(), key=lambda x: -x[1])),
+    })
+
+
+@app.route("/api/listings/update", methods=["POST"])
+def update_listing():
+    data = request.get_json(silent=True) or {}
+    row_index = data.get("index") # 0-based data index (row 1 is header)
+    header = data.get("header")
+    value = data.get("value", "")
+
+    if not isinstance(row_index, int) or row_index < 0:
+        return jsonify({"error": "index must be a non-negative integer"}), 400
+    if not isinstance(header, str) or not header.strip():
+        return jsonify({"error": "header is required"}), 400
+    if value is None:
+        value = ""
+    
+    sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+    tab_name = os.environ.get("GOOGLE_SHEET_TAB", "📋 Listing Tracker")
+    
+    log.info(f"Update request: Row {row_index}, Col '{header}', Val '{value}'")
+    
+    service = get_sheets_service()
+    if not service or not sheet_id:
+        return jsonify({
+            "success": True, 
+            "message": "Local edit only. persistence requires service-account.json.",
+            "warning": "Google Sheets persistence is not fully configured."
+        })
+
+    try:
+        # 1. Find column index for header
+        res = service.spreadsheets().values().get(
+            spreadsheetId=sheet_id, range=f"'{tab_name}'!1:1"
+        ).execute()
+        headers = res.get('values', [[]])[0]
+        try:
+            col_idx = headers.index(header)
+        except ValueError:
+            # Column not found, attempt to add it to the header row automatically
+            log.info(f"Column '{header}' not found in sheet. Adding it to header row.")
+            headers.append(header)
+            service.spreadsheets().values().update(
+                spreadsheetId=sheet_id,
+                range=f"'{tab_name}'!1:1",
+                valueInputOption="USER_ENTERED",
+                body={"values": [headers]}
+            ).execute()
+            col_idx = len(headers) - 1
+            
+        # 2. Convert column index to A1 notation (e.g. 0 -> A, 1 -> B, ...)
+        col_letter = ""
+        n = col_idx + 1
+        while n > 0:
+            n, rem = divmod(n - 1, 26)
+            col_letter = chr(65 + rem) + col_letter
+            
+        # 3. Update the specific cell (Row index is data index + 2 because of 1-based sheet and header)
+        sheet_row = row_index + 2
+        cell_range = f"'{tab_name}'!{col_letter}{sheet_row}"
+        
+        service.spreadsheets().values().update(
+            spreadsheetId=sheet_id,
+            range=cell_range,
+            valueInputOption="USER_ENTERED",
+            body={"values": [[value]]}
+        ).execute()
+        
+        return jsonify({"success": True, "message": "Updated Google Sheets successfully"})
+    except Exception as e:
+        log.error(f"Persistence error: {traceback.format_exc()}")
+        return jsonify({"error": f"Failed to persist: {str(e)}"}), 500
+
+
+ETSY_IMAGE_CACHE = {}
+
+_pw_playwright = None
+_pw_browser = None
+_pw_lock = __import__('threading').Lock()
+
+
+def _get_etsy_image_pw(url):
+    global _pw_playwright, _pw_browser
+    from playwright.sync_api import sync_playwright
+    with _pw_lock:
+        if _pw_playwright is None:
+            _pw_playwright = sync_playwright().start()
+        if _pw_browser is None or not _pw_browser.is_connected():
+            _pw_browser = _pw_playwright.chromium.launch(
+                headless=False,
+                args=['--disable-blink-features=AutomationControlled']
+            )
+    try:
+        ctx = _pw_browser.new_context(
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+            viewport={'width': 1280, 'height': 800},
+        )
+        pg = ctx.new_page()
+        pg.add_init_script('Object.defineProperty(navigator, "webdriver", {get: () => undefined})')
+        pg.goto(url, wait_until='commit', timeout=30000)
+        try:
+            pg.wait_for_function('document.querySelector(\'meta[property="og:image"]\')', timeout=12000)
+            img_url = pg.evaluate('document.querySelector(\'meta[property="og:image"]\')?.content')
+        except Exception:
+            img_url = pg.evaluate('document.querySelector(\'meta[property="og:image"]\')?.content')
+        pg.close()
+        ctx.close()
+        return img_url
+    except Exception as e:
+        log.error(f"Playwright error: {str(e)}")
+        try:
+            ctx.close()
+        except Exception:
+            pass
+        return None
+
+
+_pw_semaphore = __import__('threading').Semaphore(2)
+
+@app.route("/api/scrape-etsy-image", methods=["GET"])
+def scrape_etsy_image():
+    url = request.args.get("url")
+    if not url or "etsy.com" not in url:
+        return jsonify({"error": "Invalid URL"}), 400
+
+    if url in ETSY_IMAGE_CACHE:
+        cached_data = ETSY_IMAGE_CACHE[url]
+        if time.time() - cached_data['ts'] < 86400:
+            return jsonify({"image": cached_data['image']})
+
+    listing_id = None
+    parts = url.split("/listing/")
+    if len(parts) > 1:
+        listing_id = parts[1].split("/")[0].split("?")[0]
+
+    api_key = os.environ.get("ETSY_API_KEY")
+    if api_key and listing_id:
+        try:
+            log.info(f"Trying Etsy API (v3) for listing {listing_id}")
+            api_url = f"https://openapi.etsy.com/v3/application/listings/{listing_id}/images"
+            res = requests.get(api_url, headers={"x-api-key": api_key}, timeout=5)
+            if res.status_code == 200:
+                img_data = res.json()
+                if img_data.get("results") and len(img_data["results"]) > 0:
+                    img_url = img_data["results"][0].get("url_fullxfull") or img_data["results"][0].get("url_570xN")
+                    if img_url:
+                        ETSY_IMAGE_CACHE[url] = {"image": img_url, "ts": time.time()}
+                        return jsonify({"image": img_url})
+            log.warning(f"Etsy API v3 failed for {listing_id}: {res.status_code}")
+        except Exception as e:
+            log.error(f"Etsy API error: {str(e)}")
+
+    with _pw_semaphore:
+        img_url = _get_etsy_image_pw(url)
+    if img_url:
+        ETSY_IMAGE_CACHE[url] = {"image": img_url, "ts": time.time()}
+        return jsonify({"image": img_url})
+
+    if listing_id:
+        return jsonify({"listing_id": listing_id, "url": url})
+
+    return jsonify({"error": "Failed to fetch image"}), 404
+
+
+@app.route('/api/generate-listing-ai', methods=['POST'])
+def generate_listing_ai():
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    category = (data.get('category') or '').strip()
+    style = (data.get('style') or '').strip()
+
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+    
+    api_key = (os.getenv('OPENROUTER_API_KEY') or '').strip()
+    model = os.getenv('OPENROUTER_MODEL', 'google/gemini-2.0-flash-001')
+    
+    # Debug log (masked)
+    key_peek = f"{api_key[:8]}...{api_key[-4:]}" if api_key else "None"
+    log.info(f"AI Generation using model {model} and key {key_peek}")
+    
+    if not api_key or 'YOUR_OPENROUTER_API_KEY' in api_key:
+        return jsonify({"error": "OpenRouter API Key not configured in .env"}), 400
+        
+    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'etsy_description.md')
+    try:
+        with open(prompt_path, encoding="utf-8") as f:
+            prompt = f.read().format(name=name, category=category, style=style)
+    except FileNotFoundError:
+        return jsonify({"error": "AI prompt template is missing"}), 500
+    
+    try:
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            data=json.dumps({
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"}
+            }),
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            log.error(f"OpenRouter Error: {response.status_code} - {response.text}")
+            return jsonify({"error": f"AI API Error: {response.text}"}), response.status_code
+            
+        result = response.json()
+        if 'choices' not in result:
+            log.error(f"Unexpected AI response structure: {result}")
+            return jsonify({"error": "Unexpected response from AI"}), 500
+        ai_content = json.loads(result['choices'][0]['message']['content'])
+        return jsonify(ai_content)
+        
+    except Exception as e:
+        log.error(f"AI Generation failed: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
+WOO_CONFIG_FILE = os.path.join(BASE_DIR, "woo_config.json")
+
+
+class WooCommerceClient:
+    def __init__(self, base_url, consumer_key, consumer_secret):
+        self.base_url = base_url.rstrip("/")
+        self.auth_header = "Basic " + base64.b64encode(
+            f"{consumer_key}:{consumer_secret}".encode()
+).decode()
+
+    def _request(self, method, endpoint, params=None, json_data=None, timeout=30):
+        url = f"{self.base_url}/wp-json/wc/v3{endpoint}"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": self.auth_header,
+        }
+        try:
+            resp = requests.request(
+                method, url, headers=headers, params=params,
+                json=json_data, timeout=timeout,
+            )
+        except requests.exceptions.ConnectionError:
+            return None, {"error": f"Cannot connect to {self.base_url}"}, {}
+        except requests.exceptions.Timeout:
+            return None, {"error": "Request timed out"}, {}
+        except Exception as e:
+            return None, {"error": str(e)}, {}
+
+        try:
+            body = resp.json()
+        except Exception:
+            body = {"raw": resp.text}
+
+        wc_headers = {}
+        for h in ["X-WP-Total", "X-WP-TotalPages"]:
+            v = resp.headers.get(h)
+            if v:
+                wc_headers[h] = v
+
+        if not resp.ok:
+            msg = body.get("message", "") if isinstance(body, dict) else ""
+            code = body.get("code", "") if isinstance(body, dict) else ""
+            return resp.status_code, {"error": msg or f"WooCommerce error {resp.status_code}", "code": code}, wc_headers
+
+        return resp.status_code, body, wc_headers
+
+    def list_products(self, params=None):
+        return self._request("GET", "/products", params=params)
+
+    def get_product(self, product_id):
+        return self._request("GET", f"/products/{product_id}")
+
+    def create_product(self, data):
+        return self._request("POST", "/products", json_data=data)
+
+    def update_product(self, product_id, data):
+        return self._request("PUT", f"/products/{product_id}", json_data=data)
+
+    def delete_product(self, product_id, force=False):
+        params = {}
+        if force:
+            params["force"] = "true"
+        return self._request("DELETE", f"/products/{product_id}", params=params)
+
+
+def get_woo_creds():
+    cfg = {}
+    if os.path.exists(WOO_CONFIG_FILE):
+        try:
+            with open(WOO_CONFIG_FILE, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+    return {
+        "woo_url": os.environ.get("WC_URL") or cfg.get("woo_url", ""),
+        "woo_key": os.environ.get("WC_KEY") or cfg.get("woo_key", ""),
+        "woo_secret": os.environ.get("WC_SECRET") or cfg.get("woo_secret", ""),
+    }
+
+
+def make_woo_client():
+    creds = get_woo_creds()
+    if not creds["woo_url"] or not creds["woo_key"] or not creds["woo_secret"]:
+        return None, {"error": "WooCommerce credentials not configured. Set WC_URL, WC_KEY, WC_SECRET in .env or save via /api/woo/config."}
+    return WooCommerceClient(creds["woo_url"], creds["woo_key"], creds["woo_secret"]), None
+
+
+@app.route("/api/woo/config", methods=["GET"])
+def woo_config_get():
+    creds = get_woo_creds()
+    masked = {**creds}
+    if masked["woo_key"]:
+        k = masked["woo_key"]
+        masked["woo_key"] = k[:4] + "*" * min(len(k) - 4, 12) if len(k) > 4 else "****"
+    if masked["woo_secret"]:
+        s = masked["woo_secret"]
+        masked["woo_secret"] = s[:4] + "*" * min(len(s) - 4, 20) if len(s) > 4 else "****"
+    return jsonify(masked)
+
+
+@app.route("/api/woo/config", methods=["POST"])
+def woo_config_save():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    data = request.get_json(silent=True) or {}
+    woo_url = (data.get("woo_url") or "").strip().rstrip("/")
+    woo_key = (data.get("woo_key") or "").strip()
+    woo_secret = (data.get("woo_secret") or "").strip()
+    if not woo_url or not woo_key or not woo_secret:
+        return jsonify({"error": "All fields required: woo_url, woo_key, woo_secret"}), 400
+    cfg = {"woo_url": woo_url, "woo_key": woo_key, "woo_secret": woo_secret}
+    try:
+        with open(WOO_CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, indent=2)
+    except Exception as e:
+        return jsonify({"error": f"Failed to save config: {str(e)}"}), 500
+    return jsonify({"success": True})
+
+
+@app.route("/api/woo/products", methods=["GET"])
+def woo_products_list():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    allowed_params = ["search", "per_page", "page", "status", "category", "sku",
+                      "orderby", "order", "type", "stock_status", "min_price", "max_price",
+                      "after", "before", "exclude", "include", "parent", "slug", "featured"]
+    params = {}
+    for p in allowed_params:
+        val = request.args.get(p)
+        if val is not None:
+            params[p] = val
+    status_code, body, wc_headers = client.list_products(params=params or None)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    resp = make_response(jsonify(body), status_code if isinstance(status_code, int) else 200)
+    for h, v in wc_headers.items():
+        resp.headers[h] = v
+    return resp
+
+
+@app.route("/api/woo/products/<int:product_id>", methods=["GET"])
+def woo_products_get(product_id):
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    status_code, body, wc_headers = client.get_product(product_id)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    resp = make_response(jsonify(body), status_code if isinstance(status_code, int) else 200)
+    for h, v in wc_headers.items():
+        resp.headers[h] = v
+    return resp
+
+
+@app.route("/api/woo/products", methods=["POST"])
+def woo_products_create():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    data = request.get_json(silent=True) or {}
+    payload = {}
+    for field in ["name", "type", "status", "featured", "catalog_visibility",
+                   "description", "short_description", "sku", "regular_price",
+                   "sale_price", "manage_stock", "stock_quantity", "stock_status",
+                   "weight", "dimensions", "shipping_class", "virtual", "downloadable",
+                   "download_limit", "download_expiry", "tax_status", "tax_class",
+                   "meta_data", "categories", "tags", "images"]:
+        if field in data:
+            payload[field] = data[field]
+    if "name" not in payload:
+        return jsonify({"error": "name is required"}), 400
+    if "regular_price" in payload:
+        payload["regular_price"] = str(payload["regular_price"])
+    status_code, body, wc_headers = client.create_product(payload)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    record_event("woo_product_create", mode="woo", success=True)
+    return jsonify(body), status_code if isinstance(status_code, int) else 201
+
+
+@app.route("/api/woo/products/<int:product_id>", methods=["PUT"])
+def woo_products_update(product_id):
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    data = request.get_json(silent=True) or {}
+    payload = {}
+    for field in ["name", "type", "status", "featured", "catalog_visibility",
+                   "description", "short_description", "sku", "regular_price",
+                   "sale_price", "manage_stock", "stock_quantity", "stock_status",
+                   "weight", "dimensions", "shipping_class", "virtual", "downloadable",
+                   "download_limit", "download_expiry", "tax_status", "tax_class",
+                   "meta_data", "categories", "tags", "images"]:
+        if field in data:
+            payload[field] = data[field]
+    if "regular_price" in payload:
+        payload["regular_price"] = str(payload["regular_price"])
+    status_code, body, wc_headers = client.update_product(product_id, payload)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    record_event("woo_product_update", mode="woo", success=True)
+    resp = make_response(jsonify(body), status_code if isinstance(status_code, int) else 200)
+    for h, v in wc_headers.items():
+        resp.headers[h] = v
+    return resp
+
+
+@app.route("/api/woo/products/<int:product_id>", methods=["DELETE"])
+def woo_products_delete(product_id):
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    force = request.args.get("force", "false").lower() == "true"
+    status_code, body, wc_headers = client.delete_product(product_id, force=force)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    record_event("woo_product_delete", mode="woo", success=True)
+    resp = make_response(jsonify(body), status_code if isinstance(status_code, int) else 200)
+    for h, v in wc_headers.items():
+        resp.headers[h] = v
+    return resp
+
+
+def _wp_auth_header():
+    wp_user = os.environ.get("WP_USERNAME", "")
+    wp_pass = os.environ.get("WP_APP_PASSWORD", "").strip()
+    if not wp_user or not wp_pass:
+        cfg = {}
+        if os.path.exists(WOO_CONFIG_FILE):
+            try:
+                with open(WOO_CONFIG_FILE, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+            except Exception:
+                pass
+        wp_user = wp_user or cfg.get("wp_username", "")
+        wp_pass = wp_pass or cfg.get("wp_app_password", "").strip()
+    if not wp_user or not wp_pass:
+        return None
+    return "Basic " + base64.b64encode(f"{wp_user}:{wp_pass}".encode()).decode()
+
+
+@app.route("/api/woo/categories", methods=["GET"])
+def woo_categories():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    all_cats = []
+    page = 1
+    while True:
+        status_code, body, wc_headers = client._request("GET", "/products/categories", params={"per_page": "100", "page": str(page)})
+        if isinstance(body, dict) and "error" in body:
+            return jsonify(body), status_code if isinstance(status_code, int) else 502
+        if not isinstance(body, list) or len(body) == 0:
+            break
+        for c in body:
+            all_cats.append({"id": c.get("id"), "name": c.get("name", ""), "slug": c.get("slug", ""), "count": c.get("count", 0), "parent": c.get("parent", 0)})
+        if len(body) < 100:
+            break
+        page += 1
+    return jsonify(all_cats)
+
+
+@app.route("/api/woo/media", methods=["POST"])
+def woo_upload_media():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    auth = _wp_auth_header()
+    if not auth:
+        return jsonify({"error": "WordPress credentials not configured. Set WP_USERNAME and WP_APP_PASSWORD in .env."}), 422
+    creds = get_woo_creds()
+    store_url = creds["woo_url"].rstrip("/")
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    f = request.files["file"]
+    if not f.filename:
+        return jsonify({"error": "No file selected"}), 400
+    mime_type = f.mimetype or "application/octet-stream"
+    try:
+        file_bytes = f.read()
+    except Exception as e:
+        return jsonify({"error": f"Failed to read file: {str(e)}"}), 400
+    url = f"{store_url}/wp-json/wp/v2/media"
+    headers = {
+        "Authorization": auth,
+        "Content-Disposition": f'attachment; filename="{f.filename}"',
+        "Content-Type": mime_type,
+    }
+    try:
+        resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+    except requests.exceptions.ConnectionError:
+        return jsonify({"error": f"Cannot connect to {store_url}"}), 502
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "Upload timed out"}), 504
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
+    if resp.status_code == 401:
+        return jsonify({"error": "WordPress rejected credentials (401). Check WP_USERNAME and WP_APP_PASSWORD in .env."}), 401
+    if resp.status_code >= 400:
+        try:
+            err_data = resp.json()
+            return jsonify({"error": err_data.get("message", f"Upload failed with status {resp.status_code}")}), resp.status_code
+        except Exception:
+            return jsonify({"error": f"Upload failed with status {resp.status_code}"}), resp.status_code
+    data = resp.json()
+    return jsonify({"id": data.get("id"), "source_url": data.get("source_url", ""), "title": data.get("title", {}).get("rendered", ""), "media_type": data.get("media_type", "")}), 201
+
+
+@app.route("/api/woo/generate", methods=["POST"])
+def woo_ai_generate():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    data = request.get_json(silent=True) or {}
+    pdf_text = (data.get("pdf_text") or "").strip()
+    filename = (data.get("filename") or "").strip()
+    product_name = (data.get("product_name") or "").strip()
+    if not pdf_text and not product_name:
+        return jsonify({"error": "Provide pdf_text or product_name"}), 400
+    api_key = (os.getenv("OPENROUTER_API_KEY") or "").strip()
+    model = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")
+    if not api_key or "YOUR_OPENROUTER_API_KEY" in api_key:
+        return jsonify({"error": "OpenRouter API Key not configured in .env"}), 400
+    system_prompt = "You are an expert product copywriter for a sewing pattern store. The store sells digital PDF sewing patterns for garments, accessories, and home decor. Customers are home sewists ranging from beginners to advanced. All your output must be accurate, SEO-friendly, and written in an engaging tone. When writing HTML descriptions, use <p>, <ul>, <li>, <strong> tags only — no headings or inline styles."
+    client, wc_err = make_woo_client()
+    categories = []
+    if not wc_err:
+        _, cat_body, _ = client._request("GET", "/products/categories", params={"per_page": "100"})
+        if isinstance(cat_body, list):
+            categories = [{"id": c.get("id"), "name": c.get("name", "")} for c in cat_body]
+    try:
+        import openai
+        oai_client = openai.OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
+        if not product_name:
+            name_prompt = f'Based on this sewing pattern PDF content, generate a concise, SEO-friendly product name.\nThe name should clearly describe the garment/item, include sizing if mentioned, and be suitable as a WooCommerce product title.\nReturn only the product name — no explanation, no quotes.\n\nFilename: {filename}\n\nPDF content:\n{pdf_text[:3000]}'
+            name_resp = oai_client.chat.completions.create(model=model, max_tokens=100, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": name_prompt}])
+            product_name = name_resp.choices[0].message.content.strip()
+        desc_prompt = f'Write product descriptions for this sewing pattern: "{product_name}"\n\nPDF content:\n{pdf_text[:4000]}\n\nReturn a JSON object with exactly these two keys:\n- "short_description": 1-2 sentences (plain text, max 200 chars) for the WooCommerce excerpt\n- "full_description": 3-5 paragraphs in HTML using only <p>, <ul>, <li>, <strong> tags.\n  Cover: what the pattern makes, skill level, included sizes, suggested fabrics, number of pattern pieces, what\'s included in the PDF.\n\nReturn only valid JSON. No markdown fences.'
+        desc_resp = oai_client.chat.completions.create(model=model, max_tokens=1000, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": desc_prompt}])
+        desc_raw = desc_resp.choices[0].message.content.strip()
+        import re as _re
+        desc_raw = _re.sub(r'^```(?:json)?\s*', '', desc_raw)
+        desc_raw = _re.sub(r'\s*```$', '', desc_raw)
+        descriptions = json.loads(desc_raw)
+        category_id = 0
+        if categories:
+            cat_list = "\n".join(f"- ID {c['id']}: {c['name']}" for c in categories)
+            cat_prompt = f'Select the most appropriate WooCommerce category for this sewing pattern.\n\nProduct name: {product_name}\nPDF excerpt: {pdf_text[:1500]}\n\nAvailable categories:\n{cat_list}\n\nReturn only the numeric category ID — nothing else.'
+            cat_resp = oai_client.chat.completions.create(model=model, max_tokens=10, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": cat_prompt}])
+            cat_raw = cat_resp.choices[0].message.content.strip()
+            try:
+                category_id = int(_re.sub(r'\D', '', cat_raw)) if _re.search(r'\d', cat_raw) else 0
+            except ValueError:
+                category_id = categories[0]["id"] if categories else 0
+        tags_prompt = f'Suggest up to 8 product tags for this sewing pattern: "{product_name}"\n\nPDF excerpt: {pdf_text[:1500]}\n\nTags should cover: garment type, skill level, sizing system, occasion/use, fabric type, style keywords.\nReturn a JSON array of strings — tag names only, lowercase, no explanation.\nExample: ["dress", "beginner", "women", "summer", "wrap dress"]\n\nReturn only valid JSON. No markdown fences.'
+        tags_resp = oai_client.chat.completions.create(model=model, max_tokens=150, messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": tags_prompt}])
+        tags_raw = tags_resp.choices[0].message.content.strip()
+        tags_raw = _re.sub(r'^```(?:json)?\s*', '', tags_raw)
+        tags_raw = _re.sub(r'\s*```$', '', tags_raw)
+        try:
+            tags = json.loads(tags_raw)
+            tags = [str(t) for t in tags][:8]
+        except (json.JSONDecodeError, TypeError):
+            tags = []
+        return jsonify({
+            "name": product_name,
+            "short_description": descriptions.get("short_description", ""),
+            "full_description": descriptions.get("full_description", ""),
+            "category_id": category_id,
+            "tags": tags,
+            "categories": categories,
+        })
+    except json.JSONDecodeError as e:
+        return jsonify({"error": f"AI returned invalid JSON: {str(e)}"}), 502
+    except Exception as e:
+        log.error(f"Woo AI generate error: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/woo/products/create-full", methods=["POST"])
+def woo_product_create_full():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    name = (request.form.get("name") or "").strip()
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+    price = request.form.get("regular_price", "0")
+    status = request.form.get("status", "draft")
+    short_description = request.form.get("short_description", "")
+    full_description = request.form.get("description", "")
+    sku = request.form.get("sku", "")
+    category_id = request.form.get("category_id", "")
+    tags_raw = request.form.get("tags", "")
+    tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
+    virtual = request.form.get("virtual", "true").lower() == "true"
+    downloadable = request.form.get("downloadable", "true").lower() == "true"
+    is_single_pdf = request.form.get("is_single_pdf", "false").lower() == "true"
+    folder_path = request.form.get("folder_path", "")
+    image_ids = []
+    cover_file = request.files.get("cover_image")
+    gallery_files = request.files.getlist("gallery_images")
+    auth = _wp_auth_header()
+    store_url = get_woo_creds()["woo_url"].rstrip("/")
+    if (cover_file or gallery_files) and (not auth or not store_url):
+        return jsonify({"error": "WordPress credentials required for image uploads. Set WP_USERNAME and WP_APP_PASSWORD."}), 422
+    if cover_file:
+        try:
+            mime = cover_file.mimetype or "image/jpeg"
+            file_bytes = cover_file.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{cover_file.filename}"', "Content-Type": mime}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code >= 400:
+                return jsonify({"error": f"Cover image upload failed: {resp.status_code} {resp.text[:200]}"}), 502
+            image_ids.append(resp.json().get("id"))
+        except Exception as e:
+            return jsonify({"error": f"Cover image upload error: {str(e)}"}), 502
+    for gf in gallery_files:
+        if not gf or not gf.filename:
+            continue
+        try:
+            mime = gf.mimetype or "image/jpeg"
+            file_bytes = gf.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{gf.filename}"', "Content-Type": mime}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code >= 400:
+                log.warning(f"Gallery image upload failed: {resp.status_code}")
+                continue
+            image_ids.append(resp.json().get("id"))
+        except Exception as e:
+            log.warning(f"Gallery image upload error: {str(e)}")
+            continue
+    downloads = []
+    pdf_file = request.files.get("pdf_file")
+    pdf_files = request.files.getlist("pdf_files")
+    if pdf_file and auth and store_url:
+        try:
+            file_bytes = pdf_file.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{pdf_file.filename}"', "Content-Type": "application/pdf"}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code >= 400:
+                log.warning(f"PDF upload failed: {resp.status_code}")
+            else:
+                downloads.append({"name": pdf_file.filename, "file": resp.json().get("source_url", "")})
+        except Exception as e:
+            log.warning(f"PDF upload error: {str(e)}")
+    for pf in pdf_files:
+        if not pf or not pf.filename:
+            continue
+        if pdf_file and pf.filename == pdf_file.filename:
+            continue
+        try:
+            file_bytes = pf.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{pf.filename}"', "Content-Type": "application/pdf"}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code < 400:
+                downloads.append({"name": pf.filename, "file": resp.json().get("source_url", "")})
+        except Exception as e:
+            log.warning(f"PDF upload error for {pf.filename}: {str(e)}")
+    if is_single_pdf and folder_path and auth and store_url:
+        if os.path.isfile(folder_path) and folder_path.lower().endswith(".pdf"):
+            try:
+                with open(folder_path, "rb") as fh:
+                    file_bytes = fh.read()
+                pdf_name = os.path.basename(folder_path)
+                url = f"{store_url}/wp-json/wp/v2/media"
+                headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{pdf_name}"', "Content-Type": "application/pdf"}
+                resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+                if resp.status_code < 400:
+                    downloads.append({"name": pdf_name, "file": resp.json().get("source_url", "")})
+            except Exception as e:
+                log.warning(f"Single PDF upload from folder error: {str(e)}")
+    downloads = []
+    if download_url:
+        downloads = [{"name": pdf_file.filename if pdf_file else (os.path.basename(folder_path) if folder_path else "Pattern PDF"), "file": download_url}]
+    payload = {
+        "name": name,
+        "type": "simple",
+        "status": status,
+        "virtual": virtual,
+        "downloadable": downloadable,
+        "regular_price": str(float(price)) if price else "0",
+        "short_description": short_description,
+        "description": full_description,
+    }
+    if sku:
+        payload["sku"] = sku
+    if category_id:
+        try:
+            payload["categories"] = [{"id": int(category_id)}]
+        except ValueError:
+            pass
+    if tags:
+        payload["tags"] = [{"name": t} for t in tags]
+    if image_ids:
+        payload["images"] = [{"id": iid} for iid in image_ids]
+    if downloads:
+        payload["downloads"] = downloads
+        payload["download_limit"] = -1
+        payload["download_expiry"] = -1
+    status_code, body, wc_headers = client.create_product(payload)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    record_event("woo_product_create", mode="woo", success=True)
+    resp = make_response(jsonify(body), status_code if isinstance(status_code, int) else 201)
+    for h, v in wc_headers.items():
+        resp.headers[h] = v
+    return resp
+
+
+@app.route("/api/woo/patterns-folder", methods=["GET"])
+def woo_patterns_folder_get():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    cfg = {}
+    if os.path.exists(WOO_CONFIG_FILE):
+        try:
+            with open(WOO_CONFIG_FILE, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+    folder = cfg.get("patterns_folder", "")
+    return jsonify({"patterns_folder": folder})
+
+
+@app.route("/api/woo/patterns-folder", methods=["POST"])
+def woo_patterns_folder_set():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    data = request.get_json(silent=True) or {}
+    folder = (data.get("patterns_folder") or "").strip()
+    cfg = {}
+    if os.path.exists(WOO_CONFIG_FILE):
+        try:
+            with open(WOO_CONFIG_FILE, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+    cfg["patterns_folder"] = folder
+    try:
+        with open(WOO_CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, indent=2)
+    except Exception as e:
+        return jsonify({"error": f"Failed to save config: {str(e)}"}), 500
+    return jsonify({"success": True, "patterns_folder": folder})
+
+
+@app.route("/api/woo/scan-patterns", methods=["POST"])
+def woo_scan_patterns():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    data = request.get_json(silent=True) or {}
+    folder = data.get("folder", "")
+    if not folder:
+        cfg = {}
+        if os.path.exists(WOO_CONFIG_FILE):
+            try:
+                with open(WOO_CONFIG_FILE, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+            except Exception:
+                pass
+        folder = cfg.get("patterns_folder", "")
+    if not folder or not os.path.isdir(folder):
+        return jsonify({"error": "Patterns folder not found. Set a valid folder path."}), 400
+    try:
+        import fitz as pdf_module
+    except ImportError:
+        return jsonify({"error": "PyMuPDF not installed. Run: pip install pymupdf"}), 500
+    import re as _re2
+    products = []
+    try:
+        entries = sorted(os.listdir(folder))
+    except Exception as e:
+        return jsonify({"error": f"Cannot read folder: {str(e)}"}), 400
+    subfolders_with_pdfs = []
+    direct_pdfs = []
+    for entry in entries:
+        full_path = os.path.join(folder, entry)
+        if os.path.isdir(full_path) and not entry.startswith("_") and not entry.startswith("."):
+            pdfs = sorted([f for f in os.listdir(full_path) if f.lower().endswith(".pdf")])
+            if pdfs:
+                subfolders_with_pdfs.append((entry, full_path, pdfs))
+        elif os.path.isfile(full_path) and entry.lower().endswith(".pdf"):
+            direct_pdfs.append(entry)
+    if subfolders_with_pdfs:
+        for entry, full_path, pdfs in subfolders_with_pdfs:
+            m = _re2.match(r"^\s*(\d+)\s*[-]?\s*(.*)", entry)
+            number = int(m.group(1)) if m else None
+            clean_name = (m.group(2).strip() or entry.strip()) if m else entry.strip()
+            images = []
+            for pdf_name in pdfs:
+                try:
+                    doc = pdf_module.open(os.path.join(full_path, pdf_name))
+                    for page_idx in range(min(len(doc), 4)):
+                        page = doc.load_page(page_idx)
+                        pix = page.get_pixmap(matrix=pdf_module.Matrix(1.5, 1.5), alpha=False)
+                        if pix.width < 200 or pix.height < 200:
+                            continue
+                        images.append({"pdf": pdf_name, "page": page_idx + 1, "width": pix.width, "height": pix.height})
+                    doc.close()
+                except Exception:
+                    pass
+            products.append({
+                "folder": entry,
+                "path": full_path,
+                "number": number,
+                "clean_name": clean_name,
+                "pdfs": pdfs,
+                "image_count": len(images),
+                "warnings": [] if len(pdfs) >= 1 else [f"Only {len(pdfs)} PDF(s) found"],
+            })
+    elif direct_pdfs:
+        m = _re2.match(r"^\s*(\d+)\s*[-]?\s*(.*)", os.path.basename(folder))
+        base_number = int(m.group(1)) if m else None
+        base_clean = (m.group(2).strip() or os.path.basename(folder)) if m else os.path.basename(folder)
+        for i, pdf_name in enumerate(direct_pdfs):
+            full_path = os.path.join(folder, pdf_name)
+            m2 = _re2.match(r"^\s*(\d+)\s*[-]?\s*(.*)", pdf_name)
+            number = m2.group(1) if m2 else None
+            clean_name = (m2.group(2).strip() or pdf_name) if m2 else pdf_name
+            clean_name = os.path.splitext(clean_name)[0]
+            images = []
+            try:
+                doc = pdf_module.open(full_path)
+                for page_idx in range(min(len(doc), 4)):
+                    page = doc.load_page(page_idx)
+                    pix = page.get_pixmap(matrix=pdf_module.Matrix(1.5, 1.5), alpha=False)
+                    if pix.width < 200 or pix.height < 200:
+                        continue
+                    images.append({"pdf": pdf_name, "page": page_idx + 1, "width": pix.width, "height": pix.height})
+                doc.close()
+            except Exception:
+                pass
+            products.append({
+                "folder": pdf_name,
+                "path": full_path,
+                "number": number or (base_number + i + 1 if base_number else i + 1),
+                "clean_name": clean_name,
+                "pdfs": [pdf_name],
+                "image_count": len(images),
+                "warnings": [],
+                "is_single_pdf": True,
+            })
+    return jsonify({"folder": folder, "products": products, "total": len(products)})
+
+
+@app.route("/api/woo/scan-pattern-images/<path:folder_path>", methods=["POST"])
+def woo_scan_pattern_images(folder_path):
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    import re as _re2
+    try:
+        import fitz as pdf_module
+    except ImportError:
+        return jsonify({"error": "PyMuPDF not installed"}), 500
+    cfg = {}
+    if os.path.exists(WOO_CONFIG_FILE):
+        try:
+            with open(WOO_CONFIG_FILE, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+    base = cfg.get("patterns_folder", "")
+    full_path = folder_path
+    if base and not os.path.isabs(folder_path):
+        full_path = os.path.join(base, folder_path)
+    if not os.path.isdir(full_path):
+        return jsonify({"error": f"Folder not found: {full_path}"}), 404
+    images = []
+    pdfs = sorted([f for f in os.listdir(full_path) if f.lower().endswith(".pdf")])
+    for pdf_name in pdfs:
+        try:
+            doc = pdf_module.open(os.path.join(full_path, pdf_name))
+            for page_idx in range(min(len(doc), 8)):
+                page = doc.load_page(page_idx)
+                pix = page.get_pixmap(matrix=pdf_module.Matrix(2, 2), alpha=False)
+                buf = pix.tobytes("jpg")
+                img_b64 = base64.b64encode(buf).decode("ascii")
+                images.append({
+                    "pdf": pdf_name,
+                    "page": page_idx + 1,
+                    "width": pix.width,
+                    "height": pix.height,
+                    "thumbnail": f"data:image/jpeg;base64,{img_b64}",
+                })
+            doc.close()
+        except Exception as e:
+            images.append({"pdf": pdf_name, "page": 0, "width": 0, "height": 0, "error": str(e)})
+    m = _re2.match(r"^\s*(\d+)\s*[-]?\s*(.*)", os.path.basename(full_path))
+    clean_name = (m.group(2).strip() or os.path.basename(full_path)) if m else os.path.basename(full_path)
+    thumbnail = None
+    if images and "thumbnail" in images[0]:
+        thumbnail = images[0]["thumbnail"]
+    return jsonify({"folder": os.path.basename(full_path), "path": full_path, "clean_name": clean_name, "pdfs": pdfs, "images": images, "thumbnail": thumbnail})
+
+
+@app.route("/api/woo/upload-pattern", methods=["POST"])
+def woo_upload_pattern():
+    if not check_admin_auth(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    client, err = make_woo_client()
+    if err:
+        return jsonify(err), 422
+    name = (request.form.get("name") or "").strip()
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+    price = request.form.get("regular_price", "6.99")
+    status = request.form.get("status", "draft")
+    short_description = request.form.get("short_description", "")
+    full_description = request.form.get("description", "")
+    category_id = request.form.get("category_id", "")
+    tags_raw = request.form.get("tags", "")
+    tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
+    folder_path = request.form.get("folder_path", "")
+    auth = _wp_auth_header()
+    store_url = get_woo_creds()["woo_url"].rstrip("/")
+    image_ids = []
+    cover_file = request.files.get("cover_image")
+    if cover_file:
+        try:
+            mime = cover_file.mimetype or "image/jpeg"
+            file_bytes = cover_file.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{cover_file.filename}"', "Content-Type": mime}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code < 400:
+                image_ids.append(resp.json().get("id"))
+        except Exception as e:
+            log.warning(f"Cover upload error: {str(e)}")
+    gallery_files = request.files.getlist("gallery_images")
+    for gf in gallery_files:
+        if not gf or not gf.filename:
+            continue
+        try:
+            mime = gf.mimetype or "image/jpeg"
+            file_bytes = gf.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{gf.filename}"', "Content-Type": mime}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code < 400:
+                image_ids.append(resp.json().get("id"))
+        except Exception:
+            continue
+    downloads = []
+    pdf_files = request.files.getlist("pdf_files")
+    uploaded_pdf_names = set()
+    for pf in pdf_files:
+        if not pf or not pf.filename:
+            continue
+        uploaded_pdf_names.add(pf.filename)
+        try:
+            file_bytes = pf.read()
+            url = f"{store_url}/wp-json/wp/v2/media"
+            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{pf.filename}"', "Content-Type": "application/pdf"}
+            resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+            if resp.status_code < 400:
+                downloads.append({"name": pf.filename, "file": resp.json().get("source_url", "")})
+        except Exception:
+            continue
+    is_single_pdf = request.form.get("is_single_pdf", "false").lower() == "true"
+    if folder_path and auth and store_url:
+        if is_single_pdf and os.path.isfile(folder_path) and folder_path.lower().endswith(".pdf"):
+            pdf_name = os.path.basename(folder_path)
+            if pdf_name not in uploaded_pdf_names:
+                try:
+                    with open(folder_path, "rb") as fh:
+                        file_bytes = fh.read()
+                    url = f"{store_url}/wp-json/wp/v2/media"
+                    headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{pdf_name}"', "Content-Type": "application/pdf"}
+                    resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+                    if resp.status_code < 400:
+                        downloads.append({"name": pdf_name, "file": resp.json().get("source_url", "")})
+                except Exception as e:
+                    log.warning(f"Single PDF upload error: {str(e)}")
+        elif os.path.isdir(folder_path):
+            try:
+                import fitz as _fitz
+            except ImportError:
+                _fitz = None
+            for pdf_name in sorted(os.listdir(folder_path)):
+                if not pdf_name.lower().endswith(".pdf"):
+                    continue
+                pdf_full = os.path.join(folder_path, pdf_name)
+                if not os.path.isfile(pdf_full) or pdf_name in uploaded_pdf_names:
+                    continue
+                try:
+                    with open(pdf_full, "rb") as fh:
+                        file_bytes = fh.read()
+                    url = f"{store_url}/wp-json/wp/v2/media"
+                    headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{pdf_name}"', "Content-Type": "application/pdf"}
+                    resp = requests.post(url, headers=headers, data=file_bytes, timeout=120)
+                    if resp.status_code < 400:
+                        downloads.append({"name": pdf_name, "file": resp.json().get("source_url", "")})
+                except Exception as e:
+                    log.warning(f"PDF upload from folder error for {pdf_name}: {str(e)}")
+            if _fitz and not image_ids and not cover_file:
+                try:
+                    all_pdfs_in_folder = sorted(
+                        [f for f in os.listdir(folder_path) if f.lower().endswith(".pdf")],
+                        key=lambda f: f.lower(),
+                    )
+                    for pdf_name in all_pdfs_in_folder[:1]:
+                        doc = _fitz.open(os.path.join(folder_path, pdf_name))
+                        for page_idx in range(min(len(doc), 2)):
+                            page = doc.load_page(page_idx)
+                            pix = page.get_pixmap(matrix=_fitz.Matrix(2, 2), alpha=False)
+                            img_bytes = pix.tobytes("jpg")
+                            img_name = f"{os.path.splitext(pdf_name)[0]}_p{page_idx+1}.jpg"
+                            url = f"{store_url}/wp-json/wp/v2/media"
+                            headers = {"Authorization": auth, "Content-Disposition": f'attachment; filename="{img_name}"', "Content-Type": "image/jpeg"}
+                            resp = requests.post(url, headers=headers, data=img_bytes, timeout=120)
+                            if resp.status_code < 400:
+                                image_ids.append(resp.json().get("id"))
+                        doc.close()
+                        break
+                except Exception as e:
+                    log.warning(f"Cover extraction from folder error: {str(e)}")
+    payload = {
+        "name": name,
+        "type": "simple",
+        "status": status,
+        "virtual": True,
+        "downloadable": True,
+        "regular_price": str(float(price)) if price else "0",
+        "short_description": short_description,
+        "description": full_description,
+    }
+    if category_id:
+        try:
+            payload["categories"] = [{"id": int(category_id)}]
+        except ValueError:
+            pass
+    if tags:
+        payload["tags"] = [{"name": t} for t in tags]
+    if image_ids:
+        payload["images"] = [{"id": iid} for iid in image_ids]
+    if downloads:
+        payload["downloads"] = downloads
+        payload["download_limit"] = -1
+        payload["download_expiry"] = -1
+    status_code, body, wc_headers = client.create_product(payload)
+    if isinstance(body, dict) and "error" in body:
+        return jsonify(body), status_code if isinstance(status_code, int) else 502
+    record_event("woo_product_create", mode="woo_pattern", success=True)
+    resp = make_response(jsonify(body), status_code if isinstance(status_code, int) else 201)
+    for h, v in wc_headers.items():
+        resp.headers[h] = v
+    return resp
+
+
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, use_reloader=False)

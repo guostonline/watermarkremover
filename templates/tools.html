@@ -119,7 +119,9 @@ const tools=[
   {id:'listing',label:'Listing Generator',icon:'📝',group:'Etsy'},
   {id:'calendar',label:'Calendar',icon:'📅',group:'Planning'},
   {id:'cover',label:'Cover Creator',icon:'🎨',group:'Etsy'},
-  {id:'analytics',label:'Analytics',icon:'📊',group:'Etsy'}
+  {id:'analytics',label:'Analytics',icon:'📊',group:'Etsy'},
+  {id:'woo',label:'WooCommerce',icon:'🏪',group:'Store',href:'/woo/'},
+  {id:'ai-studio',label:'AI Image Studio',icon:'✨',group:'Store'}
 ];
 
 function renderSidebar(){
@@ -556,43 +558,347 @@ p.innerHTML=`
 `;
 break;
 case'analytics':
+p.innerHTML=`<div class="page-header"><h1 class="page-title">Analytics</h1><p class="page-subtitle">Revenue and performance tracking</p></div><div class="tool-card"><div class="tool-body"><p style="color:var(--text3);text-align:center;padding:40px">Connect your Etsy and WooCommerce stores via the API settings to view analytics.</p></div></div>`;
+break;
+case'ai-studio':
 p.innerHTML=`
 <div class="page-header">
-<h1 class="page-title">Analytics</h1>
-<p class="page-subtitle">Revenue and performance tracking</p>
+  <h1 class="page-title">AI Image Studio</h1>
+  <p class="page-subtitle">Upload 2 reference images → 5 Etsy listing images via ChatGPT prompts or direct API</p>
 </div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
-<div class="tool-card" style="padding:20px">
-<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Revenue</div>
-<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">$0</div>
-<div style="font-size:0.75rem;color:var(--text3)">/mo</div>
-</div>
-<div class="tool-card" style="padding:20px">
-<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Sales</div>
-<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">0</div>
-<div style="font-size:0.75rem;color:var(--text3)">this month</div>
-</div>
-<div class="tool-card" style="padding:20px">
-<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Conversion</div>
-<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">0%</div>
-</div>
-<div class="tool-card" style="padding:20px">
-<div style="color:var(--text3);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">Avg Order</div>
-<div style="font-size:1.5rem;font-weight:700;font-family:var(--mono)">$0</div>
-</div>
-</div>
-<div class="tool-card">
-<div class="tool-header">
-<span class="tool-title">Connect to Etsy</span>
-</div>
-<div class="tool-body">
-<p style="color:var(--text3);text-align:center;padding:40px">Etsy API integration coming soon</p>
-</div>
+<div style="display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start">
+
+  <div class="tool-card">
+    <div class="tool-header" style="display:flex;align-items:center;justify-content:space-between">
+      <span class="tool-title">Reference Setup</span>
+      <span id="ais-mode-badge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(99,102,241,.12);color:#6366f1">ChatGPT Mode</span>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+
+      <!-- Mode: ChatGPT / API -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+        <button class="ais-mode-btn active" data-mode="chatgpt" onclick="aisSetMode('chatgpt',this)" style="padding:8px;border:none;border-radius:6px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff">ChatGPT Prompts</button>
+        <button class="ais-mode-btn" data-mode="api" onclick="aisSetMode('api',this)" style="padding:8px;border:none;border-radius:6px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text-sec)">API Generate</button>
+      </div>
+
+      <!-- Reference uploads -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Front Image</div>
+          <label style="display:flex;align-items:center;justify-content:center;height:110px;border:2px dashed var(--border);border-radius:8px;cursor:pointer;background:var(--surface2);position:relative;overflow:hidden">
+            <span id="ais-front-hint" style="font-size:11px;color:var(--text-mute);text-align:center">📷 Upload front</span>
+            <img id="ais-front-preview" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+            <input id="ais-front-file" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="aisPreview('front',this)">
+          </label>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Back Image</div>
+          <label style="display:flex;align-items:center;justify-content:center;height:110px;border:2px dashed var(--border);border-radius:8px;cursor:pointer;background:var(--surface2);position:relative;overflow:hidden">
+            <span id="ais-back-hint" style="font-size:11px;color:var(--text-mute);text-align:center">📷 Upload back</span>
+            <img id="ais-back-preview" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+            <input id="ais-back-file" type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="aisPreview('back',this)">
+          </label>
+        </div>
+      </div>
+      <p id="ais-img-note" style="margin:0;font-size:11px;color:var(--text-mute);display:none">ℹ️ OpenRouter uses text-to-image — reference images are used for prompt context only.</p>
+
+      <!-- API mode fields -->
+      <div id="ais-api-fields" style="display:none;flex-direction:column;gap:10px">
+
+        <!-- Provider toggle -->
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Provider</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+            <button class="ais-prov-btn active" data-prov="openai" onclick="aisSetProvider('openai',this)" style="padding:7px;border:none;border-radius:6px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff">OpenAI</button>
+            <button class="ais-prov-btn" data-prov="openrouter" onclick="aisSetProvider('openrouter',this)" style="padding:7px;border:none;border-radius:6px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text-sec)">OpenRouter</button>
+          </div>
+        </div>
+
+        <!-- API Key -->
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">
+            <span id="ais-key-label">OpenAI API Key</span>
+          </div>
+          <input id="ais-api-key" type="password" placeholder="sk-..." class="form-input" style="font-size:13px">
+        </div>
+
+        <!-- Model -->
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Model</div>
+          <select id="ais-model" class="form-select" style="font-size:13px;padding:8px">
+            <option value="gpt-image-1">gpt-image-1</option>
+          </select>
+        </div>
+
+        <!-- Quality (OpenAI only) -->
+        <div id="ais-quality-row">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Quality</div>
+          <select id="ais-quality" class="form-select" style="font-size:13px;padding:8px">
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Common fields -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Product Name</div>
+          <input id="ais-name" class="form-input" value="Annie Dress" style="font-size:13px">
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Studio Background</div>
+          <input id="ais-studio" class="form-input" value="solid warm beige, seamless" style="font-size:13px">
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Dress Details to Keep</div>
+        <textarea id="ais-details" class="form-input" rows="2" style="font-size:12px;resize:vertical">orange satin tropical floral slip mini dress, thin spaghetti straps, V-neck, above-knee length, soft draped fabric</textarea>
+      </div>
+
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Six Collage Colors</div>
+        <textarea id="ais-colors" class="form-input" rows="2" style="font-size:12px;resize:vertical">sage green floral, ivory cream floral, dusty rose floral, golden mustard floral, soft lavender floral, powder blue floral</textarea>
+      </div>
+
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);margin-bottom:5px">Male Outfit (Image 5)</div>
+        <input id="ais-male" class="form-input" value="ivory linen shirt and beige linen trousers" style="font-size:13px">
+      </div>
+
+      <p id="ais-status" style="margin:0;font-size:12px;color:var(--text-mute);line-height:1.5">ChatGPT mode: generate prompts, upload your 2 images in ChatGPT, paste one at a time.</p>
+
+      <div style="display:flex;gap:8px">
+        <button id="ais-generate-btn" onclick="aisGenerate()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">✨ Create 5 Prompts</button>
+        <button onclick="aisFillSample()" style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--text-sec)">Sample</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery -->
+  <div class="tool-card">
+    <div class="tool-header" style="display:flex;justify-content:space-between;align-items:center">
+      <span id="ais-output-title" class="tool-title">ChatGPT Prompts</span>
+      <span id="ais-count-badge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--text-sec)">0 / 5</span>
+    </div>
+    <div id="ais-gallery" style="padding:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;min-height:380px"></div>
+  </div>
 </div>
 `;
+window.aisMode='chatgpt'; window.aisProvider='openai';
+aisInitGallery();
+fetch('/api/ai-studio/config').then(r=>r.json()).then(cfg=>{
+  if(cfg.or_key){localStorage.setItem('ais-or-key',cfg.or_key);}
+  if(cfg.or_model){localStorage.setItem('ais-or-model',cfg.or_model);}
+});
+(function(){
+  const k=localStorage.getItem('ais-openai-key'); if(k) document.getElementById('ais-api-key').value=k;
+})();
 break;
 }
 }
+
+/* ── AI Image Studio ─────────────────────────────── */
+const AIS_TASKS=['Front Single','Back Single','Front 6 Models','Back 6 Models','Couple Image'];
+const AIS_OR_MODELS=[
+  {v:'google/gemini-2.0-flash-exp:free',      l:'Gemini 2.0 Flash (free)'},
+  {v:'google/gemini-2.5-flash-preview',       l:'Gemini 2.5 Flash'},
+  {v:'black-forest-labs/FLUX-1.1-pro',        l:'FLUX 1.1 Pro'},
+  {v:'black-forest-labs/FLUX-1-schnell:free', l:'FLUX Schnell (free)'},
+  {v:'openai/dall-e-3',                       l:'DALL-E 3 (via OR)'},
+  {v:'stabilityai/stable-diffusion-3-5-large',l:'SD 3.5 Large'},
+];
+const AIS_OAI_MODELS=[
+  {v:'gpt-image-1', l:'gpt-image-1'},
+];
+
+function aisVal(id,fb=''){const el=document.getElementById(id);return el?(el.value.trim()||fb):fb;}
+
+function aisSetProvider(prov,btn){
+  window.aisProvider=prov;
+  document.querySelectorAll('.ais-prov-btn').forEach(b=>{
+    const on=b.dataset.prov===prov;
+    b.style.background=on?'var(--accent)':'transparent';
+    b.style.color=on?'#fff':'var(--text-sec)';
+  });
+  const keyLabel=document.getElementById('ais-key-label');
+  const keyInput=document.getElementById('ais-api-key');
+  const modelSel=document.getElementById('ais-model');
+  const qualRow=document.getElementById('ais-quality-row');
+  const imgNote=document.getElementById('ais-img-note');
+
+  if(prov==='openrouter'){
+    if(keyLabel) keyLabel.textContent='OpenRouter API Key';
+    const saved=localStorage.getItem('ais-or-key')||'';
+    if(keyInput) keyInput.value=saved;
+    if(modelSel){
+      const savedModel=localStorage.getItem('ais-or-model')||'';
+      modelSel.innerHTML=AIS_OR_MODELS.map(m=>`<option value="${m.v}"${m.v===savedModel?' selected':''}>${m.l}</option>`).join('');
+    }
+    if(qualRow) qualRow.style.display='none';
+    if(imgNote) imgNote.style.display='block';
+  } else {
+    if(keyLabel) keyLabel.textContent='OpenAI API Key';
+    const saved=localStorage.getItem('ais-openai-key')||'';
+    if(keyInput) keyInput.value=saved;
+    if(modelSel) modelSel.innerHTML=AIS_OAI_MODELS.map(m=>`<option value="${m.v}">${m.l}</option>`).join('');
+    if(qualRow) qualRow.style.display='block';
+    if(imgNote) imgNote.style.display='none';
+  }
+}
+
+function aisSetMode(mode,btn){
+  window.aisMode=mode;
+  document.querySelectorAll('.ais-mode-btn').forEach(b=>{
+    const on=b.dataset.mode===mode;
+    b.style.background=on?'var(--accent)':'transparent';
+    b.style.color=on?'#fff':'var(--text-sec)';
+  });
+  const badge=document.getElementById('ais-mode-badge');
+  if(badge) badge.textContent=mode==='api'?'API Mode':'ChatGPT Mode';
+  const apiFields=document.getElementById('ais-api-fields');
+  if(apiFields) apiFields.style.display=mode==='api'?'flex':'none';
+  const genBtn=document.getElementById('ais-generate-btn');
+  if(genBtn) genBtn.textContent=mode==='api'?'🚀 Generate 5 Images':'✨ Create 5 Prompts';
+  const status=document.getElementById('ais-status');
+  if(status) status.textContent=mode==='api'
+    ?'API mode: images generated server-side and saved locally.'
+    :'ChatGPT mode: generate prompts, upload your 2 images in ChatGPT, paste one at a time.';
+  aisInitGallery();
+}
+
+function aisPreview(side,input){
+  const preview=document.getElementById('ais-'+side+'-preview');
+  const hint=document.getElementById('ais-'+side+'-hint');
+  if(!input.files[0]) return;
+  preview.src=URL.createObjectURL(input.files[0]);
+  preview.style.display='block';
+  if(hint) hint.style.display='none';
+}
+
+function aisFillSample(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('ais-name','Annie Dress');
+  set('ais-studio','single solid warm beige studio background, seamless, no props');
+  set('ais-details','orange satin tropical floral slip mini dress, thin spaghetti straps, V-neck with small front cutout, above-knee length, soft draped fabric, tropical floral print');
+  set('ais-colors','sage green floral, ivory cream floral, dusty rose floral, golden mustard floral, soft lavender floral, powder blue floral');
+  set('ais-male','ivory linen shirt and beige linen trousers');
+  const s=document.getElementById('ais-status');if(s) s.textContent='Sample loaded.';
+}
+
+function aisBuildPrompts(){
+  const name=aisVal('ais-name','Annie Dress');
+  const details=aisVal('ais-details','sewing pattern dress');
+  const studio=aisVal('ais-studio','solid warm beige background, seamless');
+  const palette=aisVal('ais-colors','sage green, ivory, dusty rose, golden mustard, lavender, powder blue');
+  const man=aisVal('ais-male','ivory linen shirt and beige linen trousers');
+  const common=`Use the 2 uploaded images as reference for the same ${name} garment style. Preserve the sewing pattern and construction: ${details}. Photorealistic fashion catalog quality, clean lighting, realistic anatomy, crisp fabric detail, no text, no logo, no watermark. Background must be ${studio}.`;
+  return [
+    {title:'Front Single',    prompt:`${common}\n\nCreate one full-body FRONT VIEW image. Different adult female model, new selling-friendly color, elegant relaxed catalog pose. Keep exact garment design — no added sleeves, collars, buttons, or extra decorations.`},
+    {title:'Back Single',     prompt:`${common}\n\nCreate one full-body BACK VIEW image. Different adult female model, new selling-friendly color. Show back clearly. Keep exact garment design.`},
+    {title:'Front 6 Models',  prompt:`${common}\n\nCreate a 2×3 fashion catalog collage with thin white dividers. Six different female models, FRONT VIEW each, colors in order: ${palette}. Polished Etsy listing style.`},
+    {title:'Back 6 Models',   prompt:`${common}\n\nCreate a 2×3 fashion catalog collage with thin white dividers. BACK VIEW each, same color order: ${palette}. Polished Etsy listing style.`},
+    {title:'Couple Image',    prompt:`${common}\n\nFull-body couple image. Female wears the original ${name}. Add male model wearing ${man}. Natural premium summer marketplace pose.`},
+  ];
+}
+
+function aisInitGallery(){
+  const g=document.getElementById('ais-gallery');if(!g) return;
+  const isApi=window.aisMode==='api';
+  document.getElementById('ais-output-title').textContent=isApi?'Generated Images':'ChatGPT Prompts';
+  g.innerHTML=AIS_TASKS.map(t=>isApi
+    ?`<div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)"><div style="font-size:12px;font-weight:700">${t}</div><div style="flex:1;min-height:180px;background:var(--surface3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-mute)">Waiting…</div><span style="font-size:11px;color:var(--text-mute);text-align:center">Not ready</span></div>`
+    :`<div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)"><div style="font-size:12px;font-weight:700">${t}</div><div style="flex:1;min-height:180px;overflow:auto;padding:8px;background:var(--surface3);border-radius:6px;font-size:11px;font-family:monospace;color:var(--text-sec);white-space:pre-wrap;line-height:1.4">Click Generate…</div><button disabled style="padding:5px;background:var(--surface3);border:1px solid var(--border);border-radius:6px;font:inherit;font-size:11px;font-weight:700;color:var(--text-mute)">Copy</button></div>`
+  ).join('');
+  document.getElementById('ais-count-badge').textContent='0 / 5';
+}
+
+async function aisGenerate(){
+  const btn=document.getElementById('ais-generate-btn');
+  const g=document.getElementById('ais-gallery');
+
+  if(window.aisMode==='chatgpt'){
+    const prompts=aisBuildPrompts();
+    window._aisPrompts=prompts;
+    document.getElementById('ais-output-title').textContent='ChatGPT Prompts';
+    document.getElementById('ais-count-badge').textContent='5 / 5';
+    g.innerHTML=prompts.map((p,i)=>`
+      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <div style="font-size:12px;font-weight:700">${p.title}</div>
+        <div style="flex:1;min-height:180px;overflow:auto;padding:8px;background:var(--surface3);border-radius:6px;font-size:11px;font-family:monospace;color:var(--text-sec);white-space:pre-wrap;line-height:1.4">${(p.prompt||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        <button onclick="aisCopy(this,${i})" style="padding:5px;background:var(--accent);border:none;border-radius:6px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;color:#fff">Copy ${i+1}</button>
+      </div>`).join('');
+    const s=document.getElementById('ais-status');
+    if(s) s.textContent='Prompts ready — upload your 2 images in ChatGPT then paste one at a time.';
+    return;
+  }
+
+  // API mode
+  const prov=window.aisProvider||'openai';
+  const apiKey=aisVal('ais-api-key');
+  if(!apiKey){document.getElementById('ais-status').textContent='Enter an API key.';return;}
+
+  if(prov==='openai'){
+    const front=document.getElementById('ais-front-file').files[0];
+    const back=document.getElementById('ais-back-file').files[0];
+    if(!front||!back){document.getElementById('ais-status').textContent='Upload both reference images for OpenAI mode.';return;}
+  }
+
+  // Save key
+  localStorage.setItem(prov==='openrouter'?'ais-or-key':'ais-openai-key', apiKey);
+
+  btn.disabled=true; btn.textContent='Generating…';
+  document.getElementById('ais-count-badge').textContent='Working…';
+  document.getElementById('ais-status').textContent='Generating 5 images — this may take a few minutes…';
+  document.getElementById('ais-output-title').textContent='Generated Images';
+  aisInitGallery();
+
+  const fd=new FormData();
+  if(prov==='openai'){
+    fd.append('images',document.getElementById('ais-front-file').files[0]);
+    fd.append('images',document.getElementById('ais-back-file').files[0]);
+  }
+  fd.append('provider', prov);
+  fd.append('apiKey',   apiKey);
+  fd.append('model',    aisVal('ais-model','gpt-image-1'));
+  fd.append('quality',  aisVal('ais-quality','medium'));
+  fd.append('productName',      aisVal('ais-name','Annie Dress'));
+  fd.append('dressDetails',     aisVal('ais-details'));
+  fd.append('studioBackground', aisVal('ais-studio'));
+  fd.append('colors',           aisVal('ais-colors'));
+  fd.append('maleOutfit',       aisVal('ais-male'));
+
+  try{
+    const res=await fetch('/api/ai-studio/generate',{method:'POST',body:fd});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Generation failed');
+    g.innerHTML=data.results.map(r=>`
+      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <div style="font-size:12px;font-weight:700">${r.title}</div>
+        <div style="flex:1;border-radius:6px;overflow:hidden;background:var(--surface3)"><img src="${r.url}" style="width:100%;display:block;object-fit:contain" loading="lazy"></div>
+        <a href="${r.url}" download style="display:block;text-align:center;padding:5px;background:var(--accent);color:#fff;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none">Download PNG</a>
+      </div>`).join('');
+    document.getElementById('ais-count-badge').textContent=data.results.length+' / 5';
+    document.getElementById('ais-status').textContent='Done! Images saved in generated folder.';
+  }catch(e){
+    document.getElementById('ais-status').textContent='Error: '+e.message;
+    document.getElementById('ais-count-badge').textContent='Error';
+  }finally{
+    btn.disabled=false;
+    btn.textContent=window.aisMode==='api'?'🚀 Generate 5 Images':'✨ Create 5 Prompts';
+  }
+}
+
+function aisCopy(btn,idx){
+  const p=(window._aisPrompts||[])[idx];if(!p) return;
+  navigator.clipboard.writeText(p.prompt).then(()=>{
+    const orig=btn.textContent; btn.textContent='Copied ✓';
+    setTimeout(()=>{btn.textContent=orig;},1400);
+  });
+}
+/* ── End AI Studio ───────────────────────────────── */
 
 function generateListing(){
 const name=document.getElementById('patternName').value;

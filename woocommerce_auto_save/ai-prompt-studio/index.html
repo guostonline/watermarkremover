@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Etsy AI Prompt Studio</title>
+  <style>
+    :root {
+      --paper: #fbf7ef;
+      --ink: #2d2923;
+      --muted: #71695d;
+      --line: #e5d8c7;
+      --rose: #c97871;
+      --olive: #697650;
+      --gold: #bf8b3d;
+      --blue: #43697c;
+      --white: #fffdf8;
+      --shadow: 0 22px 70px rgba(65, 45, 24, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(201, 120, 113, .18), transparent 26rem),
+        radial-gradient(circle at 88% 0%, rgba(105, 118, 80, .18), transparent 26rem),
+        linear-gradient(135deg, #fffaf3 0%, var(--paper) 48%, #f3eadc 100%);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 36px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      padding: 18px 0 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--olive);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 820px;
+      font-size: clamp(40px, 6vw, 82px);
+      line-height: .92;
+      letter-spacing: 0;
+      font-weight: 500;
+    }
+
+    .header-note {
+      width: min(420px, 100%);
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 22px;
+      margin-top: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 253, 248, .82);
+      border: 1px solid rgba(229, 216, 199, .95);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 243, .72);
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .step-mark {
+      display: inline-grid;
+      place-items: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: var(--white);
+      background: var(--olive);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--ink);
+      outline: none;
+      padding: 11px 12px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 14px;
+      line-height: 1.35;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(201, 120, 113, .85);
+      box-shadow: 0 0 0 4px rgba(201, 120, 113, .15);
+    }
+
+    .upload {
+      position: relative;
+      min-height: 156px;
+      border: 1px dashed rgba(105, 118, 80, .58);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(105, 118, 80, .08), transparent),
+        rgba(255, 253, 248, .76);
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .upload input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload strong {
+      display: block;
+      color: var(--ink);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .upload span {
+      display: block;
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .thumbs img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      border-color: var(--olive);
+      background: var(--olive);
+      color: var(--white);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 2px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 6px;
+      padding: 12px 15px;
+      color: var(--white);
+      background: var(--ink);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(45, 41, 35, .16);
+    }
+
+    .btn.secondary { background: var(--rose); }
+    .btn.ghost {
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 740px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 243, .72);
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--white);
+      padding: 10px 13px;
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: var(--white);
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .output-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+      padding: 18px;
+      min-height: 0;
+    }
+
+    .prompt-box {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 650px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    .prompt-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .prompt-title strong {
+      font-size: 18px;
+    }
+
+    #promptOutput {
+      width: 100%;
+      min-height: 0;
+      height: 100%;
+      border: 0;
+      border-radius: 0;
+      padding: 18px;
+      background:
+        linear-gradient(rgba(67, 105, 124, .04) 1px, transparent 1px),
+        var(--white);
+      background-size: 100% 31px;
+      box-shadow: none;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .copy-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      background: #fff9ef;
+    }
+
+    .status {
+      color: var(--olive);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .side-list {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .note-card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, .9);
+    }
+
+    .note-card h3 {
+      margin: 0 0 8px;
+      color: var(--olive);
+      font-size: 16px;
+    }
+
+    .note-card p, .note-card li {
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .note-card p { margin: 0; }
+    .note-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .swatch {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 1px rgba(45, 41, 35, .18);
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-family: "Trebuchet MS", Verdana, sans-serif;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      header, main, .output-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-note {
+        width: 100%;
+      }
+
+      .workspace {
+        min-height: 0;
+      }
+
+      .prompt-box {
+        min-height: 560px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app {
+        width: min(100% - 20px, 1480px);
+        padding-top: 14px;
+      }
+
+      h1 {
+        font-size: 39px;
+      }
+
+      .row, .segmented {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <p class="eyebrow">Local prompt builder for ChatGPT image generation</p>
+        <h1>Etsy AI Prompt Studio</h1>
+      </div>
+      <p class="header-note">
+        Upload your reference dress photos, describe the sewing pattern once, then copy ready prompts for model, color, background, collage, and Etsy listing images.
+      </p>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Pattern Details</h2>
+          <span class="step-mark">Ask first</span>
+        </div>
+        <div class="controls">
+          <label class="upload">
+            <input id="imageInput" type="file" accept="image/*" multiple>
+            <span>
+              <strong>Add reference images</strong>
+              Use the same photos you will upload to ChatGPT. They stay on your computer.
+            </span>
+          </label>
+          <div id="thumbs" class="thumbs"></div>
+
+          <div class="row">
+            <label>
+              Product name
+              <input id="productName" value="Thalia Dress">
+            </label>
+            <label>
+              Store / brand
+              <input id="brandName" value="Pattern Lab Co.">
+            </label>
+          </div>
+
+          <label>
+            Exact dress details to preserve
+            <textarea id="garmentDetails">sleeveless high round neckline, loose straight maxi dress shape, side slit, ankle/maxi length, simple clean seams, soft draped fabric, relaxed summer fit</textarea>
+          </label>
+
+          <label>
+            Never change these details
+            <textarea id="rules">Do not add sleeves, belt, buttons, ruffles, collar, waist seam, pockets, prints, or extra decorations. Do not turn it into a different dress pattern.</textarea>
+          </label>
+
+          <div class="row">
+            <label>
+              Main output
+              <select id="outputFormat">
+                <option>2x3 grid with 6 photos</option>
+                <option>single full-body fashion photo</option>
+                <option>front and back comparison</option>
+                <option>Etsy cover image</option>
+                <option>sewing pattern infographic</option>
+              </select>
+            </label>
+            <label>
+              Aspect ratio
+              <select id="aspectRatio">
+                <option>square 1:1</option>
+                <option>vertical 4:5</option>
+                <option>portrait 2:3</option>
+                <option>wide 3:2</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Creative direction
+            <select id="creativeMode">
+              <option value="auto">Let AI choose models, colors, and backgrounds</option>
+              <option value="soft">Soft feminine Etsy style</option>
+              <option value="coastal">Coastal vacation lifestyle</option>
+              <option value="studio">Clean boutique studio</option>
+              <option value="seasonal">Seasonal color collection</option>
+            </select>
+          </label>
+
+          <div class="segmented" aria-label="View mode">
+            <button class="chip active" data-view="front">Front views</button>
+            <button class="chip" data-view="back">Back views</button>
+            <button class="chip" data-view="mixed">Mixed views</button>
+            <button class="chip" data-view="listing">Listing set</button>
+          </div>
+
+          <div class="actions">
+            <button id="generateBtn" class="btn">Generate Prompt</button>
+            <button id="exampleBtn" class="btn secondary">Fill Thalia Example</button>
+            <button id="resetBtn" class="btn ghost">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel workspace">
+        <div class="tabs">
+          <button class="tab active" data-step="variation">Step 2: 6 Variations</button>
+          <button class="tab" data-step="single">Single Photo</button>
+          <button class="tab" data-step="back">Back View</button>
+          <button class="tab" data-step="cover">Etsy Cover</button>
+          <button class="tab" data-step="infographic">Infographic</button>
+        </div>
+
+        <div class="output-grid">
+          <div class="prompt-box">
+            <div class="prompt-title">
+              <strong id="promptTitle">Step 2 Prompt</strong>
+              <span id="wordCount" class="status">0 words</span>
+            </div>
+            <textarea id="promptOutput" spellcheck="false"></textarea>
+            <div class="copy-row">
+              <span id="copyStatus" class="status">Ready</span>
+              <button id="copyBtn" class="btn">Copy Prompt</button>
+            </div>
+          </div>
+
+          <aside class="side-list">
+            <div class="note-card">
+              <h3>How to use</h3>
+              <ul>
+                <li>Upload the same reference images in ChatGPT.</li>
+                <li>Copy this prompt after the images.</li>
+                <li>Regenerate if the dress shape changes.</li>
+              </ul>
+            </div>
+            <div class="note-card">
+              <h3>Best colors</h3>
+              <p>The app asks ChatGPT to choose selling-friendly colors, but keeps the sewing pattern consistent.</p>
+              <div class="swatches">
+                <span class="swatch" style="background:#f3eadc"></span>
+                <span class="swatch" style="background:#9aaa82"></span>
+                <span class="swatch" style="background:#bd735f"></span>
+                <span class="swatch" style="background:#d8a3a3"></span>
+                <span class="swatch" style="background:#7ea4be"></span>
+                <span class="swatch" style="background:#1f2638"></span>
+              </div>
+            </div>
+            <div class="note-card">
+              <h3>Repair prompt</h3>
+              <p id="repairPrompt">Regenerate with stronger garment consistency. Keep the exact sewing pattern and change only model, color, pose, and background.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">Built for local use. No images are uploaded by this page.</div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const state = { step: "variation", view: "front" };
+
+    const stepTitles = {
+      variation: "Step 2 Prompt",
+      single: "Single Photo Prompt",
+      back: "Back View Prompt",
+      cover: "Etsy Cover Prompt",
+      infographic: "Infographic Prompt"
+    };
+
+    const directions = {
+      auto: "You may creatively choose the model, dress colors, poses, and backgrounds yourself. Make choices that look attractive for Etsy and help the sewing pattern sell.",
+      soft: "Use a soft feminine Etsy look with warm light, floral or neutral backgrounds, graceful poses, and gentle colors.",
+      coastal: "Use bright coastal vacation lifestyle scenes, sunlit stone streets, sea views, beach walkways, and breezy summer styling.",
+      studio: "Use clean boutique studio photography with neutral walls, natural window light, plants, fabric texture, and uncluttered styling.",
+      seasonal: "Create a seasonal color collection with spring, summer, autumn, and evening colors across varied natural backgrounds."
+    };
+
+    function value(id) {
+      return $(id).value.trim();
+    }
+
+    function viewText() {
+      if (state.view === "back") return "show back views that clearly display the back neckline, back fit, side slit, and full length";
+      if (state.view === "mixed") return "include a useful mix of front, side, three-quarter, and back views";
+      if (state.view === "listing") return "create listing-ready views that show the garment clearly for buyers";
+      return "show front views that clearly display the neckline, silhouette, side slit, and full length";
+    }
+
+    function baseIntro() {
+      return `Use the uploaded images as the exact reference for the ${value("productName")} sewing pattern from ${value("brandName")}. Keep the same garment design in every result: ${value("garmentDetails")}.`;
+    }
+
+    function qualityBlock() {
+      return `Professional Etsy sewing pattern listing photography, realistic fabric texture, natural body proportions, clean composition, bright natural light, elegant colors, sharp product detail, no text, no logo, no watermark.`;
+    }
+
+    function negativeBlock() {
+      return `${value("rules")} Avoid distorted hands, extra fingers, extra limbs, bad feet, warped body, blurry face, messy fabric, unrealistic anatomy, cropped garment, or changed sewing construction.`;
+    }
+
+    function variationPrompt() {
+      return `Create one Etsy product variation image as a ${value("outputFormat")} in ${value("aspectRatio")} format.
+
+${baseIntro()}
+
+Generate 6 different female models, 6 different dress colors, and 6 different beautiful backgrounds. ${directions[value("creativeMode")]}
+
+Composition requirements:
+- 2 rows x 3 columns collage
+- each panel shows one full-body model wearing the same ${value("productName")} pattern
+- ${viewText()}
+- use different models with natural realistic faces and varied hair, skin tones, and body types
+- use different selling-friendly dress colors such as ivory, sage green, terracotta, dusty rose, sky blue, navy, olive, sand, black, or lavender
+- use different beautiful backgrounds such as Mediterranean patio, beach walkway, modern studio, garden, boutique room, sunny stone street, neutral home interior, or floral outdoor scene
+- keep every panel consistent in quality and product clarity
+
+Important garment rules:
+- Keep the exact ${value("productName")} sewing pattern
+- Keep these details: ${value("garmentDetails")}
+- ${negativeBlock()}
+
+Style: ${qualityBlock()}
+
+The final image should look like a beautiful Etsy listing color/model/background variation preview for a PDF sewing pattern.`;
+    }
+
+    function singlePrompt() {
+      return `Create one high-quality realistic fashion product photo for an Etsy sewing pattern listing.
+
+${baseIntro()}
+
+Creatively choose one new female model, one flattering dress color, one beautiful background, and one natural pose. ${directions[value("creativeMode")]}
+
+The model should be full body and the garment must be easy to inspect. ${viewText()}.
+
+Important garment rules:
+- Keep the exact ${value("productName")} sewing pattern
+- Keep these details: ${value("garmentDetails")}
+- ${negativeBlock()}
+
+Style: ${qualityBlock()}
+
+Make the image fresh and unique while clearly showing the same sewing pattern from the reference images.`;
+    }
+
+    function backPrompt() {
+      return `Create a realistic back-view fashion product photo for my Etsy sewing pattern listing.
+
+${baseIntro()}
+
+Generate a new model, dress color, and background. The model should face away from the camera or stand in a natural three-quarter back pose so buyers can understand the back shape, side slit, and full dress length.
+
+Important garment rules:
+- Keep the exact ${value("productName")} sewing pattern
+- Keep these details: ${value("garmentDetails")}
+- Make the back view believable and consistent with the reference images
+- ${negativeBlock()}
+
+Style: ${qualityBlock()}
+
+Do not make a collage unless needed. Create one clean listing-ready image.`;
+    }
+
+    function coverPrompt() {
+      return `Create a polished Etsy main listing cover image for the ${value("productName")} PDF sewing pattern.
+
+Use the uploaded images as garment reference. Keep the exact dress design: ${value("garmentDetails")}.
+
+Cover layout:
+- one large realistic full-body fashion photo of the dress
+- elegant handmade sewing pattern mood
+- soft space for title text, but do not add text unless I ask later
+- refined Etsy thumbnail composition that still reads clearly when small
+- attractive model, beautiful dress color, and warm selling-friendly background chosen by you
+
+Important garment rules:
+- Keep the exact ${value("productName")} sewing pattern
+- ${negativeBlock()}
+
+Style: ${qualityBlock()}
+
+The result should feel premium, trustworthy, and ready to become the first Etsy listing image.`;
+    }
+
+    function infographicPrompt() {
+      return `Create a clean Etsy sewing pattern infographic image for the ${value("productName")}.
+
+Use the uploaded images as the exact garment reference. Keep the design consistent: ${value("garmentDetails")}.
+
+Create a listing graphic that visually communicates:
+- same dress shown on realistic models
+- front and back views
+- color variation preview
+- PDF sewing pattern feeling
+- beginner-friendly handmade mood
+
+Do not add readable text unless I ask in a later step. Use simple visual blocks, sewing tools, fabric details, and clear product images instead.
+
+Important garment rules:
+- Keep the exact ${value("productName")} sewing pattern in every image
+- ${negativeBlock()}
+
+Style: warm refined Etsy design, realistic product images, soft natural colors, clean layout, high detail, no logo, no watermark.`;
+    }
+
+    function generate() {
+      const builders = {
+        variation: variationPrompt,
+        single: singlePrompt,
+        back: backPrompt,
+        cover: coverPrompt,
+        infographic: infographicPrompt
+      };
+      $("promptTitle").textContent = stepTitles[state.step];
+      $("promptOutput").value = builders[state.step]();
+      $("wordCount").textContent = `${$("promptOutput").value.trim().split(/\s+/).filter(Boolean).length} words`;
+      $("repairPrompt").textContent = `Regenerate with stronger ${value("productName")} consistency. Keep exactly: ${value("garmentDetails")}. Only change model, color, pose, and background.`;
+      $("copyStatus").textContent = "Ready";
+    }
+
+    document.querySelectorAll(".tab").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        state.step = button.dataset.step;
+        generate();
+      });
+    });
+
+    document.querySelectorAll(".chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        state.view = button.dataset.view;
+        generate();
+      });
+    });
+
+    $("imageInput").addEventListener("change", (event) => {
+      $("thumbs").innerHTML = "";
+      [...event.target.files].slice(0, 6).forEach((file) => {
+        const img = document.createElement("img");
+        img.alt = file.name;
+        img.src = URL.createObjectURL(file);
+        $("thumbs").appendChild(img);
+      });
+    });
+
+    $("generateBtn").addEventListener("click", generate);
+
+    $("copyBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText($("promptOutput").value);
+      $("copyStatus").textContent = "Copied";
+    });
+
+    $("exampleBtn").addEventListener("click", () => {
+      $("productName").value = "Thalia Dress";
+      $("brandName").value = "Pattern Lab Co.";
+      $("garmentDetails").value = "sleeveless high round neckline, loose straight maxi dress shape, side slit, ankle/maxi length, simple clean seams, soft draped fabric, relaxed summer fit";
+      $("rules").value = "Do not add sleeves, belt, buttons, ruffles, collar, waist seam, pockets, prints, or extra decorations. Do not turn it into a different dress pattern.";
+      $("outputFormat").value = "2x3 grid with 6 photos";
+      $("aspectRatio").value = "square 1:1";
+      $("creativeMode").value = "auto";
+      generate();
+    });
+
+    $("resetBtn").addEventListener("click", () => {
+      $("productName").value = "";
+      $("brandName").value = "Pattern Lab Co.";
+      $("garmentDetails").value = "";
+      $("rules").value = "";
+      $("thumbs").innerHTML = "";
+      $("imageInput").value = "";
+      generate();
+    });
+
+    ["productName", "brandName", "garmentDetails", "rules", "outputFormat", "aspectRatio", "creativeMode"].forEach((id) => {
+      $(id).addEventListener("input", generate);
+      $(id).addEventListener("change", generate);
+    });
+
+    generate();
+  </script>
+</body>
+</html>

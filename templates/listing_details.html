@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listing Details</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel-2: #1f2733;
+      --text: #e6edf3;
+      --muted: #9da7b3;
+      --border: #2d3748;
+      --ok: #1fa971;
+      --warn: #d29922;
+      --btn: #2f81f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 980px; margin: 24px auto; padding: 0 16px 32px; }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .title { font-size: 1.4rem; font-weight: 700; margin: 0; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--btn);
+      border-color: #1f6feb;
+      color: #fff;
+    }
+    .card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .status {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+    }
+    .status.ok { color: #57d9a3; }
+    .status.err { color: #ff7b72; }
+    .grid {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+    .field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .field-copy {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .field-copy:hover {
+      border-color: var(--btn);
+      color: #fff;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0f1622;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.92rem;
+    }
+    textarea { min-height: 96px; resize: vertical; }
+    .actions {
+      border-top: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1 class="title">Listing Details</h1>
+        <p class="subtitle" id="rowMeta">Loading...</p>
+      </div>
+      <a class="btn" href="/app#listings">Back To Listings</a>
+    </div>
+
+    <div class="card">
+      <div id="status" class="status">Fetching listing data...</div>
+      <form id="detailsForm" class="grid"></form>
+      <div class="actions">
+        <button class="btn" type="button" id="reloadBtn">Reload</button>
+        <button class="btn btn-primary" type="button" id="saveBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const listingIndex = {{ index }};
+    const fieldOrder = [
+      'Image URL', 'Pattern Name', 'Category', 'Date Listed', 'Day #', 'Ready?', 'Status',
+      'Etsy URL', 'Suggested Title (140 chars)', 'Suggested Tags (all 13)', 'Priority',
+      'Folder Name', 'Notes'
+    ];
+
+    const copyEnabledFields = new Set([
+      'pattern name',
+      'category',
+      'suggested title (140 chars)',
+      'suggested tags (all 13)',
+      'indiepattern description',
+      'indiepattern keywords',
+      'indiepattern title',
+      'indiepattern url'
+    ]);
+
+    let currentRow = null;
+
+    function setStatus(msg, mode) {
+      const el = document.getElementById('status');
+      el.className = `status ${mode || ''}`.trim();
+      el.textContent = msg;
+    }
+
+    function inputFor(key, value) {
+      const lower = key.toLowerCase();
+      const safe = (value || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      if (lower === 'ready?') {
+        return `<select data-key="${key}"><option value="Yes" ${value === 'Yes' ? 'selected' : ''}>Yes</option><option value="No" ${value === 'No' ? 'selected' : ''}>No</option></select>`;
+      }
+      if (lower === 'status') {
+        const opts = ['Not Listed', 'Listed', 'Pending', 'Skipped'];
+        return `<select data-key="${key}">${opts.map(o => `<option value="${o}" ${value === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+      }
+      if (lower.includes('date listed')) {
+        let dVal = '';
+        if (value) {
+          const p = value.split('-');
+          if (p.length === 3 && p[2] && p[2].length === 4) {
+            dVal = `${p[2]}-${String(p[1] || '').padStart(2, '0')}-${String(p[0] || '').padStart(2, '0')}`;
+          }
+        }
+        return `<input type="date" data-key="${key}" value="${dVal}">`;
+      }
+      if (lower === 'etsy url' || lower === 'image url') {
+        const placeholder = lower === 'etsy url' ? 'https://www.etsy.com/listing/...' : 'https://.../image.jpg';
+        return `<input type="url" data-key="${key}" value="${safe.replace(/"/g, '&quot;')}" placeholder="${placeholder}">`;
+      }
+      if (safe.length > 80 || lower.includes('title') || lower.includes('tags') || lower.includes('notes') || lower.includes('description')) {
+        return `<textarea data-key="${key}">${safe}</textarea>`;
+      }
+      return `<input type="text" data-key="${key}" value="${safe.replace(/"/g, '&quot;')}">`;
+    }
+
+    function renderForm(row) {
+      const form = document.getElementById('detailsForm');
+      const keys = Object.keys(row);
+      ['Etsy URL', 'Image URL'].forEach(requiredKey => {
+        if (!keys.includes(requiredKey)) keys.push(requiredKey);
+      });
+      keys.sort((a, b) => {
+        let ai = fieldOrder.indexOf(a.trim());
+        let bi = fieldOrder.indexOf(b.trim());
+        if (ai === -1) ai = 999;
+        if (bi === -1) bi = 999;
+        return ai - bi;
+      });
+
+      form.innerHTML = keys.map(k => {
+        const keyLower = (k || '').toLowerCase().trim();
+        const showCopy = copyEnabledFields.has(keyLower);
+        const safeKey = (k || '').replace(/'/g, "\\'");
+        return `<div class="field"><div class="field-head"><label>${k}</label>${showCopy ? `<button class="field-copy" type="button" onclick="copyFieldValue('${safeKey}')">Copy</button>` : ''}</div>${inputFor(k, row[k])}</div>`;
+      }).join('');
+    }
+
+    function escapeSelectorValue(value) {
+      if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(value);
+      return (value || '').replace(/(["\\\]])/g, '\\$1');
+    }
+
+    function copyFieldValue(key) {
+      const field = document.querySelector(`#detailsForm [data-key="${escapeSelectorValue(key)}"]`);
+      if (!field) return;
+      navigator.clipboard.writeText(field.value || '').then(() => {
+        setStatus(`Copied ${key}.`, 'ok');
+      }).catch(() => {
+        setStatus(`Failed to copy ${key}.`, 'err');
+      });
+    }
+
+    function normalizedValue(key, value) {
+      if (key.toLowerCase().includes('date listed') && value) {
+        const p = value.split('-');
+        if (p.length === 3 && p[0].length === 4) {
+          return `${p[2]}-${p[1]}-${p[0]}`;
+        }
+      }
+      return value;
+    }
+
+    async function loadListing() {
+      setStatus('Fetching listing data...');
+      try {
+        const res = await fetch('/api/listings');
+        const data = await res.json();
+        if (!data.listings || !Array.isArray(data.listings)) {
+          setStatus('No listings response from API.', 'err');
+          return;
+        }
+        const row = data.listings[listingIndex];
+        if (!row) {
+          setStatus(`Listing index ${listingIndex} not found.`, 'err');
+          return;
+        }
+        currentRow = row;
+        document.getElementById('rowMeta').textContent = `Row ${listingIndex + 2} in Google Sheet`;
+        renderForm(row);
+        setStatus('Ready to edit this listing.', 'ok');
+      } catch (e) {
+        setStatus(`Failed to load listing: ${e.message}`, 'err');
+      }
+    }
+
+    async function saveChanges() {
+      if (!currentRow) return;
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+
+      const fields = document.querySelectorAll('#detailsForm [data-key]');
+      let changed = 0;
+      let ok = 0;
+
+      for (const field of fields) {
+        const key = field.dataset.key;
+        const raw = field.value;
+        const value = normalizedValue(key, raw);
+
+        if ((currentRow[key] || '') === value) continue;
+
+        changed += 1;
+        try {
+          const res = await fetch('/api/listings/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ index: listingIndex, header: key, value })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            currentRow[key] = value;
+            ok += 1;
+          }
+        } catch (e) {
+        }
+      }
+
+      if (changed === 0) {
+        setStatus('No changes to save.');
+      } else if (ok === changed) {
+        setStatus(`Saved ${ok}/${changed} changes.`, 'ok');
+      } else {
+        setStatus(`Saved ${ok}/${changed} changes. Some fields failed to update.`, 'err');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+    }
+
+    document.getElementById('reloadBtn').addEventListener('click', loadListing);
+    document.getElementById('saveBtn').addEventListener('click', saveChanges);
+    loadListing();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WooCommerce Pattern Uploader</title>
+  <style>
+    :root {
+      --ink:      #0f172a;
+      --muted:    #475569;
+      --line:     #e2e8f0;
+      --paper:    #f8fafc;
+      --panel:    #ffffff;
+      --accent:   #0d7f68;
+      --accent-h: #0a6655;
+      --red:      #dc2626;
+      --orange:   #d97706;
+      --blue:     #2563eb;
+      --dark:     #1e293b;
+      --step-bg:  #f1f5f9;
+      --p1: #c0392b; --p2: #e67e22; --p3: #7f8c8d; --p4: #bdc3c7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--paper); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+
+    /* header */
+    .app-header { padding: 18px 28px 14px; border-bottom: 1px solid var(--line); background: var(--step-bg); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .app-header h1 { font-size: 20px; font-weight: 800; flex: 1; }
+
+    /* sheet status bar */
+    .sheet-bar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: #e8f5f0; border: 1px solid #b2d9cc; border-radius: 8px; font-size: 12px; }
+    .sheet-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: #aaa; flex-shrink: 0; }
+    .sheet-bar .dot.ok { background: var(--accent); }
+    .sheet-bar .dot.warn { background: var(--orange); }
+    .sheet-bar strong { color: var(--accent); }
+    .sheet-bar .sheet-cats { display: flex; gap: 6px; }
+    .sheet-bar .scat { background: #c5e8df; color: #0a5244; border-radius: 999px; padding: 2px 8px; font-weight: 700; }
+    button.btn-sync { background: var(--dark); color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    button.btn-sync:hover { background: #1a2820; }
+    button.btn-sync:disabled { opacity: .5; cursor: wait; }
+
+    /* page */
+    .page { max-width: 1320px; margin: 0 auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* step cards */
+    .step-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .step-head { display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid var(--line); background: var(--step-bg); }
+    .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 800; display: grid; place-items: center; flex-shrink: 0; }
+    .step-head h2 { font-size: 15px; font-weight: 700; flex: 1; }
+    .badge { background: #e6efe9; color: #275246; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .badge.warn { background: #fde8df; color: #8b3a20; }
+    .badge.p1 { background: var(--p1); color: #fff; }
+    .badge.p2 { background: var(--p2); color: #fff; }
+    .badge.p3 { background: var(--p3); color: #fff; }
+    .badge.p4 { background: var(--p4); color: #555; }
+    .step-body { padding: 16px 18px; }
+
+    /* buttons */
+    button { border: none; border-radius: 7px; padding: 9px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .15s; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-h); }
+    .btn-dark { background: var(--dark); color: #fff; }
+    .btn-dark:hover:not(:disabled) { background: #1a2820; }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+    .btn-ghost:hover:not(:disabled) { background: #ece8de; }
+    .btn-mini { padding: 6px 10px; font-size: 12px; background: var(--accent); color: #fff; border-radius: 6px; white-space: nowrap; }
+    .btn-mini:hover:not(:disabled) { background: var(--accent-h); }
+
+    /* ── folder filter toolbar ── */
+    .filter-top { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .filter-top input[type=text] { flex: 1; min-width: 180px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 7px; font: inherit; font-size: 13px; background: #fff; color: var(--ink); }
+    .btn-filter-toggle { display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--line); border-radius: 7px; padding: 7px 12px; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--ink); white-space: nowrap; }
+    .btn-filter-toggle:hover { background: #ece8de; }
+    .btn-filter-toggle .fc { background: var(--accent); color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 11px; font-weight: 800; }
+    .filter-panel { background: #f9f7f2; border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; margin-bottom: 10px; display: none; flex-direction: column; gap: 10px; }
+    .filter-panel.open { display: flex; }
+    .filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .filter-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; min-width: 80px; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 4px; }
+    .btn-group button { padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 6px; background: #fff; border: 1px solid var(--line); color: var(--ink); cursor: pointer; }
+    .btn-group button:hover { background: #e8f0ee; }
+    .btn-group button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-group button.p1.active { background: var(--p1); border-color: var(--p1); }
+    .btn-group button.p2.active { background: var(--p2); border-color: var(--p2); }
+    .btn-group button.p3.active { background: var(--p3); border-color: var(--p3); }
+    .btn-group button.p4.active { background: var(--p4); border-color: var(--p4); color: #444; }
+    .filter-sort { display: flex; align-items: center; gap: 8px; }
+    .filter-sort select { padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 12px; background: #fff; color: var(--ink); }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+    .filter-pill { display: flex; align-items: center; gap: 4px; background: #d4ece3; color: #1a4d3a; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+    .filter-pill button { background: none; border: none; padding: 0 0 0 2px; cursor: pointer; font-size: 13px; color: #1a4d3a; line-height: 1; }
+    .filter-count { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    /* folder list */
+    .folder-list { max-height: 380px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
+    .folder-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid #ece7dc; cursor: pointer; user-select: none; }
+    .folder-row:last-child { border-bottom: none; }
+    .folder-row:hover { background: #eef6f1; }
+    .folder-row.checked { background: #e4f0ea; }
+    .folder-row input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+    .folder-num { color: var(--accent); font-weight: 800; font-size: 12px; min-width: 28px; text-align: right; }
+    .folder-name { flex: 1; font-weight: 600; }
+    .folder-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .folder-sub { font-size: 11px; color: var(--muted); }
+    .folder-badges { display: flex; gap: 4px; align-items: center; }
+    .fbadge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; }
+    .fbadge-cat { background: #e6f0ff; color: #1a4080; }
+    .fbadge-sub { background: #f0e8ff; color: #4a2080; }
+    .fbadge-p1 { background: var(--p1); color: #fff; }
+    .fbadge-p2 { background: var(--p2); color: #fff; }
+    .fbadge-p3 { background: var(--p3); color: #fff; }
+    .fbadge-p4 { background: var(--p4); color: #555; }
+    .fbadge-indie { background: #d4ece3; color: #1a4d3a; }
+    .fbadge-warn { background: #fde8df; color: #8b3a20; }
+
+    /* results */
+    .results-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .result-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #ece7dc; cursor: pointer; transition: background .12s; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row:hover { background: #eef6f1; }
+    .result-row.ready { border-left: 3px solid var(--accent); }
+    .result-row.missing { border-left: 3px solid var(--red); }
+    .result-num { color: var(--accent); font-weight: 800; font-size: 12px; min-width: 28px; text-align: right; flex-shrink: 0; }
+    .result-name { min-width: 130px; max-width: 180px; }
+    .result-name strong { display: block; font-weight: 700; font-size: 13px; }
+    .result-name span { font-size: 11px; color: var(--muted); }
+    .result-thumbs { display: flex; gap: 5px; flex: 1; }
+    .result-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 5px; border: 2px solid transparent; background: #f0ede5; flex-shrink: 0; }
+    .result-thumb.cover { border-color: var(--accent); }
+    .result-meta { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; min-width: 90px; }
+    .result-edit-btn { padding: 5px 10px; font-size: 12px; font-weight: 700; background: var(--dark); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    .result-edit-btn:hover { background: #1a2820; }
+    .result-actions { display: flex; flex-direction: column; gap: 6px; }
+    .result-del-btn { padding: 5px 10px; font-size: 12px; font-weight: 700; background: #fde8df; color: #8b3a20; border: 1px solid #efc7b8; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    .result-del-btn:hover { background: #f8d8cb; }
+    .scores { display: flex; gap: 4px; }
+    .score-pill { font-size: 10px; padding: 2px 6px; border-radius: 999px; font-weight: 700; background: #e8f0ee; color: #2a5045; }
+
+    /* step footer */
+    .step-footer { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--step-bg); }
+
+    /* progress */
+    .log-box { background: #1c2920; color: #d4f0e0; border-radius: 8px; padding: 14px; font-family: Consolas, monospace; font-size: 12px; min-height: 120px; max-height: 320px; overflow-y: auto; white-space: pre-wrap; }
+    .product-link { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #e4f0ea; border-radius: 6px; margin-top: 6px; font-size: 13px; }
+    .product-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
+    .product-link a:hover { text-decoration: underline; }
+
+    /* modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 100; justify-content: center; align-items: flex-start; padding: 28px 16px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--panel); border-radius: 12px; width: 100%; max-width: 980px; box-shadow: 0 20px 60px rgba(0,0,0,.3); display: flex; flex-direction: column; }
+    .modal-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--step-bg); border-radius: 12px 12px 0 0; flex-wrap: wrap; }
+    .modal-head h3 { flex: 1; font-size: 15px; font-weight: 800; }
+    .modal-close { background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 6px; }
+    .modal-close:hover { background: var(--line); color: var(--ink); }
+    .modal-body { display: grid; grid-template-columns: 280px 1fr; }
+    .modal-images { padding: 16px; border-right: 1px solid var(--line); }
+    .modal-images h4 { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .4px; }
+    .img-tools { display: flex; gap: 6px; margin-bottom: 10px; }
+    .img-tools button { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+    .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .img-card { position: relative; border: 2px solid var(--line); border-radius: 7px; overflow: hidden; cursor: pointer; background: #f0ede5; aspect-ratio: 3/4; }
+    .img-card:hover { border-color: var(--accent); }
+    .img-card.selected { border-color: var(--accent); }
+    .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-badge { position: absolute; top: 4px; left: 4px; background: var(--accent); color: #fff; font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 999px; }
+    .img-badge.cover-badge { background: #d97706; }
+    .img-sel-count { margin-top: 8px; font-size: 12px; color: var(--muted); }
+    .modal-right { display: flex; flex-direction: column; overflow: hidden; }
+    .modal-form { padding: 16px; display: flex; flex-direction: column; gap: 11px; overflow-y: auto; max-height: 520px; flex: 1; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+    .field-row { display: flex; gap: 7px; align-items: flex-start; }
+    .field-row input, .field-row textarea { flex: 1; }
+    input[type=text], input[type=number], textarea, select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; font: inherit; font-size: 13px; background: #fff; color: var(--ink); width: 100%; }
+    textarea { resize: vertical; min-height: 80px; }
+    .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* competitor section */
+    .indie-section { border: 1px solid #c5e8df; border-radius: 8px; overflow: hidden; }
+    .indie-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #e8f5f0; cursor: pointer; font-size: 12px; font-weight: 700; color: #0a5244; }
+    .indie-head .arrow { transition: transform .2s; font-size: 10px; }
+    .indie-head.open .arrow { transform: rotate(90deg); }
+    .indie-body { display: none; padding: 10px 12px; font-size: 12px; }
+    .indie-body.open { display: block; }
+    .indie-row { display: flex; gap: 8px; padding: 3px 0; border-bottom: 1px solid #e0f0eb; }
+    .indie-row:last-child { border-bottom: none; }
+    .indie-label { min-width: 110px; color: var(--muted); font-size: 11px; font-weight: 600; flex-shrink: 0; }
+    .indie-val { flex: 1; color: var(--ink); word-break: break-word; }
+    .indie-val a { color: var(--accent); text-decoration: none; }
+    .indie-val a:hover { text-decoration: underline; }
+
+    /* scores bar */
+    .scores-bar { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 12px; background: #f5f9f7; border: 1px solid var(--line); border-radius: 8px; }
+    .score-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .score-item .s-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+    .score-item .s-val { font-size: 16px; font-weight: 800; color: var(--accent); }
+    .score-item .s-bar { width: 40px; height: 4px; background: #d0e8e0; border-radius: 2px; overflow: hidden; }
+    .score-item .s-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+
+    /* misc */
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .empty-msg { padding: 24px; text-align: center; color: var(--muted); }
+    .divider { border: none; border-top: 1px solid var(--line); margin: 8px 0; }
+    @media (max-width: 780px) {
+      .modal-body { grid-template-columns: 1fr; }
+      .modal-images { border-right: none; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+<script>const WOO_BASE = "{{ woo_base }}";</script>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>WooCommerce Pattern Uploader</h1>
+  <div class="sheet-bar" id="sheetBar">
+    <div class="dot" id="sheetDot"></div>
+    <span id="sheetStatus">Loading sheet data…</span>
+    <div class="sheet-cats" id="sheetCats"></div>
+    <button class="btn-sync" id="syncSheetBtn">↻ Sync Sheet</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Patterns Folder Selector -->
+  <div id="folderConfigBar" style="display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px;background:#fffdf7;border:1px solid #d9ded8;border-radius:10px;flex-wrap:wrap">
+    <span style="font-size:12px;font-weight:700;color:#69746d;white-space:nowrap">📂 Patterns Folder</span>
+    <input type="text" id="rootFolderInput" placeholder="e.g. C:\Users\DELL\Patterns" style="flex:1;min-width:220px;padding:7px 11px;border:1px solid #d9ded8;border-radius:7px;font-size:13px;background:#fff;color:#18201c;font-family:inherit">
+    <button onclick="saveRootFolder()" style="padding:7px 16px;background:#0d7f68;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">Save &amp; Scan</button>
+    <span id="folderConfigStatus" style="font-size:12px;color:#69746d"></span>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card" id="step1">
+    <div class="step-head">
+      <div class="step-num">1</div>
+      <h2>Select Folders</h2>
+      <span class="badge" id="selCount">0 selected</span>
+    </div>
+    <div class="step-body">
+
+      <!-- top row: search + toggle + bulk actions -->
+      <div class="filter-top">
+        <input type="text" id="folderSearch" placeholder="Search name, category, sub-category…">
+        <button class="btn-filter-toggle" id="filterToggle">⚙ Filters <span class="fc hidden" id="filterCount">0</span></button>
+        <button class="btn-ghost" id="selAllBtn">Select List</button>
+        <button class="btn-ghost" id="deselAllBtn">Clear</button>
+        <button class="btn-ghost" id="selVisibleBtn">Select Visible</button>
+      </div>
+
+      <!-- collapsible filter panel -->
+      <div class="filter-panel" id="filterPanel">
+
+        <div class="filter-row">
+          <span class="filter-label">Category</span>
+          <div class="btn-group" id="fCat">
+            <button data-val="" class="active">All</button>
+            <button data-val="Dress">Dress</button>
+            <button data-val="Top">Top</button>
+            <button data-val="Skirt">Skirt</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">Priority</span>
+          <div class="btn-group" id="fPrio">
+            <button data-val="" class="active">All</button>
+            <button data-val="1" class="p1">🔥 P1</button>
+            <button data-val="2" class="p2">⭐ P2</button>
+            <button data-val="3" class="p3">📌 P3</button>
+            <button data-val="4" class="p4">💤 P4</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">Status</span>
+          <div class="btn-group" id="fStatus">
+            <button data-val="" class="active">All</button>
+            <button data-val="publier">📤 To Publish</button>
+            <button data-val="publi">✅ Published</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">WC Status</span>
+          <div class="btn-group" id="fWcStatus">
+            <button data-val="" class="active">All</button>
+            <button data-val="publie">✅ Publié</button>
+            <button data-val="apublier">📤 À Publier</button>
+            <button data-val="empty">— Empty</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">IndiePattern</span>
+          <div class="btn-group" id="fIndie">
+            <button data-val="" class="active">All</button>
+            <button data-val="yes">✅ Has data</button>
+            <button data-val="no">— No data</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">Min Demand</span>
+          <div class="btn-group" id="fDemand">
+            <button data-val="0" class="active">Any</button>
+            <button data-val="7">≥ 7</button>
+            <button data-val="8">≥ 8</button>
+            <button data-val="9">≥ 9</button>
+            <button data-val="10">10</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">PDFs</span>
+          <div class="btn-group" id="fPdf">
+            <button data-val="" class="active">All</button>
+            <button data-val="3">Exactly 3</button>
+            <button data-val="warn">⚠ Missing</button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">Sort by</span>
+          <div class="filter-sort">
+            <select id="fSort">
+              <option value="num">Number #</option>
+              <option value="demand">Demand ↓</option>
+              <option value="priority">Priority</option>
+              <option value="name">Name A–Z</option>
+            </select>
+            <button class="btn-ghost" id="clearFiltersBtn" style="font-size:12px;padding:5px 10px;">✕ Clear all</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- active filter pills + count -->
+      <div class="filter-pills" id="filterPills"></div>
+      <div class="filter-count" id="filterCountLine"></div>
+
+      <div class="folder-list" id="folderList"><div class="empty-msg">Loading…</div></div>
+    </div>
+    <div class="step-footer">
+      <button class="btn-primary" id="extractBtn" disabled>Extract Selected Folders →</button>
+      <span id="extractStatus" class="muted" style="font-size:13px;"></span>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card hidden" id="step2">
+    <div class="step-head">
+      <div class="step-num">2</div>
+      <h2>Review &amp; Edit Products</h2>
+      <span class="badge" id="readyCount">0 ready</span>
+    </div>
+    <div class="step-body">
+      <div class="results-list" id="resultsList"><div class="empty-msg">No results yet.</div></div>
+    </div>
+    <div class="step-footer">
+      <button class="btn-ghost" id="clearResultsBtn">Clear Review List</button>
+      <button class="btn-danger" id="sendAllBtn" disabled>Send All to WooCommerce →</button>
+      <span class="muted" style="font-size:13px;" id="sendStatus"></span>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card hidden" id="step3">
+    <div class="step-head">
+      <div class="step-num">3</div>
+      <h2>Upload Progress</h2>
+      <span class="badge" id="uploadBadge">idle</span>
+    </div>
+    <div class="step-body">
+      <div class="log-box" id="logBox"></div>
+      <div id="createdLinks"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Edit Product</h3>
+      <div id="modalBadges" style="display:flex;gap:6px;"></div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- left: images -->
+      <div class="modal-images">
+        <h4>Images <span id="imgSelCount" style="font-weight:400;text-transform:none;letter-spacing:0">(0 selected)</span></h4>
+        <div class="img-tools">
+          <button class="btn-ghost" id="imgSelectAllBtn" type="button">Select all</button>
+          <button class="btn-ghost" id="imgClearBtn" type="button">Clear</button>
+        </div>
+        <div class="image-grid" id="imageGrid"></div>
+      </div>
+
+      <!-- right: form + intelligence -->
+      <div class="modal-right">
+        <div class="modal-form" id="modalForm">
+
+          <!-- scores bar (only when sheet data present) -->
+          <div id="scoresBar" class="scores-bar hidden"></div>
+
+          <div class="field-group">
+            <label>Title</label>
+            <div class="field-row">
+              <input type="text" id="mTitle" placeholder="Product title…">
+              <button class="btn-mini" data-ai="title">✨ Generate</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Description</label>
+            <div class="field-row">
+              <textarea id="mDescription" placeholder="Product description…" style="min-height:100px;"></textarea>
+              <button class="btn-mini" data-ai="description">✨ Generate</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Short Description</label>
+            <div class="field-row">
+              <textarea id="mShortDescription" placeholder="Short sales description for WooCommerce…" style="min-height:76px;"></textarea>
+              <button class="btn-mini" data-ai="short_description">✨ Generate</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Tags (comma-separated)</label>
+            <div class="field-row">
+              <input type="text" id="mTags" placeholder="tag1, tag2, tag3…">
+              <button class="btn-mini" data-ai="tags">✨ Generate</button>
+            </div>
+          </div>
+
+          <div class="price-row">
+            <div class="field-group">
+              <label>Sale Price (USD)</label>
+              <input type="number" id="mPrice" step="0.01" min="0" value="2.99">
+            </div>
+            <div class="field-group">
+              <label>Status</label>
+              <select id="mStatus">
+                <option value="draft">Draft</option>
+                <option value="publish">Publish</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Category</label>
+            <input type="text" id="mCategory" placeholder="Sewing Patterns">
+          </div>
+
+          <hr class="divider">
+
+          <!-- IndiePattern competitor intelligence -->
+          <div class="indie-section" id="indieSection">
+            <div class="indie-head" id="indieToggle">
+              <span>🔍 IndiePattern Competitor Intelligence</span>
+              <span class="arrow">▶</span>
+            </div>
+            <div class="indie-body" id="indieBody">
+              <div id="indieContent"><span class="muted">No match found in sheet.</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--line);background:var(--step-bg);border-radius:0 0 12px 12px;">
+      <button class="btn-ghost" id="modalCancel">Cancel</button>
+      <button class="btn-primary" id="modalSave">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── state ──
+  let folders = [];
+  let sheetStats = null;
+  let selected = new Set();
+  let extracted = [];
+  let editIndex = null;
+  let modalSelImages = [];
+  let defaultCategory = "{{ config.get('default_category', 'Sewing Patterns') }}";
+
+  const $ = id => document.getElementById(id);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+  // ── priority helpers ──
+  function prioBadgeClass(p) {
+    if (!p) return "";
+    if (p.includes("1")) return "p1";
+    if (p.includes("2")) return "p2";
+    if (p.includes("3")) return "p3";
+    if (p.includes("4")) return "p4";
+    return "";
+  }
+  function prioLabel(p) {
+    if (!p) return "";
+    if (p.includes("1")) return "P1";
+    if (p.includes("2")) return "P2";
+    if (p.includes("3")) return "P3";
+    if (p.includes("4")) return "P4";
+    return p;
+  }
+  function prioDotColor(p) {
+    if (!p) return "#ccc";
+    if (p.includes("1")) return "var(--p1)";
+    if (p.includes("2")) return "var(--p2)";
+    if (p.includes("3")) return "var(--p3)";
+    return "var(--p4)";
+  }
+
+  // ── sheet status bar ──
+  async function loadSheetStats() {
+    try {
+      const res = await fetch(WOO_BASE + "/api/sheet-stats");
+      sheetStats = await res.json();
+      renderSheetBar();
+    } catch (e) {
+      $("sheetStatus").textContent = "Sheet: error loading";
+    }
+  }
+
+  function renderSheetBar() {
+    if (!sheetStats || !sheetStats.synced) {
+      $("sheetDot").className = "dot warn";
+      $("sheetStatus").innerHTML = `<span>No sheet cache — click <strong>↻ Sync Sheet</strong> to load</span>`;
+      $("sheetCats").innerHTML = "";
+      return;
+    }
+    const age = sheetStats.age_seconds;
+    const ageStr = age < 60 ? "just now" : age < 3600 ? `${Math.round(age/60)}m ago` : `${Math.round(age/3600)}h ago`;
+    $("sheetDot").className = age < 21600 ? "dot ok" : "dot warn";
+    $("sheetStatus").innerHTML = `<strong>${sheetStats.count}</strong> patterns · synced ${ageStr} · <strong>${sheetStats.matched || 0}</strong> with IndiePattern data`;
+    const cats = sheetStats.categories || {};
+    $("sheetCats").innerHTML = Object.entries(cats).map(([k,v]) =>
+      `<span class="scat">${esc(k)} ${v}</span>`
+    ).join("");
+  }
+
+  $("syncSheetBtn").addEventListener("click", async () => {
+    $("syncSheetBtn").disabled = true;
+    $("syncSheetBtn").textContent = "Syncing…";
+    $("sheetDot").className = "dot warn";
+    $("sheetStatus").textContent = "Fetching sheet from Google…";
+    try {
+      const res = await fetch(WOO_BASE + "/api/sync-sheet", {method: "POST"});
+      const data = await res.json();
+      if (!res.ok) {
+        $("sheetDot").className = "dot warn";
+        $("sheetStatus").textContent = `Sheet error: ${data.error || res.statusText}`;
+      } else {
+        sheetStats = {...data, synced: true, age_seconds: 0};
+        renderSheetBar();
+        await loadFolders();
+      }
+    } catch (e) {
+      $("sheetDot").className = "dot warn";
+      if (e.message === "Failed to fetch") {
+        $("sheetStatus").innerHTML = `<span style="color:var(--red)">⚠ Server not reachable — run <code>python app.py</code> in the project folder, then reload.</span>`;
+      } else {
+        $("sheetStatus").textContent = `Sync error: ${e.message}`;
+      }
+    }
+    $("syncSheetBtn").disabled = false;
+    $("syncSheetBtn").textContent = "↻ Sync Sheet";
+  });
+
+  // ── STEP 1: filter state ──
+  const filters = { cat: "", prio: "", status: "", wc_status: "", indie: "", demand: 0, pdf: "", sort: "num" };
+
+  function activeFilterCount() {
+    return [filters.cat, filters.prio, filters.status, filters.wc_status, filters.indie, filters.pdf].filter(Boolean).length
+         + (filters.demand > 0 ? 1 : 0);
+  }
+
+  function updateFilterBadge() {
+    const n = activeFilterCount();
+    const fc = $("filterCount");
+    fc.textContent = n;
+    fc.classList.toggle("hidden", n === 0);
+  }
+
+  function renderFilterPills() {
+    const pills = [];
+    if (filters.cat)    pills.push({key:"cat",    label:`Cat: ${filters.cat}`});
+    if (filters.prio)   pills.push({key:"prio",   label:`Priority: P${filters.prio}`});
+    if (filters.status) pills.push({key:"status", label:`Status: ${filters.status === "publier" ? "To Publish" : "Published"}`});
+    if (filters.wc_status) {
+      const wcLabel = filters.wc_status === "empty"
+        ? "Empty"
+        : filters.wc_status === "apublier"
+          ? "À Publier"
+          : "Publié";
+      pills.push({key:"wc_status", label:`WC: ${wcLabel}`});
+    }
+    if (filters.indie)  pills.push({key:"indie",  label:`IndiePattern: ${filters.indie === "yes" ? "Has data" : "No data"}`});
+    if (filters.demand > 0) pills.push({key:"demand", label:`Demand ≥ ${filters.demand}`});
+    if (filters.pdf)    pills.push({key:"pdf",    label:`PDFs: ${filters.pdf === "3" ? "Exactly 3" : "Missing"}`});
+    $("filterPills").innerHTML = pills.map(p =>
+      `<span class="filter-pill">${esc(p.label)}<button data-key="${p.key}" title="Remove">✕</button></span>`
+    ).join("");
+    $("filterPills").querySelectorAll("button[data-key]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = btn.dataset.key;
+        if (k === "demand") filters.demand = 0; else filters[k] = "";
+        syncButtonGroupUI();
+        applyAndRender();
+      });
+    });
+  }
+
+  function syncButtonGroupUI() {
+    // Category
+    $("fCat").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === filters.cat));
+    // Priority
+    $("fPrio").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === filters.prio));
+    // Status
+    $("fStatus").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === filters.status));
+    // WC Status
+    $("fWcStatus").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === filters.wc_status));
+    // Indie
+    $("fIndie").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === filters.indie));
+    // Demand
+    $("fDemand").querySelectorAll("button").forEach(b => b.classList.toggle("active", Number(b.dataset.val) === filters.demand));
+    // PDF
+    $("fPdf").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.val === filters.pdf));
+    // Sort
+    $("fSort").value = filters.sort;
+    updateFilterBadge();
+  }
+
+  function applyAndRender() { updateFilterBadge(); renderFilterPills(); renderFolderList(); }
+
+  // wire button groups
+  function wireGroup(groupId, key, isNum) {
+    $(groupId).querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        filters[key] = isNum ? Number(btn.dataset.val) : btn.dataset.val;
+        syncButtonGroupUI();
+        applyAndRender();
+      });
+    });
+  }
+  wireGroup("fCat",    "cat",    false);
+  wireGroup("fPrio",   "prio",   false);
+  wireGroup("fStatus", "status", false);
+  wireGroup("fWcStatus", "wc_status", false);
+  wireGroup("fIndie",  "indie",  false);
+  wireGroup("fDemand", "demand", true);
+  wireGroup("fPdf",    "pdf",    false);
+  $("fSort").addEventListener("change", () => { filters.sort = $("fSort").value; applyAndRender(); });
+  $("filterToggle").addEventListener("click", () => $("filterPanel").classList.toggle("open"));
+  $("clearFiltersBtn").addEventListener("click", () => {
+    Object.assign(filters, {cat:"", prio:"", status:"", wc_status:"", indie:"", demand:0, pdf:"", sort:"num"});
+    syncButtonGroupUI(); applyAndRender();
+  });
+
+  // ── STEP 1: folder list ──
+  async function loadFolders() {
+    $("folderList").innerHTML = '<div class="empty-msg">Loading…</div>';
+    try {
+      const res = await fetch(WOO_BASE + "/api/folders-enriched");
+      folders = await res.json();
+      applyAndRender();
+    } catch (e) {
+      $("folderList").innerHTML = `<div class="empty-msg" style="color:var(--red)">Error: ${esc(e.message)}</div>`;
+    }
+  }
+
+  function getFilteredSorted() {
+    const normText = v => (v || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const normWords = v => normText(v).replace(/[^a-z\s]+/g, " ").replace(/\s+/g, " ").trim();
+    const wcStatusKey = v => {
+      const t = normWords(v);
+      if (!t) return "empty";
+      if (t === "a publier") return "apublier";
+      if (t === "publie") return "publie";
+      return "other";
+    };
+    const q = $("folderSearch").value.toLowerCase();
+    let list = folders.filter(f => {
+      if (q && !f.clean_name.toLowerCase().includes(q) &&
+               !f.folder.toLowerCase().includes(q) &&
+               !(f.categorie||"").toLowerCase().includes(q) &&
+               !(f.sous_categorie||"").toLowerCase().includes(q)) return false;
+      if (filters.cat    && f.categorie !== filters.cat) return false;
+      if (filters.prio   && !(f.priorite||"").includes(filters.prio)) return false;
+      if (filters.status && !(f.statut_etsy||"").toLowerCase().includes(filters.status)) return false;
+      if (filters.wc_status) {
+        if (wcStatusKey(f.statut_woocommerce || "") !== filters.wc_status) return false;
+      }
+      if (filters.indie === "yes" && !f.indiepattern_match) return false;
+      if (filters.indie === "no"  &&  f.indiepattern_match) return false;
+      if (filters.demand > 0 && (Number(f.demande)||0) < filters.demand) return false;
+      if (filters.pdf === "3"    && f.pdf_count !== 3) return false;
+      if (filters.pdf === "warn" && !f.warnings.length) return false;
+      return true;
+    });
+
+    list = [...list].sort((a, b) => {
+      if (filters.sort === "demand")   return (Number(b.demande)||0) - (Number(a.demande)||0);
+      if (filters.sort === "priority") {
+        const pn = p => p ? (Number(p.match(/\d/)?.[0])||9) : 9;
+        return pn(a.priorite) - pn(b.priorite);
+      }
+      if (filters.sort === "name")     return (a.clean_name||"").localeCompare(b.clean_name||"");
+      return (a.number ?? a.index) - (b.number ?? b.index);
+    });
+    return list;
+  }
+
+  function prioBadgeClass2(p) {
+    if (!p) return "";
+    if (p.includes("1")) return "fbadge-p1";
+    if (p.includes("2")) return "fbadge-p2";
+    if (p.includes("3")) return "fbadge-p3";
+    return "fbadge-p4";
+  }
+
+  function renderFolderList() {
+    const visible = getFilteredSorted();
+    const total = folders.length;
+    $("filterCountLine").textContent = visible.length === total
+      ? `${total} folders`
+      : `Showing ${visible.length} of ${total} folders`;
+
+    if (!visible.length) {
+      $("folderList").innerHTML = '<div class="empty-msg">No folders match your filters.</div>';
+      return;
+    }
+
+    $("folderList").innerHTML = visible.map(f => {
+      const chk = selected.has(f.index);
+      const pCls = prioBadgeClass2(f.priorite);
+      const pLabel = f.priorite ? "P" + (f.priorite.match(/\d/)?.[0]||"") : "";
+      return `<label class="folder-row ${chk ? "checked" : ""}" data-idx="${f.index}">
+        <input type="checkbox" ${chk ? "checked" : ""} data-idx="${f.index}">
+        <span class="folder-num">${esc(f.number ?? "")}</span>
+        <span class="folder-name">${esc(f.clean_name)}</span>
+        <span class="folder-badges">
+          ${f.categorie ? `<span class="fbadge fbadge-cat">${esc(f.categorie)}</span>` : ""}
+          ${f.sous_categorie ? `<span class="fbadge fbadge-sub">${esc(f.sous_categorie)}</span>` : ""}
+          ${pCls ? `<span class="fbadge ${pCls}">${pLabel}</span>` : ""}
+          ${f.indiepattern_match ? `<span class="fbadge fbadge-indie">✅ IndieP</span>` : ""}
+          ${f.warnings.length ? `<span class="fbadge fbadge-warn">⚠ ${esc(f.warnings[0])}</span>` : ""}
+          ${f.demande ? `<span class="fbadge" style="background:#edf5e0;color:#2d5a0a">D:${esc(f.demande)}</span>` : ""}
+        </span>
+        <span class="folder-sub" style="margin-left:auto;color:var(--muted)">${f.pdf_count} PDF${f.pdf_count !== 1 ? "s" : ""}</span>
+      </label>`;
+    }).join("");
+
+    $("folderList").querySelectorAll("input[type=checkbox]").forEach(cb => {
+      cb.addEventListener("change", e => {
+        e.stopPropagation();
+        const idx = Number(cb.dataset.idx);
+        selected.has(idx) ? selected.delete(idx) : selected.add(idx);
+        updateSelCount();
+        renderFolderList();
+      });
+    });
+  }
+
+  function updateSelCount() {
+    $("selCount").textContent = `${selected.size} selected`;
+    $("extractBtn").disabled = selected.size === 0;
+  }
+
+  $("folderSearch").addEventListener("input", applyAndRender);
+  $("selAllBtn").addEventListener("click", () => {
+    selected = new Set(getFilteredSorted().map(f => f.index));
+    updateSelCount(); renderFolderList();
+  });
+  $("deselAllBtn").addEventListener("click", () => { selected.clear(); updateSelCount(); renderFolderList(); });
+  $("selVisibleBtn").addEventListener("click", () => {
+    getFilteredSorted().forEach(f => selected.add(f.index));
+    updateSelCount(); renderFolderList();
+  });
+
+  // ── STEP 1 → 2: extract ──
+  $("extractBtn").addEventListener("click", async () => {
+    $("extractBtn").disabled = true;
+    $("extractStatus").textContent = `Extracting ${selected.size} folder(s)…`;
+    try {
+      const res = await fetch(WOO_BASE + "/api/extract-batch", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({indexes: [...selected]})
+      });
+      const data = await res.json();
+      extracted = data.map(item => {
+        const s = item.sheet || {};
+        const modelPicks = (item.images || []).filter(img => img.is_model).slice(0, 2).map(img => img.url);
+        const fallbackPicks = (item.images || []).slice(0, 2).map(img => img.url);
+        return {
+          ...item,
+          // pre-fill from sheet or clean_name
+          title:       s.titre_etsy  || item.clean_name || item.folder,
+          description: s.indiepattern_description || "",
+          short_description: "",
+          tags:        s.tags        || "",
+          price:       s.prix        || "2.99",
+          category:    s.categorie   || defaultCategory,
+          status:      "draft",
+          wc_status:   "",
+          selected_images: modelPicks.length ? modelPicks : fallbackPicks,
+          ai_title_generated: false,
+          ai_title_source: "",
+          ai_description_generated: false,
+          ai_description_source: "",
+          ai_short_description_generated: false,
+          ai_short_description_source: "",
+        };
+      });
+      renderResults();
+      $("step2").classList.remove("hidden");
+      $("step2").scrollIntoView({behavior: "smooth", block: "start"});
+      await autoGenerateSelectedCopy();
+    } catch (e) {
+      $("extractStatus").textContent = `Error: ${e.message}`;
+      $("extractBtn").disabled = false;
+      return;
+    }
+    $("extractBtn").disabled = false;
+    $("extractStatus").textContent = "";
+  });
+
+  async function generateAICopyForItem(item, field) {
+    const sheet = item.sheet || {};
+    const res = await fetch(WOO_BASE + "/api/ai-generate", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        field,
+        product: {
+          title: item.title || "",
+          description: item.description || "",
+          short_description: item.short_description || "",
+          price: item.price || "",
+          tags: item.tags || "",
+          category: item.category || "",
+          indiepattern_titre: sheet.indiepattern_titre || "",
+          indiepattern_description: sheet.indiepattern_description || "",
+        }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    return data;
+  }
+
+  async function autoGenerateSelectedCopy() {
+    if (!extracted.length) return;
+    let done = 0;
+    for (const item of extracted) {
+      $("extractStatus").textContent = `Generating AI title/description ${done + 1}/${extracted.length}…`;
+      try {
+        const [titleData, descData, shortData] = await Promise.all([
+          generateAICopyForItem(item, "title"),
+          generateAICopyForItem(item, "description"),
+          generateAICopyForItem(item, "short_description"),
+        ]);
+        if (titleData.text) item.title = String(titleData.text).trim();
+        if (descData.text) item.description = String(descData.text).trim();
+        if (shortData.text) item.short_description = String(shortData.text).trim();
+        item.ai_title_generated = Boolean(item.title);
+        item.ai_title_source = titleData.source || "";
+        item.ai_description_generated = Boolean(item.description);
+        item.ai_description_source = descData.source || "";
+        item.ai_short_description_generated = Boolean(item.short_description);
+        item.ai_short_description_source = shortData.source || "";
+      } catch (e) {
+        item.ai_title_generated = false;
+        item.ai_description_generated = false;
+        item.ai_short_description_generated = false;
+        item.ai_title_source = "";
+        item.ai_description_source = "";
+        item.ai_short_description_source = "";
+      }
+      done += 1;
+      renderResults();
+    }
+    $("extractStatus").textContent = "AI generation complete.";
+  }
+
+  // ── STEP 2: results ──
+  function renderResults() {
+    const ready = extracted.filter(it => it.selected_images.length > 0 && it.title.trim()).length;
+    $("readyCount").textContent = `${ready} / ${extracted.length} ready`;
+    $("sendAllBtn").disabled = ready === 0;
+    $("sendStatus").textContent = ready < extracted.length ? `${extracted.length - ready} need editing` : "";
+
+    if (!extracted.length) {
+      $("resultsList").innerHTML = '<div class="empty-msg">No results.</div>';
+      return;
+    }
+
+    $("resultsList").innerHTML = extracted.map((item, i) => {
+      const isReady = item.selected_images.length > 0 && item.title.trim();
+      const s = item.sheet || {};
+      const thumbs = (item.images || []).slice(0, 3).map((img, ti) =>
+        `<img class="result-thumb ${item.selected_images[0] === img.url ? "cover" : ""}" src="${esc(img.url)}?t=${Date.now()}">`
+      ).join("") || `<span class="muted" style="font-size:11px">No images</span>`;
+      const prioCls = prioBadgeClass(s.priorite);
+      const scores = s.demande ? `
+        <div class="scores">
+          <span class="score-pill" title="Demand">D:${esc(s.demande)}</span>
+          <span class="score-pill" title="Competition">C:${esc(s.concurrence)}</span>
+          <span class="score-pill" title="Uniqueness">U:${esc(s.unicite)}</span>
+        </div>` : "";
+      return `<div class="result-row ${isReady ? "ready" : "missing"}" data-idx="${i}">
+        <span class="result-num">${item.number ?? i + 1}</span>
+        <div class="result-name">
+          <strong>${esc(item.clean_name)}</strong>
+          <span>${esc(s.categorie || "")}${s.sous_categorie ? " · " + esc(s.sous_categorie) : ""}</span>
+        </div>
+        <div class="result-thumbs">${thumbs}</div>
+        <div class="result-meta">
+          ${prioCls ? `<span class="badge ${prioCls}">${prioLabel(s.priorite)}</span>` : ""}
+          ${scores}
+          ${item.wc_status ? `<span class="badge">${esc(item.wc_status)}</span>` : ""}
+          ${item.ai_title_generated ? `<span class="badge">✅ Title generated${item.ai_title_source ? ` (${esc(item.ai_title_source)})` : ""}</span>` : '<span class="badge warn">Title not generated</span>'}
+          ${item.ai_description_generated ? `<span class="badge">✅ Description generated${item.ai_description_source ? ` (${esc(item.ai_description_source)})` : ""}</span>` : '<span class="badge warn">Description not generated</span>'}
+          ${item.ai_short_description_generated ? `<span class="badge">✅ Short description generated${item.ai_short_description_source ? ` (${esc(item.ai_short_description_source)})` : ""}</span>` : '<span class="badge warn">Short description not generated</span>'}
+          ${isReady ? '<span class="badge">Ready</span>' : '<span class="badge warn">Edit needed</span>'}
+        </div>
+        <div class="result-actions">
+          <button class="result-edit-btn" data-idx="${i}">✏ Edit</button>
+          <button class="result-del-btn" data-del-idx="${i}">🗑 Remove</button>
+        </div>
+      </div>`;
+    }).join("");
+
+    $("resultsList").querySelectorAll("[data-idx]").forEach(el => {
+      el.addEventListener("click", () => {
+        const idx = Number(el.dataset.idx ?? el.closest("[data-idx]")?.dataset.idx);
+        if (!isNaN(idx)) openModal(idx);
+      });
+    });
+    $("resultsList").querySelectorAll("[data-del-idx]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const idx = Number(btn.dataset.delIdx);
+        if (Number.isNaN(idx) || idx < 0 || idx >= extracted.length) return;
+        extracted.splice(idx, 1);
+        if (editIndex !== null) {
+          if (editIndex === idx) {
+            closeModal();
+          } else if (editIndex > idx) {
+            editIndex -= 1;
+          }
+        }
+        renderResults();
+      });
+    });
+  }
+
+  // ── Modal ──
+  function openModal(idx) {
+    editIndex = idx;
+    const item = extracted[idx];
+    const s = item.sheet || {};
+    modalSelImages = [...(item.selected_images || [])];
+
+    $("modalTitle").textContent = `Edit: ${item.clean_name || item.folder}`;
+
+    // priority + category badges in header
+    const prioCls = prioBadgeClass(s.priorite);
+    $("modalBadges").innerHTML = [
+      prioCls ? `<span class="badge ${prioCls}">${prioLabel(s.priorite)}</span>` : "",
+      s.categorie ? `<span class="badge">${esc(s.categorie)}</span>` : "",
+      s.statut_etsy ? `<span class="badge">${esc(s.statut_etsy)}</span>` : "",
+      item.wc_status ? `<span class="badge">${esc(item.wc_status)}</span>` : "",
+      item.ai_title_generated ? `<span class="badge">Title generated</span>` : `<span class="badge warn">Title not generated</span>`,
+      item.ai_description_generated ? `<span class="badge">Description generated</span>` : `<span class="badge warn">Description not generated</span>`,
+      item.ai_short_description_generated ? `<span class="badge">Short generated</span>` : `<span class="badge warn">Short not generated</span>`,
+    ].join("");
+
+    $("mTitle").value       = item.title || "";
+    $("mDescription").value = item.description || "";
+    $("mShortDescription").value = item.short_description || "";
+    $("mTags").value        = item.tags || "";
+    $("mPrice").value       = item.price || "2.99";
+    $("mStatus").value      = item.status || "draft";
+    $("mCategory").value    = item.category || defaultCategory;
+
+    // scores bar
+    if (s.demande) {
+      const bar = $("scoresBar");
+      bar.classList.remove("hidden");
+      bar.innerHTML = [
+        ["Demand", s.demande], ["Competition", s.concurrence], ["Uniqueness", s.unicite]
+      ].map(([lbl, val]) => `
+        <div class="score-item">
+          <span class="s-label">${lbl}</span>
+          <span class="s-val">${esc(val)}</span>
+          <div class="s-bar"><div class="s-fill" style="width:${(Number(val)||0)*10}%"></div></div>
+        </div>`).join("");
+    } else {
+      $("scoresBar").classList.add("hidden");
+    }
+
+    // competitor intelligence
+    if (s.indiepattern_url || s.indiepattern_titre || s.indiepattern_keywords) {
+      $("indieContent").innerHTML = [
+        s.indiepattern_titre    ? `<div class="indie-row"><span class="indie-label">Title</span><span class="indie-val">${esc(s.indiepattern_titre)}</span></div>` : "",
+        s.indiepattern_url      ? `<div class="indie-row"><span class="indie-label">URL</span><span class="indie-val"><a href="${esc(s.indiepattern_url)}" target="_blank" rel="noreferrer">↗ View on IndiePattern</a></span></div>` : "",
+        s.indiepattern_keywords ? `<div class="indie-row"><span class="indie-label">Keywords</span><span class="indie-val">${esc(s.indiepattern_keywords)}</span></div>` : "",
+        s.indiepattern_description ? `<div class="indie-row"><span class="indie-label">Description</span><span class="indie-val" style="max-height:80px;overflow:auto;">${esc(s.indiepattern_description)}</span></div>` : "",
+        s.notes ? `<div class="indie-row"><span class="indie-label">Notes</span><span class="indie-val">${esc(s.notes)}</span></div>` : "",
+      ].filter(Boolean).join("");
+      $("indieSection").classList.remove("hidden");
+    } else if (s.notes) {
+      $("indieContent").innerHTML = `<div class="indie-row"><span class="indie-label">Notes</span><span class="indie-val">${esc(s.notes)}</span></div>`;
+      $("indieSection").classList.remove("hidden");
+    } else {
+      $("indieSection").classList.add("hidden");
+    }
+
+    renderImageGrid(item);
+    $("modalOverlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  $("indieToggle").addEventListener("click", () => {
+    $("indieToggle").classList.toggle("open");
+    $("indieBody").classList.toggle("open");
+  });
+
+  function renderImageGrid(item) {
+    const images = item.images || [];
+    if (!images.length) {
+      $("imageGrid").innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:12px;padding:6px">No images extracted.</div>';
+      $("imgSelCount").textContent = "(0 selected)";
+      return;
+    }
+    $("imageGrid").innerHTML = images.map((img) => {
+      const selIdx = modalSelImages.indexOf(img.url);
+      const isSel = selIdx !== -1;
+      const isCover = selIdx === 0;
+      return `<div class="img-card ${isSel ? "selected" : ""}" data-url="${esc(img.url)}" title="${esc(img.pdf)} p${img.page} ${img.width}×${img.height}">
+        <img src="${esc(img.url)}?t=${Date.now()}" loading="lazy">
+        ${isSel ? `<span class="img-badge ${isCover ? "cover-badge" : ""}">${isCover ? "★" : selIdx + 1}</span>` : ""}
+      </div>`;
+    }).join("");
+    $("imgSelCount").textContent = `(${modalSelImages.length} selected)`;
+    $("imageGrid").querySelectorAll(".img-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const url = card.dataset.url;
+        const pos = modalSelImages.indexOf(url);
+        pos === -1 ? modalSelImages.push(url) : modalSelImages.splice(pos, 1);
+        renderImageGrid(item);
+      });
+    });
+  }
+
+  $("imgSelectAllBtn").addEventListener("click", () => {
+    if (editIndex === null) return;
+    const item = extracted[editIndex];
+    modalSelImages = (item.images || []).map(img => img.url);
+    renderImageGrid(item);
+  });
+
+  $("imgClearBtn").addEventListener("click", () => {
+    if (editIndex === null) return;
+    const item = extracted[editIndex];
+    modalSelImages = [];
+    renderImageGrid(item);
+  });
+
+  function closeModal() {
+    $("modalOverlay").classList.remove("open");
+    document.body.style.overflow = "";
+    editIndex = null;
+  }
+  $("modalClose").addEventListener("click", closeModal);
+  $("modalCancel").addEventListener("click", closeModal);
+  $("modalOverlay").addEventListener("click", e => { if (e.target === $("modalOverlay")) closeModal(); });
+
+  $("modalSave").addEventListener("click", () => {
+    if (editIndex === null) return;
+    extracted[editIndex] = {
+      ...extracted[editIndex],
+      title:           $("mTitle").value.trim(),
+      description:     $("mDescription").value.trim(),
+      short_description: $("mShortDescription").value.trim(),
+      tags:            $("mTags").value.trim(),
+      price:           $("mPrice").value.trim() || "2.99",
+      status:          $("mStatus").value,
+      category:        $("mCategory").value.trim(),
+      selected_images: [...modalSelImages],
+    };
+    closeModal();
+    renderResults();
+  });
+
+  // ── AI generate ──
+  document.querySelectorAll("[data-ai]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const field = btn.dataset.ai;
+      const orig = btn.textContent; btn.disabled = true; btn.textContent = "…";
+      try {
+        const current = editIndex !== null ? (extracted[editIndex] || {}) : {};
+        const sheet = current.sheet || {};
+        const res = await fetch(WOO_BASE + "/api/ai-generate", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({field, product: {
+            title:       $("mTitle").value,
+            description: $("mDescription").value,
+            short_description: $("mShortDescription").value,
+            price:       $("mPrice").value,
+            tags:        $("mTags").value,
+            category:    $("mCategory").value,
+            indiepattern_titre: sheet.indiepattern_titre || "",
+            indiepattern_description: sheet.indiepattern_description || "",
+          }})
+        });
+        const data = await res.json();
+        if (field === "title") {
+          $("mTitle").value = data.text;
+          if (editIndex !== null) {
+            extracted[editIndex].title = String(data.text || "").trim();
+            extracted[editIndex].ai_title_generated = Boolean(extracted[editIndex].title);
+            extracted[editIndex].ai_title_source = data.source || "";
+          }
+        }
+        if (field === "description") {
+          $("mDescription").value = data.text;
+          if (editIndex !== null) {
+            extracted[editIndex].description = String(data.text || "").trim();
+            extracted[editIndex].ai_description_generated = Boolean(extracted[editIndex].description);
+            extracted[editIndex].ai_description_source = data.source || "";
+          }
+        }
+        if (field === "short_description") {
+          $("mShortDescription").value = data.text;
+          if (editIndex !== null) {
+            extracted[editIndex].short_description = String(data.text || "").trim();
+            extracted[editIndex].ai_short_description_generated = Boolean(extracted[editIndex].short_description);
+            extracted[editIndex].ai_short_description_source = data.source || "";
+          }
+        }
+        if (field === "tags") $("mTags").value = data.text;
+        if (editIndex !== null && (field === "title" || field === "description" || field === "short_description")) {
+          renderResults();
+          openModal(editIndex);
+        }
+      } catch (e) { /* silent */ }
+      btn.disabled = false; btn.textContent = orig;
+    });
+  });
+
+  // ── STEP 2 → 3: send all ──
+  $("clearResultsBtn").addEventListener("click", () => {
+    extracted = [];
+    editIndex = null;
+    renderResults();
+    $("sendStatus").textContent = "Review list cleared.";
+  });
+
+  $("sendAllBtn").addEventListener("click", async () => {
+    $("sendAllBtn").disabled = true;
+    $("step3").classList.remove("hidden");
+    $("step3").scrollIntoView({behavior: "smooth", block: "start"});
+    $("uploadBadge").textContent = "uploading…";
+    $("logBox").textContent = "";
+    $("createdLinks").innerHTML = "";
+
+    const products = extracted
+      .filter(it => it.selected_images.length > 0 && it.title.trim())
+      .map(it => ({
+        index: it.index,
+        title: it.title,
+        description: it.description,
+        short_description: it.short_description,
+        price: it.price,
+        tags: it.tags,
+        category: it.category,
+        status: it.status,
+        selected_images: it.selected_images,
+        pdfs: it.pdfs,
+      }));
+
+    const log = line => {
+      $("logBox").textContent += `[${new Date().toLocaleTimeString()}] ${line}\n`;
+      $("logBox").scrollTop = $("logBox").scrollHeight;
+    };
+    log(`Uploading ${products.length} product(s)…`);
+
+    try {
+      const res = await fetch(WOO_BASE + "/api/send-batch", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({products})
+      });
+      if (!res.ok) { log(`ERROR: ${(await res.json()).error}`); $("uploadBadge").textContent = "error"; $("sendAllBtn").disabled = false; return; }
+      const {job_id} = await res.json();
+      const src = new EventSource(`${WOO_BASE}/api/events/${job_id}`);
+      src.addEventListener("log",     e => log(JSON.parse(e.data)));
+      src.addEventListener("product", e => {
+        const d = JSON.parse(e.data);
+        if (typeof d.index === "number") {
+          const row = extracted.find(it => it.index === d.index);
+          if (row) {
+            row.wc_status = d.wc_status || "Publié";
+            row.status = "publish";
+          }
+          renderResults();
+          if (editIndex !== null) openModal(editIndex);
+        }
+        if (d.permalink) $("createdLinks").insertAdjacentHTML("beforeend",
+          `<div class="product-link"><span>#${d.woocommerce_id}</span><a href="${esc(d.permalink)}" target="_blank">${esc(d.title)}</a></div>`);
+      });
+      src.addEventListener("done",  e => { log(JSON.parse(e.data)); $("uploadBadge").textContent = "done";  $("sendAllBtn").disabled = false; src.close(); });
+      src.addEventListener("error", e => { if (e.data) log(`ERROR: ${JSON.parse(e.data)}`); $("uploadBadge").textContent = "error"; $("sendAllBtn").disabled = false; src.close(); });
+    } catch (e) {
+      log(`ERROR: ${e.message}`); $("uploadBadge").textContent = "error"; $("sendAllBtn").disabled = false;
+    }
+  });
+
+  // ── folder config ──
+  async function loadRootFolder() {
+    try {
+      const r = await fetch(WOO_BASE + "/api/settings");
+      const d = await r.json();
+      if (d.root_folder) $("rootFolderInput").value = d.root_folder;
+      $("folderConfigStatus").textContent = d.scan_root ? `Scanning: ${d.scan_root}` : "";
+    } catch(_) {}
+  }
+
+  async function saveRootFolder() {
+    const path = $("rootFolderInput").value.trim();
+    if (!path) return;
+    const status = $("folderConfigStatus");
+    status.textContent = "Saving…";
+    try {
+      const r = await fetch(WOO_BASE + "/api/save-settings", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({root_folder: path})
+      });
+      const d = await r.json();
+      if (d.ok) {
+        status.textContent = `✓ Saved — scanning ${path}`;
+        await loadFolders();
+      } else {
+        status.textContent = "Error saving";
+      }
+    } catch(e) {
+      status.textContent = "Error: " + e.message;
+    }
+  }
+
+  // ── init ──
+  (async () => {
+    await Promise.all([loadRootFolder(), loadFolders(), loadSheetStats()]);
+  })();
+</script>
+</body>
+</html>

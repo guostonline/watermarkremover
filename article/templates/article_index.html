@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Article Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>const ARTICLE_BASE = "{{ article_base }}";</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f5f5f4}
+body{font-family:'Inter',system-ui,sans-serif;color:#1c1917;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:3px}
+
+/* ─── Topbar ─── */
+.topbar{position:sticky;top:0;z-index:100;height:52px;background:#fff;border-bottom:1px solid #e7e5e4;display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0}
+.topbar-brand{font-family:'Lora',serif;font-size:16px;font-weight:700;font-style:italic;color:#1c1917;letter-spacing:-.02em;margin-right:4px}
+.tb-sep{width:1px;height:20px;background:#e7e5e4;flex-shrink:0}
+.tb-kw{font-size:12px;color:#78716c;display:flex;align-items:center;gap:5px;max-width:200px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tb-stat{font-size:12px;color:#a8a29e;display:flex;align-items:center;gap:4px}
+.tb-spacer{flex:1}
+.tb-status{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid transparent}
+.s-draft{background:#fafaf9;color:#a8a29e;border-color:#e7e5e4}
+.s-saved{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid #e7e5e4;background:transparent;color:#44403c;font-family:'Inter',sans-serif;transition:all .14s;white-space:nowrap}
+.tb-btn:hover{background:#f5f5f4;border-color:#d6d3d1;color:#1c1917}
+.tb-btn:disabled{opacity:.45;cursor:not-allowed}
+.tb-btn-dark{background:#1c1917;color:#fff;border-color:#1c1917}
+.tb-btn-dark:hover{background:#292524}
+.tb-btn-green{background:#16a34a;color:#fff;border-color:#16a34a}
+.tb-btn-green:hover{background:#15803d}
+.tb-btn-sm{padding:4px 10px;font-size:11.5px}
+
+/* ─── Main ─── */
+.main{flex:1;overflow-y:auto;padding:40px 20px 80px;background:#f5f5f4}
+.doc{background:#fff;border:1px solid #e7e5e4;border-radius:14px;max-width:760px;margin:0 auto;padding:52px 60px;box-shadow:0 1px 4px rgba(0,0,0,.03),0 6px 24px rgba(0,0,0,.04);min-height:calc(100vh - 160px)}
+
+/* ─── Start Screen (replaces sidebar) ─── */
+.start-screen{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 0 40px}
+.start-icon{font-size:44px;margin-bottom:20px}
+.start-h{font-family:'Lora',serif;font-size:28px;font-weight:700;font-style:italic;color:#0c0a09;margin-bottom:10px;letter-spacing:-.02em}
+.start-p{font-size:14.5px;color:#78716c;max-width:380px;margin:0 auto 32px;line-height:1.75}
+
+/* Keyword input area */
+.kw-area{width:100%;max-width:480px;margin:0 auto}
+.kw-input-wrap{display:flex;gap:8px;margin-bottom:14px}
+.kw-input{flex:1;padding:12px 16px;border:1.5px solid #e7e5e4;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;background:#fafaf9;color:#1c1917;outline:none;transition:all .15s}
+.kw-input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.08);background:#fff}
+.kw-input::placeholder{color:#c4b8b1}
+.kw-btn{padding:12px 16px;border:1.5px solid #e7e5e4;border-radius:10px;background:#fff;color:#44403c;font-size:14px;cursor:pointer;transition:all .14s;flex-shrink:0}
+.kw-btn:hover{background:#f5f5f4;border-color:#a8a29e}
+
+/* Pills */
+.kw-pills{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:16px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:500;background:#f5f5f4;border:1px solid #e7e5e4;color:#57534e;cursor:pointer;transition:all .14s;user-select:none}
+.pill:hover{border-color:#a8a29e}
+.pill.selected{background:#eff6ff;border-color:#93c5fd;color:#2563eb}
+.pill-i{font-size:9px;font-weight:700;padding:1px 4px;border-radius:4px;background:rgba(0,0,0,.06)}
+.pills-all{font-size:11.5px;color:#a8a29e;cursor:pointer;margin-bottom:10px}
+.pills-all:hover{color:#57534e}
+
+.gen-btn{width:100%;padding:13px;background:#1c1917;color:#fff;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gen-btn:hover{background:#292524}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+
+.start-tags{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+.tag{padding:4px 11px;border-radius:14px;font-size:11.5px;font-weight:500;border:1px solid transparent}
+.tag-g{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
+.tag-b{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+.tag-s{background:#fafaf9;color:#78716c;border-color:#e7e5e4}
+.tag-y{background:#fefce8;color:#a16207;border-color:#fde68a}
+.ctx-note{font-size:11.5px;color:#a8a29e;margin-top:12px}
+
+/* ─── Progress ─── */
+.prog-card{padding:24px;border:1px solid #e7e5e4;border-radius:12px;background:#fafaf9;margin-bottom:20px}
+.prog-title{font-size:14px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.prog-step{display:flex;align-items:center;gap:9px;font-size:13px;color:#57534e;padding:7px 0;border-bottom:1px solid #f5f5f4}
+.prog-step:last-child{border:none}
+.step-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.step-done{background:#22c55e}.step-active{background:#f59e0b;animation:pulse 1s infinite}.step-pending{background:#e7e5e4}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── Article Editor ─── */
+.doc-h1{font-family:'Lora',serif;font-size:30px;font-weight:700;font-style:italic;color:#0c0a09;line-height:1.3;border:none;outline:none;width:100%;resize:none;overflow:hidden;background:transparent;padding:0;letter-spacing:-.01em;margin-bottom:6px}
+.slug-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f5f5f4}
+.slug-lbl{font-size:10px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.slug-input{flex:1;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:12px;color:#6366f1;background:transparent}
+.meta-input{width:100%;border:none;outline:none;font-size:13.5px;color:#78716c;background:transparent;resize:none;line-height:1.65;padding:0;margin-bottom:14px;font-family:'Inter',sans-serif}
+.meta-hints{display:flex;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #f5f5f4;font-size:11px;color:#a8a29e}
+.hint-v{font-weight:600}
+
+/* Sources */
+.sources-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:18px;font-size:11.5px;color:#15803d}
+.src-chip{display:inline-flex;align-items:center;padding:2px 8px;background:#dcfce7;border-radius:12px;font-size:10.5px;color:#15803d;text-decoration:none}
+.src-chip:hover{background:#bbf7d0}
+
+/* Cover */
+.cover-card{margin-bottom:22px;border:1px dashed #fde68a;border-radius:10px;overflow:hidden}
+.cover-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#fefce8;border-bottom:1px solid #fde68a}
+.cover-lbl{font-size:11.5px;font-weight:600;color:#a16207;display:flex;align-items:center;gap:5px}
+.cover-body{padding:12px 14px;font-size:12.5px;color:#78350f;line-height:1.7;background:#fffbeb}
+
+/* Sections */
+.sec{margin-bottom:24px}
+.sec-head{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.sec-tag{font-size:9.5px;font-family:'JetBrains Mono',monospace;padding:2px 6px;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:4px;color:#a8a29e;flex-shrink:0}
+.sec-h{font-family:'Lora',serif;font-size:20px;font-weight:700;font-style:italic;color:#1c1917;border:none;outline:none;background:transparent;flex:1;line-height:1.35}
+.sec-tools{display:flex;gap:3px;opacity:.5;transition:opacity .15s}
+.sec:hover .sec-tools{opacity:1}
+.sec-tool{padding:3px 7px;border:1px solid #e7e5e4;border-radius:5px;background:#fff;color:#a8a29e;font-size:11px;cursor:pointer;transition:all .14s}
+.sec-tool:hover{background:#f5f5f4;color:#44403c;border-color:#a8a29e}
+.sec-body{font-size:14.5px;line-height:1.85;color:#292524;width:100%;border:none;outline:none;background:transparent;resize:none;min-height:80px;font-family:'Inter',sans-serif}
+.sec-divider{height:1px;background:#f5f5f4;margin:20px 0}
+.img-prompt-box{margin-top:10px;padding:11px 14px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#78350f;line-height:1.6}
+.img-prompt-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a16207;margin-bottom:4px}
+.img-prompt-sub{font-size:10px;font-family:'JetBrains Mono',monospace;color:#a16207;margin-bottom:5px;opacity:.7}
+
+/* Body wrap — canvas + right sidebar */
+.body-wrap{display:flex;align-items:flex-start;min-height:calc(100vh - 52px)}
+
+/* Right Sidebar */
+.right-sidebar{width:260px;min-width:260px;background:#fff;border-left:1px solid #e7e5e4;height:calc(100vh - 52px);position:sticky;top:52px;overflow-y:auto;flex-shrink:0;display:none}
+.right-sidebar.visible{display:block}
+.rs-body{padding:18px 16px;display:flex;flex-direction:column;gap:16px}
+.rs-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#a8a29e;margin-bottom:8px}
+
+/* SEO Ring */
+.seo-ring-wrap{display:flex;align-items:center;gap:10px;padding:12px;background:#fafaf9;border:1px solid #e7e5e4;border-radius:10px}
+.seo-ring{position:relative;width:48px;height:48px;flex-shrink:0}
+.seo-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.seo-ring circle{fill:none;stroke-width:3.5;stroke-linecap:round}
+.ring-track{stroke:#e7e5e4}.ring-fill{transition:stroke-dasharray .6s ease}
+.ring-fill.low{stroke:#ef4444}.ring-fill.med{stroke:#f59e0b}.ring-fill.high{stroke:#22c55e}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.seo-item{display:flex;align-items:center;gap:5px;font-size:11px;padding:2px 0;color:#57534e}
+.seo-sep{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#a8a29e;margin:8px 0 3px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-item{background:#fafaf9;border:1px solid #e7e5e4;border-radius:8px;padding:8px 10px}
+.stat-label{font-size:9.5px;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:2px}
+.stat-val{font-size:18px;font-weight:700;color:#1c1917;line-height:1}
+
+/* Actions inline at bottom of article */
+.article-actions{margin-top:28px;padding-top:20px;border-top:1px solid #f5f5f4;display:flex;gap:8px;flex-wrap:wrap}
+.seo-actions{display:flex;gap:6px;flex-direction:column}
+
+/* FAQ */
+.faq-sec{margin-top:28px;padding-top:20px;border-top:2px solid #f5f5f4}
+.faq-h{font-family:'Lora',serif;font-size:22px;font-weight:700;font-style:italic;color:#1c1917;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.faq-badge{font-size:10px;font-weight:600;padding:2px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;color:#16a34a;font-family:'Inter',sans-serif;font-style:normal}
+.faq-item{padding:13px 0;border-bottom:1px solid #f5f5f4}
+.faq-item:last-child{border:none}
+.faq-q{font-size:14px;font-weight:600;outline:none;margin-bottom:5px}
+.faq-a{font-size:13.5px;color:#57534e;line-height:1.7;outline:none}
+
+/* Opt log */
+.opt-log{padding:8px;background:#fff;border:1px solid #f0f0f0;border-radius:7px;font-size:11px;display:flex;flex-direction:column;gap:3px;margin-top:8px}
+.opt-row{display:flex;align-items:center;gap:5px}
+
+/* Spinner */
+.spinner{width:13px;height:13px;border-radius:50%;border:2px solid rgba(0,0,0,.1);border-top-color:currentColor;animation:spin .65s linear infinite;display:inline-block;flex-shrink:0}
+.spinner-w{border-color:rgba(255,255,255,.25);border-top-color:#fff}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toasts */
+#toasts{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;background:#fff;border:1px solid #e7e5e4;box-shadow:0 4px 20px rgba(0,0,0,.08);animation:toastIn .2s ease;pointer-events:all;min-width:200px;max-width:340px}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}}
+.toast-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toast.success .toast-dot{background:#22c55e}.toast.error .toast-dot{background:#ef4444}.toast.info .toast-dot{background:#6366f1}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:14px;padding:26px;width:400px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.12);animation:mIn .18s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.97)}}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:15px;font-weight:700}
+.modal-x{background:none;border:none;font-size:20px;cursor:pointer;color:#a8a29e;line-height:1;padding:2px 5px;border-radius:5px}
+.modal-x:hover{background:#f5f5f4;color:#57534e}
+.modal-preview{padding:12px;background:#fafaf9;border:1px solid #e7e5e4;border-radius:8px;margin-bottom:14px}
+.modal-preview-t{font-size:13px;font-weight:600;margin-bottom:3px}
+.modal-preview-m{font-size:11.5px;color:#78716c}
+.wp-opts{display:flex;gap:12px;margin-top:6px}
+.wp-opt{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer}
+.wp-warn{padding:9px 12px;background:#fefce8;border:1px solid #fde68a;border-radius:7px;font-size:12px;color:#78350f;margin:12px 0}
+.modal-ok{text-align:center;padding:8px 0}
+.modal-ok-i{font-size:38px;margin-bottom:10px}
+.modal-ok-t{font-size:15px;font-weight:700;margin-bottom:5px}
+.modal-ok-links{display:flex;gap:8px;justify-content:center;margin-top:12px}
+
+.hidden{display:none!important}
+
+/* Settings page */
+.settings-page{max-width:560px;margin:0 auto;padding:20px 0}
+.settings-h{font-family:'Lora',serif;font-size:22px;font-weight:700;font-style:italic;color:#1c1917;margin-bottom:6px}
+.settings-sub{font-size:13.5px;color:#78716c;margin-bottom:28px;line-height:1.6}
+.settings-section{margin-bottom:28px}
+.settings-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#a8a29e;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f5f5f4}
+.settings-row{margin-bottom:16px}
+.settings-label{font-size:13px;font-weight:600;color:#1c1917;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.settings-label-hint{font-size:11.5px;font-weight:400;color:#a8a29e}
+.settings-input{width:100%;padding:10px 13px;border:1.5px solid #e7e5e4;border-radius:9px;font-family:'Inter',sans-serif;font-size:13.5px;background:#fafaf9;color:#1c1917;outline:none;transition:all .15s}
+.settings-input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.08);background:#fff}
+.settings-input::placeholder{color:#c4b8b1}
+.settings-input.mono{font-family:'JetBrains Mono',monospace;font-size:12.5px}
+.settings-save{display:flex;align-items:center;gap:10px;margin-top:24px}
+.settings-ok{font-size:12.5px;color:#16a34a;display:flex;align-items:center;gap:5px;opacity:0;transition:opacity .3s}
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.model-card{padding:10px 12px;border:1.5px solid #e7e5e4;border-radius:9px;cursor:pointer;transition:all .14s;background:#fafaf9}
+.model-card:hover{border-color:#a8a29e;background:#fff}
+.model-card.active{border-color:#6366f1;background:#eff6ff;}
+.model-card-name{font-size:12.5px;font-weight:600;color:#1c1917;margin-bottom:2px}
+.model-card-desc{font-size:11px;color:#a8a29e}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <span class="topbar-brand">PatternsLab</span>
+  <div class="tb-sep"></div>
+  <span class="tb-kw" id="tbKw">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span id="tbKwText">New article</span>
+  </span>
+  <span class="tb-stat" id="tbWordStat" style="display:none">
+    <div class="tb-sep" style="margin:0 2px"></div>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+    <span id="tbWords">0</span> words
+  </span>
+  <div class="tb-spacer"></div>
+  <a href="{{ article_base }}/history" class="tb-btn" style="font-size:12px">📚 History</a>
+  <button class="tb-btn" onclick="toggleSettings()" id="btnSettings" title="Settings">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+  <span id="tbStatus" class="tb-status s-draft" style="display:none">Draft</span>
+  <div class="tb-sep" id="tbSep" style="display:none"></div>
+  <button class="tb-btn" id="btnSave" onclick="saveArticle()" style="display:none">💾 Save</button>
+  <div style="position:relative;display:none" id="exportWrap">
+    <button class="tb-btn" onclick="toggleExport()">⬇ Export ▾</button>
+    <div id="exportMenu" class="hidden" style="position:absolute;top:calc(100%+6px);right:0;background:#fff;border:1px solid #e7e5e4;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);min-width:130px;z-index:50;overflow:hidden">
+      <button onclick="previewHtml();toggleExport()" style="display:block;width:100%;padding:9px 14px;text-align:left;background:none;border:none;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;color:#1c1917" onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background=''">👁 Preview HTML</button>
+      <button onclick="exportArticle('html');toggleExport()" style="display:block;width:100%;padding:9px 14px;text-align:left;background:none;border:none;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;color:#1c1917" onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background=''">⬇ Download HTML</button>
+      <button onclick="exportArticle('markdown');toggleExport()" style="display:block;width:100%;padding:9px 14px;text-align:left;background:none;border:none;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;color:#1c1917" onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background=''">⬇ Markdown</button>
+    </div>
+  </div>
+  <button class="tb-btn tb-btn-green" id="btnPublish" onclick="openWpModal()" style="display:none">📤 Publish</button>
+</header>
+
+<!-- Body wrap: canvas + right sidebar -->
+<div class="body-wrap">
+
+<!-- Main -->
+<main class="main">
+  <div class="doc">
+
+    <!-- Start screen (keyword input — no sidebar) -->
+    <div id="startScreen" class="start-screen">
+      <div class="start-icon">✂️</div>
+      <div class="start-h">SEO Article Generator</div>
+      <div class="start-p">Enter your target keyword, discover related search terms, then generate a fully optimised article with citations and internal product links.</div>
+
+      <div class="kw-area">
+        <div class="kw-input-wrap">
+          <input type="text" id="keywordInput" class="kw-input" placeholder="e.g. sewing pattern free for beginners" onkeydown="if(event.key==='Enter')findKeywords()">
+          <button class="kw-btn" onclick="findKeywords()" id="btnFindKw">🔍</button>
+        </div>
+
+        <div id="kwSection" class="hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#a8a29e">Related Keywords</span>
+            <span class="pills-all" onclick="selectAllKw()">Select all</span>
+          </div>
+          <div id="kwPills" class="kw-pills"></div>
+        </div>
+
+        <button class="gen-btn" id="btnGenerate" onclick="generateArticle()">✨ Generate Article</button>
+        <div id="siteCtx" class="ctx-note hidden"></div>
+      </div>
+
+      <div class="start-tags">
+        <span class="tag tag-g">1000–2000 words</span>
+        <span class="tag tag-b">Web research + citations</span>
+        <span class="tag tag-s">Internal product links</span>
+        <span class="tag tag-y">SEO + AI score</span>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div id="progressPanel" class="hidden">
+      <div class="prog-card">
+        <div class="prog-title"><div class="spinner" style="color:#6366f1"></div>Generating Article…</div>
+        <div id="progressSteps"></div>
+        <div id="progressSources" class="hidden" style="margin-top:14px;padding-top:14px;border-top:1px solid #f5f5f4">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#a8a29e;margin-bottom:7px">Sources Found</div>
+          <div id="sourcesList" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settingsPage" class="settings-page hidden">
+      <div class="settings-h">Settings</div>
+      <div class="settings-sub">Configure your API keys and AI model preferences.</div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">API Configuration</div>
+
+        <div class="settings-row">
+          <div class="settings-label">
+            OpenRouter API Key
+            <span class="settings-label-hint">Required for article generation</span>
+          </div>
+          <input type="password" id="settingsApiKey" class="settings-input mono" placeholder="sk-or-v1-…" autocomplete="off">
+          <div style="font-size:11.5px;color:#a8a29e;margin-top:5px">
+            Get your key at <a href="https://openrouter.ai/keys" target="_blank" style="color:#6366f1;text-decoration:none">openrouter.ai/keys</a>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-label">
+            Pexels API Key
+            <span class="settings-label-hint">Optional for image suggestions</span>
+          </div>
+          <input type="text" id="settingsPexelsKey" class="settings-input mono" placeholder="Pexels API key" autocomplete="off" spellcheck="false">
+          <div style="font-size:11.5px;color:#a8a29e;margin-top:5px">
+            Get your key at <a href="https://www.pexels.com/api/" target="_blank" style="color:#6366f1;text-decoration:none">pexels.com/api</a>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-label">Model</div>
+          <input type="text" id="settingsModel" class="settings-input mono" placeholder="google/gemini-2.0-flash-001">
+          <div style="font-size:11.5px;color:#a8a29e;margin-top:5px;margin-bottom:10px">Or pick a preset:</div>
+          <div class="model-grid">
+            <div class="model-card" onclick="pickModel('google/gemini-2.0-flash-001')" data-model="google/gemini-2.0-flash-001">
+              <div class="model-card-name">Gemini 2.0 Flash</div>
+              <div class="model-card-desc">Fast · Recommended</div>
+            </div>
+            <div class="model-card" onclick="pickModel('google/gemini-2.5-flash-preview')" data-model="google/gemini-2.5-flash-preview">
+              <div class="model-card-name">Gemini 2.5 Flash</div>
+              <div class="model-card-desc">Latest · Preview</div>
+            </div>
+            <div class="model-card" onclick="pickModel('openai/gpt-4o-mini')" data-model="openai/gpt-4o-mini">
+              <div class="model-card-name">GPT-4o Mini</div>
+              <div class="model-card-desc">OpenAI · Affordable</div>
+            </div>
+            <div class="model-card" onclick="pickModel('anthropic/claude-3-5-haiku')" data-model="anthropic/claude-3-5-haiku">
+              <div class="model-card-name">Claude 3.5 Haiku</div>
+              <div class="model-card-desc">Anthropic · Quality</div>
+            </div>
+            <div class="model-card" onclick="pickModel('openai/gpt-4o')" data-model="openai/gpt-4o">
+              <div class="model-card-name">GPT-4o</div>
+              <div class="model-card-desc">OpenAI · Powerful</div>
+            </div>
+            <div class="model-card" onclick="pickModel('anthropic/claude-sonnet-4-5')" data-model="anthropic/claude-sonnet-4-5">
+              <div class="model-card-name">Claude Sonnet</div>
+              <div class="model-card-desc">Anthropic · Best</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-save">
+          <button class="gen-btn" onclick="saveSettings()" id="btnSaveSettings" style="max-width:160px;padding:10px 20px">Save Settings</button>
+          <div class="settings-ok" id="settingsOk">✓ Saved successfully</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article Editor -->
+    <div id="articleEditor" class="hidden">
+
+      <textarea class="doc-h1" id="metaTitle" rows="2" oninput="autoH(this);updateTitleHint()" placeholder="Article title…"></textarea>
+
+      <div class="slug-row">
+        <span class="slug-lbl">Slug</span>
+        <input type="text" id="metaSlug" class="slug-input" placeholder="url-slug-here">
+        <button class="tb-btn tb-btn-sm" onclick="regenMeta('title')" id="btnRegenTitle" style="margin-left:auto">↻ Title</button>
+        <button class="tb-btn tb-btn-sm" onclick="regenMeta('meta')" id="btnRegenMeta">↻ Meta</button>
+      </div>
+
+      <textarea class="meta-input" id="metaDescription" rows="2" oninput="autoH(this);updateMetaHint()" placeholder="Meta description…"></textarea>
+
+      <div class="meta-hints">
+        <span>Title: <span class="hint-v" id="titleLenHint"></span></span>
+        <span>Meta: <span class="hint-v" id="metaLenHint"></span></span>
+      </div>
+
+      <div id="sourcesBar" class="sources-bar hidden">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Sources</span>
+        <span id="sourcesInline"></span>
+      </div>
+
+      <div id="coverImageCard" class="cover-card hidden">
+        <div class="cover-head">
+          <div class="cover-lbl">🖼 Cover / Featured Image <span style="font-weight:400;font-size:10px;font-family:'JetBrains Mono',monospace">1200×628px</span></div>
+          <div style="display:flex;gap:6px">
+            <button id="pexelsCoverBtn" onclick="autoCoverFromPexels()" class="tb-btn tb-btn-sm" style="border-color:#bfdbfe;color:#1d4ed8">Auto from Pexels</button>
+            <button id="copyCoverBtn" onclick="copyCoverPrompt()" class="tb-btn tb-btn-sm" style="border-color:#fde68a;color:#a16207">Copy Prompt</button>
+            <button id="uploadCoverBtn" onclick="triggerCoverUpload()" class="tb-btn tb-btn-sm hidden">Upload Cover</button>
+            <input type="file" id="coverFileInput" accept="image/*" class="hidden" onchange="uploadCoverImage(this)">
+          </div>
+        </div>
+        <div id="coverPromptText" class="cover-body"></div>
+        <div id="coverPreview" class="hidden" style="padding:10px 14px"></div>
+      </div>
+
+      <div id="sectionsContainer"></div>
+
+      <div id="faqCard" class="faq-sec hidden">
+        <div class="faq-h">Frequently Asked Questions <span class="faq-badge">Schema Ready</span></div>
+        <div id="faqItems"></div>
+      </div>
+
+      <!-- Article Actions (Save / Publish / Export) -->
+      <div class="article-actions" id="articleActions" style="display:none">
+        <button class="tb-btn tb-btn-dark" onclick="saveArticle()">💾 Save</button>
+        <button class="tb-btn" onclick="openWpModal()" style="border-color:#bfdbfe;color:#2563eb;background:#eff6ff">📤 Publish to WP</button>
+        <button class="tb-btn tb-btn-sm" onclick="previewHtml()">👁 Preview</button>
+        <button class="tb-btn tb-btn-sm" onclick="exportArticle('html')">⬇ HTML</button>
+        <button class="tb-btn tb-btn-sm" onclick="exportArticle('markdown')">⬇ MD</button>
+      </div>
+
+    </div><!-- /articleEditor -->
+  </div><!-- /doc -->
+</main>
+
+<!-- Right Sidebar: SEO Analysis -->
+<aside class="right-sidebar" id="rightSidebar">
+  <div class="rs-body">
+
+    <div>
+      <div class="rs-label">SEO Score</div>
+      <div class="seo-ring-wrap">
+        <div class="seo-ring">
+          <svg viewBox="0 0 36 36">
+            <circle class="ring-track" cx="18" cy="18" r="15.9" stroke-dasharray="100 0"/>
+            <circle class="ring-fill low" id="ringFill" cx="18" cy="18" r="15.9" stroke-dasharray="0 100"/>
+          </svg>
+          <div class="ring-num" id="scoreNum">—</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600" id="scoreLabel">Not checked</div>
+          <div style="font-size:11px;color:#a8a29e;margin-top:2px" id="scoreSub">Run recheck</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="seo-actions">
+      <button class="tb-btn" onclick="runSeoCheck()" style="justify-content:center">↻ Recheck SEO</button>
+      <button class="tb-btn" onclick="optimizeSeo()" id="btnOptimize" style="border-color:#bbf7d0;color:#16a34a;background:#f0fdf4;justify-content:center">🔧 Fix Issues</button>
+      <div id="optimizeLog" class="opt-log hidden"></div>
+    </div>
+
+    <div>
+      <div class="rs-label">Stats</div>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-label">Words</div><div class="stat-val" id="statWords">—</div></div>
+        <div class="stat-item"><div class="stat-label">Sections</div><div class="stat-val" id="statSections">—</div></div>
+        <div class="stat-item"><div class="stat-label">Links</div><div class="stat-val" id="statLinks">—</div></div>
+        <div class="stat-item"><div class="stat-label">FAQ</div><div class="stat-val" id="statFaq">—</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="rs-label">SEO Checks</div>
+      <div id="seoChecklist"></div>
+    </div>
+
+  </div>
+</aside>
+
+</div><!-- /body-wrap -->
+
+<!-- HTML Preview Modal -->
+<div id="htmlPreviewModal" class="modal-bg hidden" style="padding:20px">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:mIn .18s ease;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #e7e5e4;flex-shrink:0">
+      <div style="font-size:15px;font-weight:700;color:#1c1917">HTML Preview</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="tb-btn tb-btn-sm" onclick="copyHtmlSource()" id="btnCopyHtml">Copy HTML</button>
+        <button class="tb-btn tb-btn-sm" onclick="exportArticle('html')" style="border-color:#bbf7d0;color:#16a34a;background:#f0fdf4">⬇ Download</button>
+        <button class="modal-x" onclick="document.getElementById('htmlPreviewModal').classList.add('hidden')">×</button>
+      </div>
+    </div>
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid #e7e5e4;flex-shrink:0">
+      <button class="html-tab active" id="tabRendered" onclick="switchHtmlTab('rendered')" style="padding:10px 20px;border:none;background:transparent;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid #6366f1;color:#6366f1;font-family:'Inter',sans-serif">Rendered</button>
+      <button class="html-tab" id="tabSource" onclick="switchHtmlTab('source')" style="padding:10px 20px;border:none;background:transparent;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:#a8a29e;font-family:'Inter',sans-serif">Source</button>
+    </div>
+    <!-- Rendered view -->
+    <div id="htmlRendered" style="flex:1;overflow-y:auto;padding:32px 48px">
+      <div id="htmlRenderedContent" style="max-width:680px;margin:0 auto;font-family:'Inter',sans-serif;font-size:15px;line-height:1.8;color:#1c1917"></div>
+    </div>
+    <!-- Source view -->
+    <div id="htmlSource" class="hidden" style="flex:1;overflow-y:auto">
+      <pre id="htmlSourceContent" style="padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:#292524;white-space:pre-wrap;word-break:break-all;margin:0;background:#fafaf9"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- WP Modal -->
+<div id="wpModal" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">📤 Publish to WordPress</div>
+      <button class="modal-x" onclick="closeWpModal()">×</button>
+    </div>
+    <div id="wpModalBody">
+      <div class="modal-preview">
+        <div class="modal-preview-t" id="wpPreviewTitle"></div>
+        <div class="modal-preview-m" id="wpPreviewMeta"></div>
+      </div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#a8a29e;margin-bottom:6px">Status</div>
+      <div class="wp-opts">
+        <label class="wp-opt"><input type="radio" name="wpStatus" value="draft" checked> Save as Draft</label>
+        <label class="wp-opt"><input type="radio" name="wpStatus" value="publish"> Publish Now</label>
+      </div>
+      <div class="wp-warn">⚠️ Publishing sends to <strong>patternslabco.com</strong>. Choose <em>Draft</em> to review first.</div>
+      <button class="gen-btn" onclick="publishToWordPress()" id="btnWpPublish">📤 Send to WordPress</button>
+    </div>
+    <div id="wpModalResult" class="modal-ok hidden">
+      <div class="modal-ok-i">✅</div>
+      <div class="modal-ok-t">Article sent!</div>
+      <div id="wpResultLinks" class="modal-ok-links"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+let state={keyword:'',selectedKeywords:[],article:null,savedId:null};
+
+window.addEventListener('load',()=>{
+  loadCtx();
+  document.addEventListener('click',e=>{
+    if(!document.getElementById('exportMenu').contains(e.target)&&!e.target.closest('#exportWrap'))
+      document.getElementById('exportMenu').classList.add('hidden');
+  });
+});
+
+async function loadCtx(){
+  try{const r=await fetch(ARTICLE_BASE+'/api/site-context');const d=await r.json();const el=document.getElementById('siteCtx');el.textContent=d.total+' items cached ('+d.products.length+' products, '+d.posts.length+' posts)';el.classList.remove('hidden');}catch(e){}
+}
+
+function toggleExport(){document.getElementById('exportMenu').classList.toggle('hidden');}
+
+function toast(msg,type='info'){
+  const c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast '+type;t.innerHTML='<div class="toast-dot"></div><span>'+msg+'</span>';
+  c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3200);
+}
+
+async function findKeywords(){
+  const kw=document.getElementById('keywordInput').value.trim();
+  if(!kw){toast('Enter a keyword first','error');return;}
+  state.keyword=kw;state.selectedKeywords=[];
+  document.getElementById('tbKwText').textContent=kw;
+  const btn=document.getElementById('btnFindKw');
+  btn.innerHTML='<span class="spinner" style="color:#78716c;width:13px;height:13px"></span>';btn.disabled=true;
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/keywords',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:kw})});
+    const d=await r.json();renderKeywords(d.keywords||[]);toast('Found '+(d.keywords||[]).length+' suggestions','success');
+  }catch(e){toast('Keyword research failed: '+e.message,'error');}
+  finally{btn.innerHTML='🔍';btn.disabled=false;}
+}
+
+function renderKeywords(kws){
+  const sec=document.getElementById('kwSection'),pills=document.getElementById('kwPills');
+  pills.innerHTML='';
+  kws.forEach(k=>{
+    const p=document.createElement('div');p.className='pill selected';
+    p.innerHTML=k.keyword+' <span class="pill-i">'+k.intent[0].toUpperCase()+'</span>';
+    p.title=k.intent+' | '+k.volume+' volume';p.dataset.kw=k.keyword;
+    p.onclick=()=>{p.classList.toggle('selected');state.selectedKeywords=[...document.querySelectorAll('#kwPills .pill.selected')].map(x=>x.dataset.kw);};
+    pills.appendChild(p);state.selectedKeywords.push(k.keyword);
+  });
+  sec.classList.remove('hidden');
+}
+
+function selectAllKw(){
+  document.querySelectorAll('#kwPills .pill').forEach(p=>p.classList.add('selected'));
+  state.selectedKeywords=[...document.querySelectorAll('#kwPills .pill')].map(p=>p.dataset.kw);
+}
+
+async function generateArticle(){
+  const kw=document.getElementById('keywordInput').value.trim();
+  if(!kw){toast('Enter a keyword first','error');return;}
+  state.keyword=kw;document.getElementById('tbKwText').textContent=kw;
+  hide('startScreen');show('progressPanel');hide('articleEditor');
+  document.getElementById('progressSteps').innerHTML='';hide('progressSources');
+  addStep('search','active','Searching the web for sources…');
+  const btn=document.getElementById('btnGenerate');btn.innerHTML='<span class="spinner spinner-w"></span> Generating…';btn.disabled=true;
+  try{
+    const resp=await fetch(ARTICLE_BASE+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:kw,selected_keywords:state.selectedKeywords})});
+    const reader=resp.body.getReader(),decoder=new TextDecoder();let buffer='';
+    while(true){const{done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const parts=buffer.split('\n\n');buffer=parts.pop();
+      for(const part of parts){if(!part.startsWith('event:'))continue;const lines=part.split('\n');const evt=lines[0].replace('event: ','').trim();const data=JSON.parse(lines[1].replace('data: ','').trim());handleSSE(evt,data);}
+    }
+  }catch(e){toast('Generation failed: '+e.message,'error');hide('progressPanel');show('startScreen');}
+  finally{btn.innerHTML='✨ Generate Article';btn.disabled=false;}
+}
+
+function handleSSE(evt,data){
+  if(evt==='progress'){
+    if(data.step==='research'){updStep('search','done','✓ Web search started');addStep('fetch','active',data.message);}
+    else if(data.step==='research_done'){updStep('fetch','done','✓ '+data.message);if(data.sources&&data.sources.length>0){show('progressSources');document.getElementById('sourcesList').innerHTML=data.sources.map(s=>'<a href="'+s.url+'" target="_blank" class="src-chip">🔗 '+s.domain+'</a>').join('');}addStep('context','active','Fetching site context…');}
+    else if(data.step==='context_done'){updStep('context','done','✓ '+data.message);addStep('ai','active','Generating with AI…');}
+    else if(data.step==='generating'){updStep('ai','active',data.message);}
+    else if(data.step==='scoring'){updStep('ai','done','✓ Article generated');addStep('seo','active',data.message);}
+  }else if(evt==='done'){
+    updStep('seo','done','✓ SEO check complete');
+    setTimeout(()=>{hide('progressPanel');state.article=data.article;state.savedId=null;renderArticle(data.article);},600);
+  }else if(evt==='error'){toast('Error: '+data.message,'error');hide('progressPanel');show('startScreen');}
+}
+
+function addStep(id,status,msg){
+  const div=document.createElement('div');div.className='prog-step';div.id='step-'+id;
+  const cls={done:'step-done',active:'step-active',pending:'step-pending'}[status];
+  div.innerHTML='<div class="step-dot '+cls+'"></div><span>'+msg+'</span>';
+  document.getElementById('progressSteps').appendChild(div);
+}
+function updStep(id,status,msg){
+  const el=document.getElementById('step-'+id);if(!el)return;
+  el.querySelector('.step-dot').className='step-dot '+{done:'step-done',active:'step-active',pending:'step-pending'}[status];
+  el.querySelector('span').textContent=msg;
+}
+
+function renderArticle(article){
+  hide('startScreen');hide('progressPanel');show('articleEditor');
+  document.getElementById('metaTitle').value=article.seo_title||'';
+  document.getElementById('metaSlug').value=article.slug||'';
+  document.getElementById('metaDescription').value=article.meta_description||'';
+  autoH(document.getElementById('metaTitle'));autoH(document.getElementById('metaDescription'));
+  updateTitleHint();updateMetaHint();
+  document.getElementById('tbKwText').textContent=state.keyword;
+  document.getElementById('tbWordStat').style.display='flex';document.getElementById('tbWords').textContent=article.word_count||0;
+  showEl('tbStatus');showEl('tbSep');showEl('btnSave');showEl('exportWrap');showEl('btnPublish');
+  document.getElementById('rightSidebar').classList.add('visible');
+  document.getElementById('articleActions').style.display='flex';
+  if(article.cover_image_prompt){document.getElementById('coverPromptText').textContent=article.cover_image_prompt;show('coverImageCard');}else hide('coverImageCard');
+  if(article.sources&&article.sources.length>0){show('sourcesBar');document.getElementById('sourcesInline').innerHTML=article.sources.map(u=>'<a href="'+u+'" target="_blank" class="src-chip">🔗 '+u.replace(/https?:\/\/(www\.)?/,'').split('/')[0]+'</a>').join('');}
+  const container=document.getElementById('sectionsContainer');container.innerHTML='';
+  (article.sections||[]).forEach((s,i)=>container.appendChild(mkSection(s,i,article.sections.length)));
+  if(article.faq&&article.faq.length>0){document.getElementById('faqItems').innerHTML=article.faq.map((f,i)=>'<div class="faq-item" id="faq-'+i+'"><div class="faq-q" contenteditable="true">'+f.question+'</div><div class="faq-a" contenteditable="true">'+f.answer+'</div></div>').join('');show('faqCard');}else hide('faqCard');
+  if(article.seo_details)renderSeo(article.seo_details);
+  updateStats(article);
+  toast('Article generated!','success');
+}
+
+function mkSection(section,idx,total){
+  const div=document.createElement('div');div.className='sec';div.dataset.idx=idx;
+  const srcs=(section.sources||[]).filter(s=>s&&s.startsWith('http')).map(s=>'<a href="'+esc(s)+'" target="_blank" class="src-chip">🔗 '+s.replace(/https?:\/\/(www\.)?/,'').split('/')[0]+'</a>').join('');
+  div.innerHTML='<div class="sec-head"><span class="sec-tag">'+(section.heading_level||'h2')+'</span>'+
+    '<input type="text" class="sec-h" value="'+esc(section.heading||'')+'" placeholder="Section heading…">'+
+    '<div class="sec-tools">'+
+      (idx>0?'<button class="sec-tool" onclick="moveSection('+idx+',-1)">↑</button>':'')+
+      (idx<total-1?'<button class="sec-tool" onclick="moveSection('+idx+',1)">↓</button>':'')+
+      '<button class="sec-tool" onclick="regenSection('+idx+')">↻ Regen</button>'+
+      '<button class="sec-tool" id="extBtn-'+idx+'" onclick="extendSection('+idx+')" style="color:#6366f1;border-color:#c7d2fe;background:#eef2ff">✦ Extend</button>'+
+      '<button class="sec-tool" onclick="toggleImg('+idx+')">🖼</button>'+
+    '</div></div>'+
+    '<textarea class="sec-body" rows="'+Math.max(4,Math.ceil((section.body||'').length/90))+'" oninput="autoH(this)">'+esc(section.body||'')+'</textarea>'+
+    (srcs?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">'+srcs+'</div>':'')+
+    '<div id="imgPr-'+idx+'" class="img-prompt-box hidden">'+
+      '<div class="img-prompt-lbl">🖼 Image Prompt — Midjourney / DALL·E</div>'+
+      '<div class="img-prompt-sub">800×533px · patternslabco.com style</div>'+
+      '<span id="imgPrTxt-'+idx+'">'+esc(section.image_prompt||'No image prompt.')+'</span>'+
+      '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">'+
+        '<button onclick="copyPr('+idx+')" id="cpBtn-'+idx+'" class="tb-btn tb-btn-sm" style="border-color:#fde68a;color:#a16207">Copy Prompt</button>'+
+        '<button onclick="showPrompt('+idx+')" class="tb-btn tb-btn-sm" style="border-color:#d8b4fe;color:#7c3aed">🤖 ChatGPT</button>'+
+        '<button id="upBtn-'+idx+'" onclick="triggerUp('+idx+')" class="tb-btn tb-btn-sm hidden">Upload Image</button>'+
+        '<input type="file" id="fi-'+idx+'" accept="image/*" class="hidden" onchange="uploadImg('+idx+',this)">'+
+      '</div>'+
+      '<div id="imgPrev-'+idx+'" class="hidden" style="margin-top:9px"></div>'+
+    '</div>'+
+    '<div class="sec-divider"></div>';
+  return div;
+}
+
+function autoH(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toggleImg(idx){document.getElementById('imgPr-'+idx).classList.toggle('hidden');}
+function triggerUp(idx){document.getElementById('fi-'+idx)?.click();}
+function triggerCoverUpload(){document.getElementById('coverFileInput')?.click();}
+
+async function autoCoverFromPexels(){
+  const btn=document.getElementById('pexelsCoverBtn');
+  const old=btn.innerHTML;
+  btn.innerHTML='<span class="spinner" style="width:11px;height:11px;color:#1d4ed8"></span> Searching…';
+  btn.disabled=true;
+  try{
+    const q=(document.getElementById('coverPromptText')?.textContent||'').trim()||
+            (document.getElementById('metaTitle')?.value||'').trim()||
+            (document.getElementById('keywordInput')?.value||'').trim();
+    if(!q){toast('Generate article first to get a cover query','error');return;}
+    let r=await fetch(ARTICLE_BASE+'/api/pexels/auto-cover',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({query:q})
+    });
+    // Fallback for environments where ARTICLE_BASE is not propagated correctly.
+    if(r.status===404){
+      r=await fetch('/article/api/pexels/auto-cover',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({query:q})
+      });
+    }
+    const ct=(r.headers.get('content-type')||'').toLowerCase();
+    const raw=await r.text();
+    let d={};
+    if(ct.includes('application/json')){
+      try{d=JSON.parse(raw||'{}');}catch(_){d={};}
+    }else{
+      throw new Error(`Unexpected response (${r.status}). Please restart server and refresh.`);
+    }
+    if(!r.ok||d.error){toast(d.error||'Pexels search failed','error');return;}
+
+    const p=document.getElementById('coverPreview');
+    p.classList.remove('hidden');
+    const credit=d.photographer?`Photo by <a href="${d.photographer_url||d.pexels_url||'#'}" target="_blank" style="color:#1d4ed8;text-decoration:none">${d.photographer}</a> on <a href="https://www.pexels.com" target="_blank" style="color:#1d4ed8;text-decoration:none">Pexels</a>`:'Source: <a href="https://www.pexels.com" target="_blank" style="color:#1d4ed8;text-decoration:none">Pexels</a>';
+    p.innerHTML='<div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px"><img src="'+d.image_url+'" style="width:120px;height:63px;object-fit:cover;border-radius:5px"><div style="font-size:11px;color:#1e3a8a"><div style="font-weight:700;margin-bottom:2px">✅ Cover selected from Pexels</div><div>'+credit+'</div></div><button onclick="removeCover()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:17px;margin-left:auto">×</button></div>';
+
+    if(state.article){
+      state.article.cover_image_url=d.image_url;
+      state.article.cover_image_source='pexels';
+      state.article.cover_image_credit={
+        photographer:d.photographer||'',
+        photographer_url:d.photographer_url||'',
+        pexels_url:d.pexels_url||''
+      };
+    }
+    document.getElementById('uploadCoverBtn').classList.remove('hidden');
+    toast('Cover image selected from Pexels','success');
+  }catch(e){
+    toast('Pexels error: '+e.message,'error');
+  }finally{
+    btn.innerHTML=old;
+    btn.disabled=false;
+  }
+}
+
+function copyPr(idx){
+  const text=document.getElementById('imgPrTxt-'+idx)?.textContent||'';
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('cpBtn-'+idx),orig=btn.innerHTML;
+    btn.innerHTML='✓ Copied!';btn.style.color='#16a34a';btn.style.borderColor='#bbf7d0';
+    document.getElementById('upBtn-'+idx)?.classList.remove('hidden');
+    setTimeout(()=>{btn.innerHTML=orig;btn.style.color='';btn.style.borderColor='';},2000);
+  });
+}
+
+function showPrompt(idx){
+  const text=(document.getElementById('imgPrTxt-'+idx)?.textContent||'').trim();
+  if(!text){toast('No image prompt available.','error');return;}
+  document.getElementById('cgpt-overlay')?.remove();
+  const ov=document.createElement('div');
+  ov.id='cgpt-overlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px';
+  ov.innerHTML=`
+    <div style="background:#fff;border-radius:12px;padding:22px 24px;max-width:620px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-weight:700;font-size:13px;color:#7c3aed">🤖 Image Prompt — paste into ChatGPT</span>
+        <button onclick="document.getElementById('cgpt-overlay').remove()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#a8a29e;line-height:1">×</button>
+      </div>
+      <div id="cgpt-prompt-box" style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:8px;padding:12px 14px;font-size:12px;font-family:'JetBrains Mono','Courier New',monospace;line-height:1.65;color:#1c1917;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow-y:auto;user-select:all">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="cgpt-copy-btn" onclick="(()=>{navigator.clipboard.writeText(document.getElementById('cgpt-prompt-box').textContent).then(()=>{const b=document.getElementById('cgpt-copy-btn');b.textContent='✓ Copied!';b.style.background='#16a34a';setTimeout(()=>{b.textContent='📋 Copy';b.style.background='#7c3aed';},2000);})})()" style="flex:1;background:#7c3aed;color:#fff;border:none;border-radius:7px;padding:9px;font-size:12px;font-weight:600;cursor:pointer">📋 Copy</button>
+        <a href="https://chatgpt.com/" target="_blank" style="flex:1;background:#10a37f;color:#fff;border-radius:7px;padding:9px;font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center">↗ Open ChatGPT</a>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  const onKey=e=>{if(e.key==='Escape'){ov.remove();document.removeEventListener('keydown',onKey);}};
+  document.addEventListener('keydown',onKey);
+}
+
+async function uploadImg(idx,input){
+  const file=input.files[0];if(!file)return;
+  const btn=document.getElementById('upBtn-'+idx);btn.innerHTML='<span class="spinner" style="width:11px;height:11px;color:#78716c"></span> Uploading…';btn.disabled=true;
+  const fd=new FormData();fd.append('image',file);fd.append('section_idx',idx);
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/upload-image',{method:'POST',body:fd});const d=await r.json();
+    if(d.error){toast(d.error,'error');return;}
+    const p=document.getElementById('imgPrev-'+idx);p.classList.remove('hidden');
+    p.innerHTML='<div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:#fafaf9;border:1px solid #e7e5e4;border-radius:7px"><img src="'+d.url+'" style="width:80px;height:60px;object-fit:cover;border-radius:5px;flex-shrink:0"><div style="font-size:11px;color:#78716c;min-width:0"><div style="font-weight:700;color:#16a34a;margin-bottom:2px">✅ Uploaded</div><div style="word-break:break-all">'+d.filename+'</div><a href="'+d.url+'" target="_blank" style="color:#6366f1;text-decoration:none;font-size:10px">Open ↗</a></div><button onclick="removeImg('+idx+')" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:17px;line-height:1;flex-shrink:0;margin-left:auto">×</button></div>';
+    if(state.article?.sections?.[idx])state.article.sections[idx].image_url=d.url;
+    btn.innerHTML='✓ Uploaded';btn.style.color='#16a34a';toast('Image uploaded','success');
+  }catch(e){toast('Upload failed: '+e.message,'error');btn.innerHTML='Upload Image';}
+  finally{btn.disabled=false;input.value='';}
+}
+function removeImg(idx){const p=document.getElementById('imgPrev-'+idx);if(p){p.innerHTML='';p.classList.add('hidden');}const b=document.getElementById('upBtn-'+idx);if(b){b.innerHTML='Upload Image';b.style.color='';}if(state.article?.sections?.[idx])delete state.article.sections[idx].image_url;}
+
+function copyCoverPrompt(){
+  const text=document.getElementById('coverPromptText')?.textContent||'';
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copyCoverBtn'),orig=btn.innerHTML;
+    btn.innerHTML='✓ Copied!';btn.style.color='#16a34a';btn.style.borderColor='#bbf7d0';
+    document.getElementById('uploadCoverBtn').classList.remove('hidden');
+    setTimeout(()=>{btn.innerHTML=orig;btn.style.color='';btn.style.borderColor='';},2000);
+  });
+}
+async function uploadCoverImage(input){
+  const file=input.files[0];if(!file)return;
+  const btn=document.getElementById('uploadCoverBtn');btn.innerHTML='<span class="spinner" style="width:11px;height:11px;color:#78716c"></span> Uploading…';btn.disabled=true;
+  const fd=new FormData();fd.append('image',file);fd.append('section_idx','cover');
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/upload-image',{method:'POST',body:fd});const d=await r.json();if(d.error){toast(d.error,'error');return;}
+    const p=document.getElementById('coverPreview');p.classList.remove('hidden');
+    p.innerHTML='<div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:#fffbeb;border:1px solid #fde68a;border-radius:7px"><img src="'+d.url+'" style="width:120px;height:63px;object-fit:cover;border-radius:5px"><div style="font-size:11px;color:#78350f"><div style="font-weight:700;margin-bottom:2px">✅ Cover uploaded (WebP)</div><div style="word-break:break-all">'+d.filename+'</div></div><button onclick="removeCover()" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:17px;margin-left:auto">×</button></div>';
+    if(state.article)state.article.cover_image_url=d.url;btn.innerHTML='✓ Uploaded';toast('Cover uploaded as WebP','success');
+  }catch(e){toast('Upload failed: '+e.message,'error');btn.innerHTML='Upload Cover';}
+  finally{btn.disabled=false;input.value='';}
+}
+function removeCover(){const p=document.getElementById('coverPreview');p.innerHTML='';p.classList.add('hidden');const b=document.getElementById('uploadCoverBtn');b.innerHTML='Upload Cover';b.style.color='';if(state.article){delete state.article.cover_image_url;delete state.article.cover_image_source;delete state.article.cover_image_credit;}}
+
+function moveSection(idx,dir){const s=state.article.sections,ni=idx+dir;if(ni<0||ni>=s.length)return;syncDOM();[s[idx],s[ni]]=[s[ni],s[idx]];renderArticle(state.article);}
+
+async function regenSection(idx){
+  syncDOM();const section=state.article.sections[idx];
+  const card=document.querySelectorAll('.sec')[idx];card.style.opacity='0.4';card.style.pointerEvents='none';
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/regenerate-section',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:state.keyword,section,prev_heading:state.article.sections[idx-1]?.heading||'',next_heading:state.article.sections[idx+1]?.heading||''})});
+    const d=await r.json();if(d.error){toast(d.error,'error');return;}
+    state.article.sections[idx]={...section,...d.section};
+    document.getElementById('sectionsContainer').replaceChild(mkSection(state.article.sections[idx],idx,state.article.sections.length),card);
+    toast('Section regenerated!','success');
+  }catch(e){toast('Regen failed: '+e.message,'error');card.style.opacity='1';card.style.pointerEvents='auto';}
+}
+
+async function extendSection(idx){
+  syncDOM();
+  const section = state.article.sections[idx];
+  const btn = document.getElementById('extBtn-'+idx);
+  const textarea = document.querySelectorAll('.sec')[idx]?.querySelector('.sec-body');
+  if(!section || !btn) return;
+
+  // Show loading state
+  const origBtn = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner" style="width:11px;height:11px;color:#6366f1"></span>';
+  btn.disabled = true;
+  if(textarea){ textarea.style.opacity='0.5'; textarea.style.pointerEvents='none'; }
+
+  try{
+    const r = await fetch(ARTICLE_BASE+'/api/extend-section', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({keyword: state.keyword, section})
+    });
+    const d = await r.json();
+    if(d.error){ toast(d.error,'error'); return; }
+
+    // Update state + textarea in-place (no full re-render)
+    state.article.sections[idx].body = d.section.body;
+    if(textarea){
+      textarea.value = d.section.body;
+      autoH(textarea);
+    }
+    // Update word count
+    state.article.word_count = state.article.sections.reduce((acc,s)=>acc+((s.body||'').split(' ').length),0);
+    document.getElementById('tbWords').textContent = state.article.word_count;
+    document.getElementById('statWords').textContent = state.article.word_count;
+    toast('Section extended!','success');
+  }catch(e){ toast('Extend failed: '+e.message,'error'); }
+  finally{
+    btn.innerHTML = origBtn;
+    btn.disabled = false;
+    if(textarea){ textarea.style.opacity='1'; textarea.style.pointerEvents='auto'; }
+  }
+}
+
+async function regenMeta(field){
+  if(!state.article)return;syncDOM();
+  const btn=document.getElementById(field==='title'?'btnRegenTitle':'btnRegenMeta');
+  btn.innerHTML='<span class="spinner" style="width:11px;height:11px;color:#78716c"></span>';btn.disabled=true;
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/regenerate-meta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword:state.keyword,field,current_title:document.getElementById('metaTitle').value,current_meta:document.getElementById('metaDescription').value,sections_summary:(state.article.sections||[]).slice(0,3).map(s=>s.heading).filter(Boolean).join(', ')})});
+    const d=await r.json();if(d.error){toast(d.error,'error');return;}
+    if(field==='title'){document.getElementById('metaTitle').value=d.value;autoH(document.getElementById('metaTitle'));state.article.seo_title=d.value;updateTitleHint();toast('Title regenerated','success');}
+    else{document.getElementById('metaDescription').value=d.value;autoH(document.getElementById('metaDescription'));state.article.meta_description=d.value;updateMetaHint();toast('Meta regenerated','success');}
+  }catch(e){toast('Regen failed: '+e.message,'error');}
+  finally{btn.innerHTML='↻ '+(field==='title'?'Title':'Meta');btn.disabled=false;}
+}
+
+async function runSeoCheck(){
+  syncDOM();
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/seo-check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article:state.article,keyword:state.keyword})});
+    const d=await r.json();renderSeo(d);state.article.seo_score=d.score;state.article.seo_details=d;updateStats(state.article);toast('SEO score: '+d.score+'/100',d.score>=70?'success':'info');
+  }catch(e){toast('SEO check failed','error');}
+}
+
+function renderSeo(seo){
+  const sc=seo.score,c=2*Math.PI*15.9,p=(sc/100)*c;
+  document.getElementById('scoreNum').textContent=sc;
+  const fill=document.getElementById('ringFill');fill.setAttribute('stroke-dasharray',p.toFixed(1)+' '+(c-p).toFixed(1));
+  fill.className='ring-fill '+(sc>=70?'high':sc>=45?'med':'low');
+  document.getElementById('scoreLabel').textContent=sc>=70?'Good':sc>=45?'Needs work':'Poor';
+  document.getElementById('scoreSub').textContent=sc+'/100';
+  const checks=seo.checks||[];let html='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#a8a29e;margin-bottom:6px">SEO Checks</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 14px">';
+  checks.forEach(c=>{html+='<div class="seo-item"><span>'+(c.passed?'✅':'❌')+'</span><span style="color:'+(c.passed?'#a8a29e':'#ef4444')+'">'+c.label+'</span></div>';});
+  html+='</div>';
+  document.getElementById('seoChecklist').innerHTML=html;
+}
+
+function syncDOM(){
+  if(!state.article)return;
+  state.article.seo_title=document.getElementById('metaTitle').value;
+  state.article.slug=document.getElementById('metaSlug').value;
+  state.article.meta_description=document.getElementById('metaDescription').value;
+  document.querySelectorAll('.sec').forEach((card,idx)=>{if(state.article.sections[idx]){state.article.sections[idx].heading=card.querySelector('.sec-h')?.value||'';state.article.sections[idx].body=card.querySelector('.sec-body')?.value||'';}});
+  state.article.faq=[...document.querySelectorAll('.faq-item')].map(item=>({question:item.querySelector('.faq-q')?.textContent||'',answer:item.querySelector('.faq-a')?.textContent||''}));
+}
+
+async function saveArticle(){
+  syncDOM();
+  try{const r=await fetch(ARTICLE_BASE+'/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article:state.article,id:state.savedId})});const d=await r.json();state.savedId=d.id;const el=document.getElementById('tbStatus');el.textContent='Saved';el.className='tb-status s-saved';toast('Saved (ID: '+d.id+')','success');}
+  catch(e){toast('Save failed: '+e.message,'error');}
+}
+function exportArticle(fmt){if(!state.savedId){toast('Save first before exporting','error');return;}window.open(ARTICLE_BASE+'/api/export/'+state.savedId+'?format='+fmt,'_blank');}
+
+function updateStats(article){
+  document.getElementById('statWords').textContent=article.word_count||0;
+  document.getElementById('statSections').textContent=(article.sections||[]).length;
+  document.getElementById('statFaq').textContent=(article.faq||[]).length;
+  let links=0;(article.sections||[]).forEach(s=>{const m=(s.body||'').match(/\[.+?\]\(https?:\/\/patternslabco\.com[^)]*\)/g);if(m)links+=m.length;});
+  document.getElementById('statLinks').textContent=links;
+  document.getElementById('tbWords').textContent=article.word_count||0;
+}
+
+async function optimizeSeo(){
+  if(!state.article)return;syncDOM();
+  const checks=state.article.seo_details?.checks||[];
+  const toFix=checks.filter(c=>!c.passed).map(c=>c.id).filter(id=>['title_length','meta_length','kw_density','internal_links','direct_answer'].includes(id));
+  if(!toFix.length){toast('No fixable issues — recheck first','info');return;}
+  const btn=document.getElementById('btnOptimize');btn.innerHTML='<span class="spinner" style="width:11px;height:11px;color:#16a34a"></span>';btn.disabled=true;
+  const logEl=document.getElementById('optimizeLog');logEl.classList.remove('hidden');logEl.innerHTML='';
+  const addLog=(icon,msg,color)=>{const row=document.createElement('div');row.className='opt-row';row.style.color=color;row.innerHTML='<span>'+icon+'</span><span>'+msg+'</span>';logEl.appendChild(row);};
+  try{
+    const resp=await fetch(ARTICLE_BASE+'/api/optimize-seo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article:state.article,keyword:state.keyword,failed_ids:toFix})});
+    const reader=resp.body.getReader(),decoder=new TextDecoder();let buffer='';
+    while(true){const{done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const parts=buffer.split('\n\n');buffer=parts.pop();
+      for(const part of parts){if(!part.startsWith('event:'))continue;const lines=part.split('\n');const et=lines[0].replace('event: ','').trim();const data=JSON.parse(lines[1].replace('data: ','').trim());
+        if(et==='progress')addLog('⏳',data.message,'#a8a29e');
+        else if(et==='step_done'){if(logEl.lastChild){logEl.lastChild.querySelector('span').textContent='✅';logEl.lastChild.style.color='#16a34a';}}
+        else if(et==='step_error')addLog('❌',data.check_id+': '+data.error,'#ef4444');
+        else if(et==='done'){state.article=data.article;renderArticle(data.article);if(data.seo)renderSeo(data.seo);const applied=data.applied||[];toast(applied.length?'Fixed: '+applied.join(', '):'No changes applied','success');setTimeout(()=>{logEl.innerHTML='';logEl.classList.add('hidden');},4000);}
+      }
+    }
+  }catch(e){toast('Optimization failed: '+e.message,'error');}
+  finally{btn.innerHTML='🔧 Fix Issues';btn.disabled=false;}
+}
+
+function openWpModal(){if(!state.article){toast('Generate an article first','error');return;}syncDOM();document.getElementById('wpPreviewTitle').textContent=state.article.seo_title||'(no title)';document.getElementById('wpPreviewMeta').textContent=state.article.meta_description||'(no meta)';document.getElementById('wpModalBody').classList.remove('hidden');document.getElementById('wpModalResult').classList.add('hidden');document.getElementById('wpModal').classList.remove('hidden');}
+function closeWpModal(){document.getElementById('wpModal').classList.add('hidden');}
+
+async function publishToWordPress(){
+  const status=document.querySelector('input[name="wpStatus"]:checked').value;
+  const btn=document.getElementById('btnWpPublish');btn.innerHTML='<span class="spinner spinner-w"></span> Sending…';btn.disabled=true;
+  try{
+    const r=await fetch(ARTICLE_BASE+'/api/publish-wordpress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article:state.article,status})});
+    const d=await r.json();if(d.error){toast(d.error,'error');btn.innerHTML='📤 Send to WordPress';btn.disabled=false;return;}
+    document.getElementById('wpModalBody').classList.add('hidden');document.getElementById('wpModalResult').classList.remove('hidden');
+    document.getElementById('wpResultLinks').innerHTML='<a href="'+d.post_url+'" target="_blank" class="tb-btn">🔗 View Post</a><a href="'+d.edit_url+'" target="_blank" class="tb-btn tb-btn-dark">✏️ Edit in WP</a>';
+    toast('Sent as '+d.status+' (ID: '+d.post_id+')','success');
+  }catch(e){toast('Publish failed: '+e.message,'error');btn.innerHTML='📤 Send to WordPress';btn.disabled=false;}
+}
+document.getElementById('wpModal').addEventListener('click',e=>{if(e.target.id==='wpModal')closeWpModal();});
+
+function updateTitleHint(){const l=document.getElementById('metaTitle').value.length,h=document.getElementById('titleLenHint');h.textContent=l+'/60';h.style.color=l>=50&&l<=60?'#16a34a':'#f59e0b';}
+function updateMetaHint(){const l=document.getElementById('metaDescription').value.length,h=document.getElementById('metaLenHint');h.textContent=l+'/160';h.style.color=l>=150&&l<=160?'#16a34a':'#f59e0b';}
+function show(id){document.getElementById(id)?.classList.remove('hidden');}
+function hide(id){document.getElementById(id)?.classList.add('hidden');}
+function showEl(id){const el=document.getElementById(id);if(el)el.style.display='';}
+
+// ── HTML Preview ──────────────────────────────────────────
+function buildHtml() {
+  syncDOM();
+  const a = state.article;
+  if (!a) return '';
+  const md2html = t => t
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
+    .replace(/^### (.+)/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)/gm, '<h1>$1</h1>')
+    .replace(/^- (.+)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
+    .replace(/^(\d+)\. (.+)/gm, '<li>$2</li>')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/^(?!<[hul])/gm, '')
+    .trim();
+
+  let html = `<h1>${a.seo_title || ''}</h1>\n`;
+  html += `<p><em>${a.meta_description || ''}</em></p>\n\n`;
+
+  (a.sections || []).forEach(s => {
+    if (s.heading) html += `<h2>${s.heading}</h2>\n`;
+    html += `<p>${md2html(s.body || '')}</p>\n\n`;
+    if (s.image_url) html += `<img src="${s.image_url}" alt="${s.heading || ''}" style="max-width:100%;border-radius:8px;margin:12px 0">\n\n`;
+  });
+
+  if (a.faq && a.faq.length) {
+    html += `<h2>Frequently Asked Questions</h2>\n`;
+    a.faq.forEach(f => {
+      html += `<h3>${f.question}</h3>\n<p>${f.answer}</p>\n\n`;
+    });
+  }
+  return html;
+}
+
+function previewHtml() {
+  if (!state.article) { toast('Generate an article first', 'error'); return; }
+  const html = buildHtml();
+  document.getElementById('htmlRenderedContent').innerHTML = html;
+  document.getElementById('htmlSourceContent').textContent = html;
+  document.getElementById('htmlPreviewModal').classList.remove('hidden');
+  switchHtmlTab('rendered');
+}
+
+function switchHtmlTab(tab) {
+  const rendered = document.getElementById('htmlRendered');
+  const source = document.getElementById('htmlSource');
+  const tabR = document.getElementById('tabRendered');
+  const tabS = document.getElementById('tabSource');
+  if (tab === 'rendered') {
+    rendered.style.display = ''; source.classList.add('hidden');
+    tabR.style.borderBottomColor = '#6366f1'; tabR.style.color = '#6366f1';
+    tabS.style.borderBottomColor = 'transparent'; tabS.style.color = '#a8a29e';
+  } else {
+    rendered.style.display = 'none'; source.classList.remove('hidden');
+    tabS.style.borderBottomColor = '#6366f1'; tabS.style.color = '#6366f1';
+    tabR.style.borderBottomColor = 'transparent'; tabR.style.color = '#a8a29e';
+  }
+}
+
+function copyHtmlSource() {
+  const text = document.getElementById('htmlSourceContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopyHtml');
+    btn.innerHTML = '✓ Copied!'; btn.style.color = '#16a34a'; btn.style.borderColor = '#bbf7d0';
+    setTimeout(() => { btn.innerHTML = 'Copy HTML'; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
+  });
+}
+
+document.getElementById('htmlPreviewModal').addEventListener('click', e => {
+  if (e.target.id === 'htmlPreviewModal') e.target.classList.add('hidden');
+});
+
+// ── Settings ──────────────────────────────────────────────
+let settingsOpen = false;
+let settingsCache = {};
+
+async function toggleSettings() {
+  settingsOpen = !settingsOpen;
+  const btn = document.getElementById('btnSettings');
+  if (settingsOpen) {
+    hide('startScreen'); hide('progressPanel'); hide('articleEditor');
+    show('settingsPage');
+    btn.style.background = '#f0f0fe';
+    btn.style.borderColor = '#6366f1';
+    btn.style.color = '#6366f1';
+    await loadSettings();
+  } else {
+    hide('settingsPage');
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    // Return to correct view
+    if (state.article) show('articleEditor');
+    else show('startScreen');
+  }
+}
+
+async function loadSettings() {
+  try {
+    const r = await fetch(ARTICLE_BASE + '/api/settings');
+    if (!r.ok) throw new Error('Settings load failed: ' + r.status);
+    const d = await r.json();
+    settingsCache = d || {};
+    document.getElementById('settingsApiKey').value = d.openrouter_api_key || '';
+    document.getElementById('settingsPexelsKey').value = d.pexels_api_key || '';
+    document.getElementById('settingsModel').value = d.openrouter_model || '';
+    highlightModelCard(d.openrouter_model || '');
+  } catch(e) { toast('Could not load settings', 'error'); }
+}
+
+function pickModel(model) {
+  document.getElementById('settingsModel').value = model;
+  highlightModelCard(model);
+}
+
+function highlightModelCard(model) {
+  document.querySelectorAll('.model-card').forEach(card => {
+    card.classList.toggle('active', card.dataset.model === model);
+  });
+}
+
+async function saveSettings() {
+  const apiKey = document.getElementById('settingsApiKey').value.trim();
+  const pexelsKey = document.getElementById('settingsPexelsKey').value.trim();
+  const model  = document.getElementById('settingsModel').value.trim();
+
+  if (!pexelsKey && !(settingsCache?.pexels_api_key || '').trim()) {
+    toast('Pexels key is empty. Paste it in the Pexels field first.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSaveSettings');
+  btn.innerHTML = '<span class="spinner spinner-w"></span> Saving…';
+  btn.disabled = true;
+  try {
+    // Keep existing values when fields are left blank, so optional updates
+    // like Pexels key save successfully.
+    const payload = {
+      openrouter_api_key: apiKey || (settingsCache?.openrouter_api_key || ''),
+      openrouter_model: model || (settingsCache?.openrouter_model || 'google/gemini-2.0-flash-001'),
+      pexels_api_key: pexelsKey || (settingsCache?.pexels_api_key || '')
+    };
+
+    const r = await fetch(ARTICLE_BASE + '/api/settings', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const txt = await r.text();
+    let d = {};
+    try { d = JSON.parse(txt || '{}'); } catch (_) { d = { error: txt.slice(0, 200) }; }
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    if (d.ok) {
+      settingsCache = payload;
+      const ok = document.getElementById('settingsOk');
+      ok.style.opacity = '1';
+      setTimeout(() => ok.style.opacity = '0', 3000);
+      toast('Settings saved (Pexels: ' + (d.saved?.pexels_api_key_set ? 'set' : 'empty') + ')', 'success');
+    }
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+  finally { btn.innerHTML = 'Save Settings'; btn.disabled = false; }
+}
+</script>
+</body>
+</html>

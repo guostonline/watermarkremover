@@ -1,0 +1,1163 @@
+{% extends "base.html" %}
+
+{% block title %}Article Generator — PatternsLab{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-body" style="display:flex;flex-direction:column;gap:16px;">
+
+  <!-- Keyword Input -->
+  <div>
+    <label style="color:#94a3b8;">Primary Keyword</label>
+    <div style="display:flex;gap:6px;margin-top:5px;">
+      <input type="text" id="keywordInput" placeholder="e.g. A-line dress sewing pattern"
+             style="background:#253245;color:#e2e8f0;border-color:#3a4a62;flex:1;"
+             onkeydown="if(event.key==='Enter')findKeywords()">
+      <button class="btn btn-primary btn-sm" onclick="findKeywords()" id="btnFindKw">
+        🔍
+      </button>
+    </div>
+  </div>
+
+  <!-- Keyword Suggestions -->
+  <div id="kwSection" class="hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <label style="color:#94a3b8;margin-bottom:0;">Related Keywords</label>
+      <button class="btn btn-sm" onclick="selectAllKw()" style="background:#253245;color:#94a3b8;border:1px solid #3a4a62;padding:3px 8px;font-size:11px;">All</button>
+    </div>
+    <div id="kwPills" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+  </div>
+
+  <!-- Generate Button -->
+  <button class="btn btn-primary w-full" id="btnGenerate" onclick="generateArticle()">
+    ✨ Generate Article
+  </button>
+
+  <!-- Site Context Status -->
+  <div id="siteContextStatus" style="font-size:11px;color:#64748b;text-align:center;"></div>
+
+  <hr style="border-color:#2d3f57;">
+
+  <!-- SEO Score Panel -->
+  <div id="seoPanel" class="hidden">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div id="scoreCircle" class="score-circle score-low" style="flex-shrink:0;">0</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#e2e8f0;">SEO Score</div>
+        <div id="scoreLabel" style="font-size:11px;color:#64748b;">Not checked</div>
+      </div>
+    </div>
+    <div id="seoChecklist"></div>
+    <div style="display:flex;gap:6px;margin-top:8px;">
+      <button class="btn btn-sm" onclick="runSeoCheck()" id="btnRecheck"
+              style="flex:1;background:#253245;color:#94a3b8;border:1px solid #3a4a62;">
+        ↻ Recheck
+      </button>
+      <button class="btn btn-sm" onclick="optimizeSeo()" id="btnOptimize"
+              style="flex:1;background:#1a3a2a;color:#4ade80;border:1px solid #166534;">
+        🔧 Fix Issues
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div id="statsPanel" class="hidden" style="font-size:12px;color:#64748b;display:flex;flex-direction:column;gap:4px;">
+    <div class="flex justify-between"><span>Word count</span><span id="statWords" style="color:#e2e8f0;">—</span></div>
+    <div class="flex justify-between"><span>Sections</span><span id="statSections" style="color:#e2e8f0;">—</span></div>
+    <div class="flex justify-between"><span>Internal links</span><span id="statLinks" style="color:#e2e8f0;">—</span></div>
+    <div class="flex justify-between"><span>FAQ items</span><span id="statFaq" style="color:#e2e8f0;">—</span></div>
+  </div>
+
+  <!-- Actions -->
+  <div id="actionButtons" class="hidden" style="display:flex;flex-direction:column;gap:6px;">
+    <button class="btn btn-primary" onclick="saveArticle()">💾 Save Article</button>
+    <button class="btn btn-sm w-full" onclick="openWpModal()"
+            style="background:#1e3a5f;color:#93c5fd;border:1px solid #1d4ed8;justify-content:center;">
+      📤 Publish to WordPress
+    </button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-secondary btn-sm" onclick="exportArticle('html')" style="flex:1;">⬇ HTML</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportArticle('markdown')" style="flex:1;">⬇ MD</button>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="emptyState" style="text-align:center;padding:80px 40px;color:var(--text-muted);">
+  <div style="font-size:48px;margin-bottom:16px;">✂️</div>
+  <div style="font-size:18px;font-weight:600;margin-bottom:8px;color:var(--text);">PatternsLab Article Generator</div>
+  <div style="max-width:380px;margin:0 auto;line-height:1.7;">
+    Enter a keyword in the sidebar, find related keywords, then generate a fully SEO-optimized article with internal product links.
+  </div>
+  <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <span class="badge badge-green">1000–2000 words</span>
+    <span class="badge badge-info">Web research + citations</span>
+    <span class="badge badge-muted">Internal product links</span>
+    <span class="badge badge-warning">SEO + AI score</span>
+  </div>
+</div>
+
+<!-- Progress Panel -->
+<div id="progressPanel" class="hidden">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Generating Article</span>
+      <div class="spinner spinner-dark"></div>
+    </div>
+    <div id="progressSteps" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div id="progressSources" class="hidden mt-3" style="font-size:12px;color:var(--text-muted);">
+      <strong>Sources found:</strong>
+      <div id="sourcesList" style="margin-top:5px;display:flex;flex-direction:column;gap:3px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Article Editor -->
+<div id="articleEditor" class="hidden">
+
+  <!-- Metadata card -->
+  <div class="card" style="border-left:4px solid var(--green);">
+    <div class="card-header">
+      <span class="card-title">Article Metadata</span>
+      <div style="display:flex;gap:6px;">
+        <span id="schemaTypeBadge" class="badge badge-info"></span>
+        <span id="wordCountBadge" class="badge badge-muted"></span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group" style="margin:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <label style="margin:0;">SEO Title <span id="titleLenHint" style="font-weight:400;color:var(--text-muted);"></span></label>
+          <button class="btn btn-secondary btn-sm" id="btnRegenTitle" onclick="regenMeta('title')" style="padding:3px 8px;font-size:11px;">↻ Regenerate</button>
+        </div>
+        <input type="text" id="metaTitle" oninput="updateTitleHint()" style="font-weight:600;">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>URL Slug</label>
+        <input type="text" id="metaSlug">
+      </div>
+    </div>
+    <div class="form-group mt-2" style="margin-bottom:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+        <label style="margin:0;">Meta Description <span id="metaLenHint" style="font-weight:400;color:var(--text-muted);"></span></label>
+        <button class="btn btn-secondary btn-sm" id="btnRegenMeta" onclick="regenMeta('meta')" style="padding:3px 8px;font-size:11px;">↻ Regenerate</button>
+      </div>
+      <textarea id="metaDescription" rows="2" oninput="updateMetaHint()"></textarea>
+    </div>
+  </div>
+
+  <!-- WordPress Modal -->
+  <div id="wpModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;display:flex;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:28px;width:420px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-size:16px;font-weight:700;">📤 Publish to WordPress</div>
+        <button onclick="closeWpModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;">×</button>
+      </div>
+      <div id="wpModalBody">
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;">
+          <div style="font-weight:600;margin-bottom:4px;" id="wpPreviewTitle"></div>
+          <div style="color:var(--text-muted);font-size:12px;" id="wpPreviewMeta"></div>
+        </div>
+        <div class="form-group">
+          <label>Publish Status</label>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--text);">
+              <input type="radio" name="wpStatus" value="draft" checked> Save as Draft
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--text);">
+              <input type="radio" name="wpStatus" value="publish"> Publish Now
+            </label>
+          </div>
+        </div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:10px 12px;font-size:12px;color:#78350f;margin-bottom:16px;">
+          ⚠️ Publishing will send the article to <strong>patternslabco.com</strong>. Choose <em>Draft</em> to review first.
+        </div>
+        <button class="btn btn-primary w-full" onclick="publishToWordPress()" id="btnWpPublish" style="justify-content:center;">
+          📤 Send to WordPress
+        </button>
+      </div>
+      <div id="wpModalResult" class="hidden" style="text-align:center;padding:8px 0;">
+        <div style="font-size:32px;margin-bottom:10px;">✅</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:6px;">Article sent!</div>
+        <div id="wpResultLinks" style="display:flex;gap:8px;justify-content:center;margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sources bar -->
+  <div id="sourcesBar" class="hidden" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;font-size:12px;">
+    <strong style="color:var(--green-dark);">📰 Web Sources Used:</strong>
+    <span id="sourcesInline"></span>
+  </div>
+
+  <!-- Cover Image Card -->
+  <div id="coverImageCard" class="hidden" style="background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:700;color:#78350f;">🖼 Cover / Featured Image — <span style="font-weight:400;font-size:11px;">1200×628px landscape</span></div>
+      <div style="display:flex;gap:6px;">
+        <button id="copyCoverBtn" onclick="copyCoverPrompt()" title="Copy prompt"
+                style="background:none;border:1px solid #fde68a;border-radius:5px;cursor:pointer;padding:3px 8px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+        <button id="uploadCoverBtn" onclick="triggerCoverUpload()" class="hidden"
+                style="background:none;border:1px solid #93c5fd;border-radius:5px;cursor:pointer;padding:3px 8px;font-size:12px;color:#1d4ed8;display:flex;align-items:center;gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Cover
+        </button>
+        <input type="file" id="coverFileInput" accept="image/*" class="hidden" onchange="uploadCoverImage(this)">
+      </div>
+    </div>
+    <div id="coverPromptText" style="font-size:12px;color:#78350f;line-height:1.6;"></div>
+    <div id="coverPreview" class="hidden" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- Sections -->
+  <div id="sectionsContainer"></div>
+
+  <!-- FAQ -->
+  <div id="faqCard" class="card hidden">
+    <div class="card-header">
+      <span class="card-title">FAQ Section</span>
+      <span class="badge badge-green">Schema Ready</span>
+    </div>
+    <div id="faqItems"></div>
+  </div>
+
+</div>
+
+<style>
+/* Section card */
+.section-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.section-card:hover { border-color: #cbd5e1; }
+.section-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+}
+.section-heading-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: inherit;
+  padding: 0;
+}
+.section-heading-input:focus { outline: none; }
+.section-body {
+  padding: 16px;
+}
+.section-body-text {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  font-family: inherit;
+  color: var(--text);
+  background: transparent;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.15s;
+}
+.section-body-text:focus {
+  outline: none;
+  border-color: var(--green);
+  background: #fafffe;
+}
+.section-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: #fafafa;
+  flex-wrap: wrap;
+}
+.img-prompt-box {
+  margin: 0 16px 12px;
+  padding: 10px 14px;
+  background: #fef9ec;
+  border: 1px solid #fde68a;
+  border-radius: 7px;
+  font-size: 12px;
+  color: #78350f;
+  line-height: 1.5;
+}
+.img-prompt-box strong { display: block; margin-bottom:4px; color:#92400e; }
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  font-size: 11px;
+  color: #15803d;
+}
+/* FAQ items */
+.faq-item { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+.faq-q { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.faq-a { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+/* Progress steps */
+.progress-step { display:flex;align-items:center;gap:8px;font-size:13px; }
+.step-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.step-done { background:var(--success); }
+.step-active { background:var(--warning);animation:pulse 1s infinite; }
+.step-pending { background:#e2e8f0; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+/* SEO checklist */
+.seo-item { display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0; }
+.seo-item .icon { width:14px;flex-shrink:0;text-align:center; }
+.seo-sep { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin:8px 0 4px; }
+</style>
+
+<script>
+// ─── State ───────────────────────────────────────────────────
+let state = {
+  keyword: '',
+  selectedKeywords: [],
+  article: null,
+  savedId: null,
+};
+
+// ─── On Load ─────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadSiteContextStatus();
+});
+
+async function loadSiteContextStatus() {
+  try {
+    const r = await fetch('/api/site-context');
+    const d = await r.json();
+    document.getElementById('siteContextStatus').textContent =
+      `${d.total} items cached (${d.products.length} products, ${d.posts.length} posts)`;
+  } catch(e) {}
+}
+
+// ─── Keyword Research ─────────────────────────────────────────
+async function findKeywords() {
+  const kw = document.getElementById('keywordInput').value.trim();
+  if (!kw) { toast('Enter a keyword first', 'error'); return; }
+  state.keyword = kw;
+  state.selectedKeywords = [];
+
+  const btn = document.getElementById('btnFindKw');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch('/api/keywords', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({keyword: kw})
+    });
+    const d = await r.json();
+    renderKeywords(d.keywords || []);
+    toast(`Found ${(d.keywords||[]).length} keyword suggestions`, 'success');
+  } catch(e) {
+    toast('Keyword research failed: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = '🔍';
+    btn.disabled = false;
+  }
+}
+
+function renderKeywords(keywords) {
+  const sec = document.getElementById('kwSection');
+  const pills = document.getElementById('kwPills');
+  pills.innerHTML = '';
+  keywords.forEach(k => {
+    const pill = document.createElement('div');
+    pill.className = 'pill selected';
+    const intentColor = k.intent === 'commercial' ? '#fef3c7' : k.intent === 'navigational' ? '#ede9fe' : '#f0fdf4';
+    pill.innerHTML = `${k.keyword} <span class="pill-intent">${k.intent[0].toUpperCase()}</span>`;
+    pill.title = `${k.intent} | ${k.volume} volume`;
+    pill.dataset.kw = k.keyword;
+    pill.onclick = () => {
+      pill.classList.toggle('selected');
+      state.selectedKeywords = [...document.querySelectorAll('.pill.selected')].map(p => p.dataset.kw);
+    };
+    pills.appendChild(pill);
+    state.selectedKeywords.push(k.keyword);
+  });
+  sec.classList.remove('hidden');
+}
+
+function selectAllKw() {
+  document.querySelectorAll('#kwPills .pill').forEach(p => p.classList.add('selected'));
+  state.selectedKeywords = [...document.querySelectorAll('.pill')].map(p => p.dataset.kw);
+}
+
+// ─── Generate Article ─────────────────────────────────────────
+async function generateArticle() {
+  const kw = document.getElementById('keywordInput').value.trim();
+  if (!kw) { toast('Enter a keyword first', 'error'); return; }
+  state.keyword = kw;
+
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('articleEditor').classList.add('hidden');
+  const progress = document.getElementById('progressPanel');
+  progress.classList.remove('hidden');
+  document.getElementById('progressSteps').innerHTML = '';
+  document.getElementById('progressSources').classList.add('hidden');
+
+  addProgressStep('search', 'active', 'Searching the web for sources...');
+
+  const btn = document.getElementById('btnGenerate');
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({keyword: kw, selected_keywords: state.selectedKeywords})
+    });
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop();
+      for (const part of parts) {
+        if (!part.startsWith('event:')) continue;
+        const lines = part.split('\n');
+        const event = lines[0].replace('event: ', '').trim();
+        const data = JSON.parse(lines[1].replace('data: ', '').trim());
+        handleSSE(event, data);
+      }
+    }
+  } catch(e) {
+    toast('Generation failed: ' + e.message, 'error');
+    progress.classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+  } finally {
+    btn.innerHTML = '✨ Generate Article';
+    btn.disabled = false;
+  }
+}
+
+function handleSSE(event, data) {
+  if (event === 'progress') {
+    if (data.step === 'research') {
+      updateProgressStep('search', 'done', '✓ Web search started');
+      addProgressStep('fetch', 'active', data.message);
+    } else if (data.step === 'research_done') {
+      updateProgressStep('fetch', 'done', `✓ ${data.message}`);
+      if (data.sources && data.sources.length > 0) {
+        const srcDiv = document.getElementById('progressSources');
+        srcDiv.classList.remove('hidden');
+        document.getElementById('sourcesList').innerHTML = data.sources
+          .map(s => `<a href="${s.url}" target="_blank" style="color:var(--green);text-decoration:none;">🔗 ${s.domain}</a>`).join('');
+      }
+      addProgressStep('context', 'active', 'Fetching site products and posts...');
+    } else if (data.step === 'context_done') {
+      updateProgressStep('context', 'done', `✓ ${data.message}`);
+      addProgressStep('ai', 'active', 'Generating article with AI...');
+    } else if (data.step === 'generating') {
+      updateProgressStep('ai', 'active', data.message);
+    } else if (data.step === 'scoring') {
+      updateProgressStep('ai', 'done', '✓ Article generated');
+      addProgressStep('seo', 'active', data.message);
+    }
+  } else if (event === 'done') {
+    updateProgressStep('seo', 'done', '✓ SEO check complete');
+    setTimeout(() => {
+      document.getElementById('progressPanel').classList.add('hidden');
+      state.article = data.article;
+      state.savedId = null;
+      renderArticle(data.article);
+    }, 600);
+  } else if (event === 'error') {
+    toast('Error: ' + data.message, 'error');
+    document.getElementById('progressPanel').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+  }
+}
+
+function addProgressStep(id, status, msg) {
+  const div = document.createElement('div');
+  div.className = 'progress-step';
+  div.id = 'step-' + id;
+  const colorMap = {done:'step-done', active:'step-active', pending:'step-pending'};
+  div.innerHTML = `<div class="step-dot ${colorMap[status]}"></div><span>${msg}</span>`;
+  document.getElementById('progressSteps').appendChild(div);
+}
+
+function updateProgressStep(id, status, msg) {
+  const el = document.getElementById('step-' + id);
+  if (!el) return;
+  const colorMap = {done:'step-done', active:'step-active', pending:'step-pending'};
+  el.querySelector('.step-dot').className = `step-dot ${colorMap[status]}`;
+  el.querySelector('span').textContent = msg;
+}
+
+// ─── Render Article ───────────────────────────────────────────
+function renderArticle(article) {
+  document.getElementById('emptyState').classList.add('hidden');
+  const editor = document.getElementById('articleEditor');
+  editor.classList.remove('hidden');
+
+  // Metadata
+  document.getElementById('metaTitle').value = article.seo_title || '';
+  document.getElementById('metaSlug').value = article.slug || '';
+  document.getElementById('metaDescription').value = article.meta_description || '';
+  document.getElementById('schemaTypeBadge').textContent = article.schema_type || 'Article';
+  updateTitleHint();
+
+  // Cover image prompt
+  const coverCard = document.getElementById('coverImageCard');
+  const coverPromptEl = document.getElementById('coverPromptText');
+  if (article.cover_image_prompt) {
+    coverPromptEl.textContent = article.cover_image_prompt;
+    coverCard.classList.remove('hidden');
+  } else {
+    coverCard.classList.add('hidden');
+  }
+  updateMetaHint();
+
+  // Sources
+  if (article.sources && article.sources.length > 0) {
+    document.getElementById('sourcesBar').classList.remove('hidden');
+    document.getElementById('sourcesInline').innerHTML = ' ' + article.sources
+      .map(u => {
+        const domain = u.replace(/https?:\/\/(www\.)?/,'').split('/')[0];
+        return `<a href="${u}" target="_blank" class="source-chip">🔗 ${domain}</a>`;
+      }).join(' ');
+  }
+
+  // Sections
+  const container = document.getElementById('sectionsContainer');
+  container.innerHTML = '';
+  (article.sections || []).forEach((section, idx) => {
+    container.appendChild(renderSectionCard(section, idx, article.sections.length));
+  });
+
+  // FAQ
+  const faqCard = document.getElementById('faqCard');
+  const faqItems = document.getElementById('faqItems');
+  if (article.faq && article.faq.length > 0) {
+    faqItems.innerHTML = article.faq.map((f, i) => `
+      <div class="faq-item" id="faq-${i}">
+        <div class="faq-q" contenteditable="true">${f.question}</div>
+        <div class="faq-a" contenteditable="true">${f.answer}</div>
+      </div>
+    `).join('');
+    faqCard.classList.remove('hidden');
+  } else {
+    faqCard.classList.add('hidden');
+  }
+
+  // SEO panel
+  if (article.seo_details) renderSeoPanel(article.seo_details);
+
+  // Stats
+  updateStats(article);
+
+  // Show action buttons and SEO panel
+  document.getElementById('seoPanel').classList.remove('hidden');
+  document.getElementById('statsPanel').classList.remove('hidden');
+  document.getElementById('actionButtons').classList.remove('hidden');
+
+  // Word count badge
+  document.getElementById('wordCountBadge').textContent = (article.word_count || 0) + ' words';
+
+  toast('Article generated successfully!', 'success');
+}
+
+function renderSectionCard(section, idx, total) {
+  const card = document.createElement('div');
+  card.className = 'section-card';
+  card.dataset.idx = idx;
+
+  const sources = (section.sources || []).filter(s => s && s.startsWith('http')).map(s => {
+    const domain = s.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+    return `<a href="${escHtml(s)}" target="_blank" rel="noopener" class="source-chip" style="text-decoration:none;">🔗 ${domain}</a>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="section-card-header">
+      <span class="badge badge-muted" style="flex-shrink:0;">${section.heading_level || 'h2'}</span>
+      <input type="text" class="section-heading-input" value="${escHtml(section.heading || '')}"
+             placeholder="Section heading...">
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        ${idx > 0 ? `<button class="btn btn-icon btn-secondary btn-sm" onclick="moveSection(${idx},-1)" title="Move up">↑</button>` : ''}
+        ${idx < total-1 ? `<button class="btn btn-icon btn-secondary btn-sm" onclick="moveSection(${idx},1)" title="Move down">↓</button>` : ''}
+      </div>
+    </div>
+    <div class="section-body">
+      <textarea class="section-body-text" rows="${Math.max(4, Math.ceil((section.body||'').length/100))}">${escHtml(section.body || '')}</textarea>
+    </div>
+    <div id="imgPrompt-${idx}" class="img-prompt-box hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <strong style="margin:0;">🖼 Image Prompt (Midjourney / DALL-E)</strong>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <button onclick="copyPrompt(${idx})" id="copyBtn-${idx}" title="Copy prompt"
+                  style="background:none;border:1px solid #fde68a;border-radius:5px;cursor:pointer;padding:3px 7px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button id="uploadBtn-${idx}" onclick="triggerUpload(${idx})" class="hidden"
+                  style="background:none;border:1px solid #93c5fd;border-radius:5px;cursor:pointer;padding:3px 7px;font-size:12px;color:#1d4ed8;display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Image
+          </button>
+          <input type="file" id="fileInput-${idx}" accept="image/*" class="hidden" onchange="uploadImage(${idx}, this)">
+        </div>
+      </div>
+      <div style="font-size:10px;color:#b45309;margin-bottom:4px;opacity:0.7;">800×533px in-post • patternslabco.com style</div>
+      <span id="imgPromptText-${idx}">${escHtml(section.image_prompt || 'No image prompt generated.')}</span>
+      <div id="imgPreview-${idx}" class="hidden" style="margin-top:10px;"></div>
+    </div>
+    <div class="section-footer">
+      <button class="btn btn-secondary btn-sm" onclick="regenSection(${idx})">↻ Regenerate</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleImgPrompt(${idx})">🖼 Image Prompt</button>
+      ${sources}
+    </div>
+  `;
+  return card;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleImgPrompt(idx) {
+  const el = document.getElementById('imgPrompt-' + idx);
+  el.classList.toggle('hidden');
+}
+
+function copyPrompt(idx) {
+  const text = document.getElementById('imgPromptText-' + idx)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn-' + idx);
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    btn.style.color = '#15803d';
+    btn.style.borderColor = '#86efac';
+    // Show upload button
+    document.getElementById('uploadBtn-' + idx)?.classList.remove('hidden');
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+      btn.style.color = '#92400e';
+      btn.style.borderColor = '#fde68a';
+    }, 2000);
+  });
+}
+
+function triggerUpload(idx) {
+  document.getElementById('fileInput-' + idx)?.click();
+}
+
+async function uploadImage(idx, input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const uploadBtn = document.getElementById('uploadBtn-' + idx);
+  uploadBtn.innerHTML = `<span class="spinner spinner-dark" style="width:11px;height:11px;border-width:1.5px;"></span> Uploading...`;
+  uploadBtn.disabled = true;
+
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('section_idx', idx);
+
+  try {
+    const r = await fetch('/api/upload-image', { method: 'POST', body: formData });
+    const d = await r.json();
+    if (d.error) { toast(d.error, 'error'); return; }
+
+    // Show thumbnail
+    const preview = document.getElementById('imgPreview-' + idx);
+    preview.classList.remove('hidden');
+    preview.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:#fff;border:1px solid #e0e5ec;border-radius:7px;">
+        <img src="${d.url}" style="width:80px;height:60px;object-fit:cover;border-radius:5px;flex-shrink:0;">
+        <div style="font-size:11px;color:#64748b;min-width:0;">
+          <div style="font-weight:600;color:#1e293b;margin-bottom:2px;">✅ Uploaded</div>
+          <div style="word-break:break-all;">${d.filename}</div>
+          <a href="${d.url}" target="_blank" style="color:var(--green);text-decoration:none;font-size:10px;">Open full size ↗</a>
+        </div>
+        <button onclick="removeImage(${idx},'${d.url}')" title="Remove"
+                style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;line-height:1;flex-shrink:0;">×</button>
+      </div>`;
+
+    // Store url in section state
+    if (state.article?.sections?.[idx]) {
+      state.article.sections[idx].image_url = d.url;
+    }
+
+    uploadBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Uploaded`;
+    uploadBtn.style.color = '#15803d';
+    uploadBtn.style.borderColor = '#86efac';
+    toast('Image uploaded', 'success');
+  } catch(e) {
+    toast('Upload failed: ' + e.message, 'error');
+    uploadBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Image`;
+  } finally {
+    uploadBtn.disabled = false;
+    input.value = '';
+  }
+}
+
+function removeImage(idx) {
+  const preview = document.getElementById('imgPreview-' + idx);
+  if (preview) preview.innerHTML = '';
+  preview.classList.add('hidden');
+  const uploadBtn = document.getElementById('uploadBtn-' + idx);
+  if (uploadBtn) {
+    uploadBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Image`;
+    uploadBtn.style.color = '#1d4ed8';
+    uploadBtn.style.borderColor = '#93c5fd';
+  }
+  if (state.article?.sections?.[idx]) delete state.article.sections[idx].image_url;
+}
+
+// ─── Cover Image ─────────────────────────────────────────────
+function copyCoverPrompt() {
+  const text = document.getElementById('coverPromptText')?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyCoverBtn');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    btn.style.color = '#15803d'; btn.style.borderColor = '#86efac';
+    document.getElementById('uploadCoverBtn').classList.remove('hidden');
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+      btn.style.color = '#92400e'; btn.style.borderColor = '#fde68a';
+    }, 2000);
+  });
+}
+
+function triggerCoverUpload() {
+  document.getElementById('coverFileInput')?.click();
+}
+
+async function uploadCoverImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const btn = document.getElementById('uploadCoverBtn');
+  btn.innerHTML = `<span class="spinner spinner-dark" style="width:11px;height:11px;border-width:1.5px;"></span> Uploading...`;
+  btn.disabled = true;
+
+  const fd = new FormData();
+  fd.append('image', file);
+  fd.append('section_idx', 'cover');
+
+  try {
+    const r = await fetch('/api/upload-image', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.error) { toast(d.error, 'error'); return; }
+
+    const preview = document.getElementById('coverPreview');
+    preview.classList.remove('hidden');
+    preview.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:8px;background:#fff;border:1px solid #fde68a;border-radius:7px;">
+        <img src="${d.url}" style="width:120px;height:63px;object-fit:cover;border-radius:5px;flex-shrink:0;">
+        <div style="font-size:11px;color:#78350f;min-width:0;">
+          <div style="font-weight:600;margin-bottom:2px;">✅ Cover uploaded (WebP)</div>
+          <div style="word-break:break-all;opacity:0.8;">${d.filename}</div>
+          <a href="${d.url}" target="_blank" style="color:var(--green);text-decoration:none;font-size:10px;">Open ↗</a>
+        </div>
+        <button onclick="removeCoverImage()" title="Remove"
+                style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;line-height:1;flex-shrink:0;">×</button>
+      </div>`;
+
+    if (state.article) state.article.cover_image_url = d.url;
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Uploaded`;
+    btn.style.color = '#15803d'; btn.style.borderColor = '#86efac';
+    toast('Cover image uploaded as WebP', 'success');
+  } catch(e) {
+    toast('Upload failed: ' + e.message, 'error');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Cover`;
+  } finally {
+    btn.disabled = false;
+    input.value = '';
+  }
+}
+
+function removeCoverImage() {
+  const preview = document.getElementById('coverPreview');
+  preview.innerHTML = ''; preview.classList.add('hidden');
+  const btn = document.getElementById('uploadCoverBtn');
+  btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Cover`;
+  btn.style.color = '#1d4ed8'; btn.style.borderColor = '#93c5fd';
+  if (state.article) delete state.article.cover_image_url;
+}
+
+function moveSection(idx, dir) {
+  const sections = state.article.sections;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= sections.length) return;
+  [sections[idx], sections[newIdx]] = [sections[newIdx], sections[idx]];
+  // Re-sync from DOM before moving
+  syncArticleFromDOM();
+  renderArticle(state.article);
+}
+
+// ─── Regenerate Section ───────────────────────────────────────
+async function regenSection(idx) {
+  syncArticleFromDOM();
+  const sections = state.article.sections;
+  const section = sections[idx];
+  const btn = document.querySelectorAll('.section-card')[idx].querySelector('button');
+
+  const card = document.querySelectorAll('.section-card')[idx];
+  card.style.opacity = '0.5';
+  card.style.pointerEvents = 'none';
+
+  try {
+    const r = await fetch('/api/regenerate-section', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        keyword: state.keyword,
+        section: section,
+        prev_heading: sections[idx-1]?.heading || '',
+        next_heading: sections[idx+1]?.heading || '',
+      })
+    });
+    const d = await r.json();
+    if (d.error) { toast(d.error, 'error'); return; }
+
+    sections[idx] = {...section, ...d.section};
+    const container = document.getElementById('sectionsContainer');
+    const newCard = renderSectionCard(sections[idx], idx, sections.length);
+    container.replaceChild(newCard, card);
+    toast('Section regenerated!', 'success');
+  } catch(e) {
+    toast('Regeneration failed: ' + e.message, 'error');
+    card.style.opacity = '1';
+    card.style.pointerEvents = 'auto';
+  }
+}
+
+// ─── Regenerate Title / Meta ─────────────────────────────────
+async function regenMeta(field) {
+  if (!state.article) return;
+  syncArticleFromDOM();
+  const btnId = field === 'title' ? 'btnRegenTitle' : 'btnRegenMeta';
+  const btn = document.getElementById(btnId);
+  btn.innerHTML = '<span class="spinner spinner-dark"></span>';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/regenerate-meta', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        keyword: state.keyword,
+        field,
+        current_title: document.getElementById('metaTitle').value,
+        current_meta: document.getElementById('metaDescription').value,
+        sections_summary: (state.article.sections || []).slice(0, 3).map(s => s.heading).filter(Boolean).join(', ')
+      })
+    });
+    const d = await r.json();
+    if (d.error) { toast(d.error, 'error'); return; }
+    if (field === 'title') {
+      document.getElementById('metaTitle').value = d.value;
+      state.article.seo_title = d.value;
+      updateTitleHint();
+      toast('Title regenerated', 'success');
+    } else {
+      document.getElementById('metaDescription').value = d.value;
+      state.article.meta_description = d.value;
+      updateMetaHint();
+      toast('Meta description regenerated', 'success');
+    }
+  } catch(e) {
+    toast('Regeneration failed: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = '↻ Regenerate';
+    btn.disabled = false;
+  }
+}
+
+// ─── SEO Panel ────────────────────────────────────────────────
+async function runSeoCheck() {
+  syncArticleFromDOM();
+  try {
+    const r = await fetch('/api/seo-check', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({article: state.article, keyword: state.keyword})
+    });
+    const d = await r.json();
+    renderSeoPanel(d);
+    state.article.seo_score = d.score;
+    state.article.seo_details = d;
+    updateStats(state.article);
+    toast(`SEO score: ${d.score}/100`, d.score >= 70 ? 'success' : 'info');
+  } catch(e) {
+    toast('SEO check failed', 'error');
+  }
+}
+
+function renderSeoPanel(seo) {
+  const circle = document.getElementById('scoreCircle');
+  const label = document.getElementById('scoreLabel');
+  circle.textContent = seo.score;
+  circle.className = 'score-circle ' + (seo.score >= 70 ? 'score-high' : seo.score >= 45 ? 'score-med' : 'score-low');
+  label.textContent = seo.score >= 70 ? 'Good' : seo.score >= 45 ? 'Needs work' : 'Poor';
+
+  const checks = seo.checks || [];
+  const seoChecks = checks.filter(c => c.category === 'seo');
+  const aiChecks = checks.filter(c => c.category === 'ai');
+
+  let html = '<div class="seo-sep" style="color:#64748b;">SEO</div>';
+  seoChecks.forEach(c => {
+    html += `<div class="seo-item">
+      <span class="icon">${c.passed ? '✅' : '❌'}</span>
+      <span style="color:${c.passed ? '#94a3b8' : '#fca5a5'}">${c.label}</span>
+    </div>`;
+  });
+  html += '<div class="seo-sep" style="color:#64748b;margin-top:10px;">AI / GEO</div>';
+  aiChecks.forEach(c => {
+    html += `<div class="seo-item">
+      <span class="icon">${c.passed ? '✅' : '❌'}</span>
+      <span style="color:${c.passed ? '#94a3b8' : '#fca5a5'}">${c.label}</span>
+    </div>`;
+  });
+
+  document.getElementById('seoChecklist').innerHTML = html;
+}
+
+// ─── Sync state from DOM ──────────────────────────────────────
+function syncArticleFromDOM() {
+  if (!state.article) return;
+  state.article.seo_title = document.getElementById('metaTitle').value;
+  state.article.slug = document.getElementById('metaSlug').value;
+  state.article.meta_description = document.getElementById('metaDescription').value;
+
+  const cards = document.querySelectorAll('.section-card');
+  cards.forEach((card, idx) => {
+    const heading = card.querySelector('.section-heading-input')?.value || '';
+    const body = card.querySelector('.section-body-text')?.value || '';
+    if (state.article.sections[idx]) {
+      state.article.sections[idx].heading = heading;
+      state.article.sections[idx].body = body;
+    }
+  });
+
+  // Sync FAQ
+  const faqItems = document.querySelectorAll('.faq-item');
+  state.article.faq = [...faqItems].map(item => ({
+    question: item.querySelector('.faq-q')?.textContent || '',
+    answer: item.querySelector('.faq-a')?.textContent || '',
+  }));
+}
+
+// ─── Save ─────────────────────────────────────────────────────
+async function saveArticle() {
+  syncArticleFromDOM();
+  try {
+    const r = await fetch('/api/save', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({article: state.article, id: state.savedId})
+    });
+    const d = await r.json();
+    state.savedId = d.id;
+    toast(`Article saved (ID: ${d.id})`, 'success');
+  } catch(e) {
+    toast('Save failed: ' + e.message, 'error');
+  }
+}
+
+// ─── Export ───────────────────────────────────────────────────
+async function exportArticle(fmt) {
+  if (!state.savedId) {
+    toast('Save the article first before exporting', 'error');
+    return;
+  }
+  window.open(`/api/export/${state.savedId}?format=${fmt}`, '_blank');
+}
+
+// ─── Stats ────────────────────────────────────────────────────
+function updateStats(article) {
+  document.getElementById('statWords').textContent = article.word_count || 0;
+  document.getElementById('statSections').textContent = (article.sections||[]).length;
+  document.getElementById('statFaq').textContent = (article.faq||[]).length;
+  // Count internal links
+  let links = 0;
+  (article.sections||[]).forEach(s => {
+    const m = (s.body||'').match(/\[.+?\]\(https?:\/\/patternslabco\.com[^)]*\)/g);
+    if (m) links += m.length;
+  });
+  document.getElementById('statLinks').textContent = links;
+}
+
+// ─── Optimize SEO (fix red checks) ───────────────────────────
+async function optimizeSeo() {
+  if (!state.article) return;
+  syncArticleFromDOM();
+
+  const checks = state.article.seo_details?.checks || [];
+  const failedIds = checks.filter(c => !c.passed).map(c => c.id);
+  const fixable = ['title_length', 'meta_length', 'kw_density', 'internal_links', 'direct_answer'];
+  const toFix = failedIds.filter(id => fixable.includes(id));
+
+  if (toFix.length === 0) {
+    toast('No fixable issues — run SEO Recheck first', 'info');
+    return;
+  }
+
+  const btn = document.getElementById('btnOptimize');
+  btn.innerHTML = '<span class="spinner" style="border-top-color:#4ade80;border-color:rgba(74,222,128,0.3);"></span>';
+  btn.disabled = true;
+
+  // Show live step log below SEO panel
+  let logEl = document.getElementById('optimizeLog');
+  if (!logEl) {
+    logEl = document.createElement('div');
+    logEl.id = 'optimizeLog';
+    logEl.style.cssText = 'font-size:11px;margin-top:8px;display:flex;flex-direction:column;gap:4px;';
+    document.getElementById('seoPanel').appendChild(logEl);
+  }
+  logEl.innerHTML = '';
+
+  function addLog(icon, msg, color) {
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;gap:5px;align-items:center;color:${color};`;
+    row.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+    logEl.appendChild(row);
+  }
+
+  try {
+    const resp = await fetch('/api/optimize-seo', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ article: state.article, keyword: state.keyword, failed_ids: toFix })
+    });
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop();
+      for (const part of parts) {
+        if (!part.startsWith('event:')) continue;
+        const lines = part.split('\n');
+        const evtType = lines[0].replace('event: ', '').trim();
+        const data = JSON.parse(lines[1].replace('data: ', '').trim());
+
+        if (evtType === 'progress') {
+          addLog('⏳', data.message, '#94a3b8');
+        } else if (evtType === 'step_done') {
+          // Replace last log entry with done tick
+          if (logEl.lastChild) {
+            logEl.lastChild.querySelector('span').textContent = '✅';
+            logEl.lastChild.style.color = '#4ade80';
+          }
+        } else if (evtType === 'step_error') {
+          addLog('❌', `${data.check_id}: ${data.error}`, '#f87171');
+        } else if (evtType === 'done') {
+          state.article = data.article;
+          renderArticle(data.article);
+          if (data.seo) renderSeoPanel(data.seo);
+          const applied = data.applied || [];
+          if (applied.length) toast(`Fixed: ${applied.join(', ')}`, 'success');
+          else toast('No changes applied', 'info');
+          // Clear log after 4s
+          setTimeout(() => { if (logEl) logEl.innerHTML = ''; }, 4000);
+        }
+      }
+    }
+  } catch(e) {
+    toast('Optimization failed: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = '🔧 Fix Issues';
+    btn.disabled = false;
+  }
+}
+
+// ─── WordPress Publish ────────────────────────────────────────
+function openWpModal() {
+  if (!state.article) { toast('Generate an article first', 'error'); return; }
+  syncArticleFromDOM();
+  document.getElementById('wpPreviewTitle').textContent = state.article.seo_title || '(no title)';
+  document.getElementById('wpPreviewMeta').textContent = state.article.meta_description || '(no meta)';
+  document.getElementById('wpModalBody').classList.remove('hidden');
+  document.getElementById('wpModalResult').classList.add('hidden');
+  document.getElementById('wpModal').classList.remove('hidden');
+}
+
+function closeWpModal() {
+  document.getElementById('wpModal').classList.add('hidden');
+}
+
+async function publishToWordPress() {
+  const status = document.querySelector('input[name="wpStatus"]:checked').value;
+  const btn = document.getElementById('btnWpPublish');
+  btn.innerHTML = '<span class="spinner"></span> Sending...';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch('/api/publish-wordpress', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ article: state.article, status })
+    });
+    const d = await r.json();
+    if (d.error) { toast(d.error, 'error'); btn.innerHTML = '📤 Send to WordPress'; btn.disabled = false; return; }
+
+    // Show success state
+    document.getElementById('wpModalBody').classList.add('hidden');
+    document.getElementById('wpModalResult').classList.remove('hidden');
+    document.getElementById('wpResultLinks').innerHTML = `
+      <a href="${d.post_url}" target="_blank" class="btn btn-secondary btn-sm">🔗 View Post</a>
+      <a href="${d.edit_url}" target="_blank" class="btn btn-primary btn-sm">✏️ Edit in WP</a>
+    `;
+    toast(`Article sent as ${d.status} (ID: ${d.post_id})`, 'success');
+  } catch(e) {
+    toast('Publish failed: ' + e.message, 'error');
+    btn.innerHTML = '📤 Send to WordPress';
+    btn.disabled = false;
+  }
+}
+
+// Close modal on backdrop click
+document.getElementById('wpModal').addEventListener('click', function(e) {
+  if (e.target === this) closeWpModal();
+});
+
+// ─── Meta hints ───────────────────────────────────────────────
+function updateTitleHint() {
+  const len = document.getElementById('metaTitle').value.length;
+  const hint = document.getElementById('titleLenHint');
+  hint.textContent = `(${len}/60)`;
+  hint.style.color = len >= 50 && len <= 60 ? 'var(--success)' : 'var(--warning)';
+}
+function updateMetaHint() {
+  const len = document.getElementById('metaDescription').value.length;
+  const hint = document.getElementById('metaLenHint');
+  hint.textContent = `(${len}/160)`;
+  hint.style.color = len >= 150 && len <= 160 ? 'var(--success)' : 'var(--warning)';
+}
+</script>
+{% endblock %}

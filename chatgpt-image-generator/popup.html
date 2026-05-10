@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatGPT Image Generator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>🤖 ChatGPT Image Generator</h1>
+
+  <textarea id="promptInput" placeholder="Enter your image prompt…&#10;e.g. Woman sewing at a bright studio desk, 1200×628px landscape, warm minimalist aesthetic"></textarea>
+  <div class="hint">Tip: include dimensions — e.g. 1200×628px landscape or 800×533px</div>
+
+  <button id="genBtn">🤖 Generate Image</button>
+
+  <div id="status">
+    <div id="statusDot"></div>
+    <span id="statusText">Opening ChatGPT…</span>
+  </div>
+
+  <div id="result">✅ Image saved to your Downloads folder.</div>
+
+  <div id="errorBox"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

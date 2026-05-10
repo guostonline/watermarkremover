@@ -1,0 +1,22 @@
+{
+  "sheet_url": "https://docs.google.com/spreadsheets/d/1L6bni_tF_q4qplJeZWLZ59e6qZ_Ds0XlPVkLCRXZglo/edit?gid=266948403",
+  "google_service_account_file": "service-account.json",
+  "sheet_name": "🔀 Combined Master",
+  "sheet_status_column": "Statut WooCommerce",
+  "wc_url": "https://patternslabco.com",
+  "wc_key": "ck_a0729810218b92ad1d876d824395225ffd076a4d",
+  "wc_secret": "cs_907df921d72fca8acf2fc9e89cb19a57c2222529",
+  "wp_username": "guostonline@gmail.com",
+  "wp_app_password": "epOg NYnj XIBz Qzjt PcMy BLjs",
+  "price": "6.99",
+  "status": "draft",
+  "default_category": "Sewing Patterns",
+  "openrouter_api_key": "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",
+  "openrouter_model": "google/gemini-3.1-flash-lite-preview",
+  "appwrite_endpoint": "https://cloud.appwrite.io/v1",
+  "appwrite_project_id": "69ef938c001dc44bfe43",
+  "appwrite_api_key": "standard_342deeafb0dc98a1d7a3a584b35a6ac31ca9babe71351007626f32448bfba8b29dccc360677e628d7c7b19bd1060e3353401591aedb5a4f742c8b1a0066fbf68ae44f247baca0229001ffd37eebaa8e914dd161e7a8b26f7ef675d5eb8d007174e95781376679320d692da57e5b3d7bad2b0bd08f6853299a2b5f6dd707820c2",
+  "appwrite_db_id": "patternlistings",
+  "appwrite_collection_id": "listings",
+  "root_folder": "C:\\Users\\DELL\\Documents\\Etsy\\500 باطرون 1"
+}

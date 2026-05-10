@@ -12,41 +12,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://js.puter.com/v2/"></script>
 <script>
 !function(t,e){var o,n,p,r,e,a,i,s,c=window,r=document;r.POSTHOG_API_KEY="{{ posthog_key }}";r.POSTHOG_HOST="{{ posthog_host }}";var u=[];c.posthog={APPLICATION_ID:!(0),__loaded:!1};o=["capture","identify","alias","setPersonProperties","getPersonProperties","reset","getSessionId","getDistinctId","setPersonPropertiesForFlags","getPersonPropertiesForFlags"];for(n=0;n<o.length;n++)!function(e){c.posthog[e]=function(){c.__POSTHOG_ENABLE__&&1===r.__POSTHOG_SNIPPET_VERSION__?(c.__POSTHOG_QUEUE__=c.__POSTHOG_QUEUE__||[],c.__POSTHOG_QUEUE__.push([e].concat(Array.prototype.slice.call(arguments,0)))):u.push([e,Array.prototype.slice.call(arguments,0)])}}(o[n]);p=r.createElement("script");p.type="text/javascript";p.async=!0;p.src="https://us.i.posthog.com/static/array.js";e=r.getElementsByTagName("script")[0];e.parentNode.insertBefore(p,e)}();
 posthog.init(r.POSTHOG_API_KEY,{api_host:r.POSTHOG_HOST,capture_pageview:!0,capture_pageleave:!0});
 posthog.capture('tool_page_view');
 </script>
+<link rel="stylesheet" href="/static/themes.css">
+<script src="/static/themes.js" defer></script>
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-
-:root{
-  --bg:#0B0F0C;
-  --glass:rgba(20,26,22,0.75);
-  --glass-border:rgba(163,255,63,0.08);
-  --glass-hover:rgba(163,255,63,0.05);
-  --text:#EAFBE7;
-  --text-sec:#A8B3AC;
-  --accent:#A3FF3F;
-  --accent-lt:#B6FF5C;
-  --accent-glow:rgba(163,255,63,0.25);
-  --accent-dim:rgba(163,255,63,0.1);
-  --danger:#F87171;
-  --success:#4ADE80;
-  --radius:16px;
-  --radius-sm:10px;
-  --font:'Outfit',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --blur:blur(12px);
-}
-
+/* Relying on global themes.css for core components */
 html{font-size:16px;-webkit-font-smoothing:antialiased}
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;line-height:1.5}
-
-.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.bg-orbs::before,.bg-orbs::after{content:'';position:absolute;border-radius:50%}
-.bg-orbs::before{width:600px;height:600px;top:-180px;left:-120px;background:radial-gradient(circle,rgba(163,255,63,0.12) 0%,transparent 70%)}
-.bg-orbs::after{width:500px;height:500px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(109,255,122,0.08) 0%,transparent 70%)}
 
 .container{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:0 20px}
 
@@ -56,32 +32,24 @@ header{padding:48px 0 12px;text-align:center}
 
 main{margin-bottom:64px}
 
-.card{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--glass-border);border-radius:var(--radius);padding:28px 24px;margin-top:20px;transition:border-color 0.3s,box-shadow 0.3s}
-.card:hover{border-color:rgba(255,255,255,0.12)}
+.card { margin-top: 20px; padding: 28px 24px; }
 
 .card-title{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-lt);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title svg{width:16px;height:16px;stroke:var(--accent-lt);stroke-width:2;fill:none}
 
-.divider{height:1px;margin:4px 0 0;background:linear-gradient(90deg,var(--accent-lt),transparent 60%);opacity:0.3}
-
-.upload-zone{border:2px dashed var(--glass-border);border-radius:var(--radius-sm);padding:44px 20px;text-align:center;cursor:pointer;transition:all 0.25s ease;background:var(--glass);position:relative}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--glass-hover);box-shadow:0 0 0 4px var(--accent-dim)}
-.upload-zone.drag-over{transform:scale(1.01)}
-.upload-zone *{pointer-events:none}
+.divider{height:1px;margin:4px 0 16px;background:linear-gradient(90deg,var(--accent-lt),transparent 60%);opacity:0.3}
 
 .upload-zone.sm{padding:24px 16px}
-
 .upload-icon{width:40px;height:40px;margin:0 auto 16px}
 .upload-zone.sm .upload-icon{width:28px;height:28px;margin-bottom:10px}
 .upload-icon svg{width:100%;height:100%;stroke:var(--accent-lt);stroke-width:1.5;fill:none}
-
 .upload-text{font-size:0.85rem;color:var(--text-sec);margin-bottom:6px}
 .upload-text em{color:var(--text);font-weight:500;font-style:normal}
 .upload-hint{font-size:0.65rem;color:var(--text-sec);opacity:0.5;letter-spacing:0.04em}
 
 input[type="file"]{display:none}
 
-.file-info{display:none;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);animation:fadeUp 0.3s ease}
+.file-info{display:none;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);animation:fadeUp 0.3s ease}
 .file-info.visible{display:flex}
 
 .file-badge{flex-shrink:0;padding:4px 8px;background:var(--accent-dim);border:1px solid rgba(124,92,252,0.2);border-radius:6px;font-family:var(--mono);font-size:0.6rem;font-weight:600;color:var(--accent-lt);letter-spacing:0.05em}
@@ -92,52 +60,42 @@ input[type="file"]{display:none}
 .remove-btn{background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:1.1rem;padding:4px 6px;border-radius:6px;transition:all 0.2s;font-family:var(--font);pointer-events:all}
 .remove-btn:hover{background:rgba(248,113,113,0.1);color:var(--danger)}
 
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font);font-size:0.85rem;font-weight:600;border:none;cursor:pointer;width:100%;padding:14px 24px;margin-top:16px;border-radius:var(--radius-sm);transition:all 0.25s ease;position:relative;overflow:hidden}
-
-.btn-primary{background:linear-gradient(135deg,#B6FF5C,#6DFF7A);color:#0B0F0C;box-shadow:0 4px 20px var(--accent-glow)}
-.btn-primary:hover:not(:disabled){background:var(--accent);box-shadow:0 6px 30px var(--accent-glow);transform:translateY(-1px)}
-.btn-primary:active:not(:disabled){transform:translateY(0)}
-.btn-primary:disabled{opacity:0.25;cursor:not-allowed;box-shadow:none}
-
-.status{display:none;margin-top:14px;padding:12px 16px;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);animation:fadeUp 0.3s ease}
+.status{display:none;margin-top:14px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);animation:fadeUp 0.3s ease}
 .status.visible{display:block}
 .status-row{display:flex;align-items:center;gap:10px}
 
-.spinner{width:14px;height:14px;border:2px solid var(--glass-border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
 .status-text{font-size:0.8rem;color:var(--text-sec)}
 .status.done .status-text{color:var(--success)}
 .status.done{border-color:rgba(52,211,153,0.2)}
 .status.error .status-text{color:var(--danger)}
 .status.error{border-color:rgba(248,113,113,0.2)}
 
-.progress-track{height:3px;border-radius:2px;background:var(--glass-border);margin-top:10px;overflow:hidden}
+.progress-track{height:3px;border-radius:2px;background:var(--border);margin-top:10px;overflow:hidden}
 .progress-bar{height:100%;width:40%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-lt));animation:shimmer 1.5s ease-in-out infinite}
 .status.done .progress-track{display:none}
 
-.download-btn{display:none;margin-top:12px;padding:14px 24px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);border-radius:var(--radius-sm);color:var(--success);text-decoration:none;font-family:var(--font);font-size:0.85rem;font-weight:600;text-align:center;transition:all 0.25s ease;animation:fadeUp 0.3s ease}
+.download-btn{display:none;margin-top:12px;padding:14px 24px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);border-radius:var(--radius-sm);color:var(--success);text-decoration:none;font-family:var(--font);font-size:0.85rem;font-weight:600;text-align:center;transition:all 0.25s ease;animation:fadeUp 0.3s ease; width: 100%; box-sizing: border-box;}
 .download-btn.visible{display:block}
 .download-btn:hover{background:rgba(52,211,153,0.15);transform:translateY(-1px)}
 
-.optional-tag{display:inline-block;font-size:0.55rem;padding:2px 6px;background:var(--glass);border:1px solid var(--glass-border);border-radius:4px;color:var(--text-sec);margin-left:8px;letter-spacing:0.04em;vertical-align:middle}
+.optional-tag{display:inline-block;font-size:0.55rem;padding:2px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text-sec);margin-left:8px;letter-spacing:0.04em;vertical-align:middle}
 .logo-preview{max-width:120px;max-height:180px;object-fit:contain;border-radius:8px}
 
 .opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.opt-grid > div { min-width: 0; }
 .opt label{display:block;font-size:0.65rem;color:var(--text-sec);font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px}
-.opt input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--glass-border);border-radius:2px;outline:none;margin-top:2px}
+.opt input[type="range"]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;outline:none;margin-top:2px}
 .opt input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--accent-glow)}
 .opt input[type="range"]::-moz-range-thumb{width:16px;height:16px;background:var(--accent);border-radius:50%;cursor:pointer;border:none}
 .opt-val{font-family:var(--mono);font-size:0.7rem;color:var(--accent-lt);margin-top:4px}
 
 .pos-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:4px}
-.pos-btn{background:var(--glass);border:1px solid var(--glass-border);color:var(--text-sec);font-family:var(--mono);font-size:0.6rem;font-weight:600;padding:8px 4px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em}
+.pos-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-sec);font-family:var(--mono);font-size:0.6rem;font-weight:600;padding:8px 4px;border-radius:8px;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em}
 .pos-btn:hover{border-color:var(--accent);color:var(--text)}
-.pos-btn.active{background:linear-gradient(135deg,var(--accent),#6d4fe0);color:#fff;border-color:transparent;box-shadow:0 2px 10px var(--accent-glow)}
+.pos-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent-lt));color:#fff;border-color:transparent;box-shadow:0 2px 10px var(--accent-glow)}
 
 footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-sec);letter-spacing:0.06em;opacity:0.5}
-
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
 
 @media(max-width:480px){
   header{padding:32px 0 8px}
@@ -145,15 +103,16 @@ footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-
   .upload-zone{padding:32px 16px}
   .opt-grid{grid-template-columns:1fr}
 }
-
 ::selection{background:var(--accent);color:#fff}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:3px}
+.nav-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent-lt))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 2px 10px var(--accent-glow)}
 </style>
 </head>
 <body>
 <div class="bg-orbs"></div>
+<div id="theme-switcher"></div>
 <div class="container">
 
   {% if not embed %}
@@ -164,6 +123,50 @@ footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-
     </a>
     <div class="brand-sub">Remove Watermark &amp; Stamp Logo</div>
   </header>
+  
+  <!-- Navigation Tabs -->
+  <nav style="display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="nav-btn active" data-route="remove" onclick="navigate('remove')" style="padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.8rem;font-weight:500;cursor:pointer;">🗑️ Remove Watermark</button>
+    <button class="nav-btn" data-route="extract" onclick="navigate('extract')" style="padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-sec);font-size:0.8rem;font-weight:500;cursor:pointer;">🖼️ Extract Images</button>
+    <button class="nav-btn" data-route="stamp" onclick="navigate('stamp')" style="padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-sec);font-size:0.8rem;font-weight:500;cursor:pointer;">✏️ Add Stamp</button>
+    <button class="nav-btn" data-route="listings" onclick="navigate('listings')" style="padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-sec);font-size:0.8rem;font-weight:500;cursor:pointer;">📋 Listings</button>
+    <button class="nav-btn" data-route="woocommerce" onclick="navigate('woocommerce')" style="padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-sec);font-size:0.8rem;font-weight:500;cursor:pointer;">🛒 WooCommerce</button>
+    <button class="nav-btn" data-route="settings" onclick="navigate('settings')" style="padding:10px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-sec);font-size:0.8rem;font-weight:500;cursor:pointer;">⚙️ Settings</button>
+  </nav>
+  <div id="woocommerce-section" style="display:none;margin-top:8px">
+    <iframe src="http://127.0.0.1:5050"
+      style="width:100%;height:85vh;border:none;border-radius:12px;background:var(--surface2)"
+      title="WooCommerce Auto-Save">
+    </iframe>
+  </div>
+  
+  <!-- Settings Section -->
+  <div id="settings-section" style="display:none;padding:20px 0">
+    <div style="max-width:500px;margin:0 auto">
+      <h2 style="font-size:1.4rem;font-weight:700;margin-bottom:8px">⚙️ Settings</h2>
+      <p style="font-size:0.85rem;color:var(--text-sec);margin-bottom:24px">Configure API keys and preferences</p>
+      
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+        <h3 style="font-size:0.8rem;font-weight:600;color:var(--text-sec);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">API Keys</h3>
+        
+        <div style="margin-bottom:16px">
+          <label style="display:block;font-size:0.75rem;font-weight:500;color:var(--text);margin-bottom:6px">Pexels API Key</label>
+          <input type="text" id="pexels-api-key" 
+            style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.85rem"
+            placeholder="Enter your Pexels API key">
+          <p style="font-size:0.65rem;color:var(--text-sec);margin-top:6px">Get your free API key at <a href="https://www.pexels.com/api/" target="_blank" style="color:var(--accent)">pexels.com/api</a></p>
+        </div>
+        
+        <button onclick="saveSettings()" style="padding:10px 20px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer">Save Settings</button>
+        <span id="settings-save-status" style="margin-left:12px;font-size:0.75rem;color:var(--text-sec)"></span>
+      </div>
+      
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <h3 style="font-size:0.8rem;font-weight:600;color:var(--text-sec);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em">About</h3>
+        <p style="font-size:0.8rem;color:var(--text-sec)">Pexels API is used to search and add free stock images to your articles for SEO optimization.</p>
+      </div>
+    </div>
+  </div>
 {% endif %}
 
   <main>
@@ -267,6 +270,58 @@ footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-
       </div>
     </div>
 
+    <!-- Step 2.5: Model Replacement -->
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Model Replacement <span class="optional-tag">optional</span>
+      </div>
+      <p style="font-size: 0.7rem; color: var(--text-sec); margin-top: -10px; margin-bottom: 16px;">Replace model images on the first page of the PDF</p>
+      <div class="divider"></div>
+      
+      <div class="opt-grid">
+        <div>
+          <label>Front Model</label>
+          <div class="upload-zone sm" id="frontModelDropZone" role="button" tabindex="0">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-text">Front Model</div>
+          </div>
+          <input type="file" id="frontModelInput" accept="image/*">
+          <div class="file-info" id="frontModelFileInfo">
+            <div class="file-meta">
+              <div class="file-name" id="frontModelFileName"></div>
+              <div id="frontModelPreviewWrap" style="display:none;margin-top:8px">
+                <img id="frontModelPreview" class="logo-preview" src="" alt="Front Model Preview">
+              </div>
+            </div>
+            <button class="remove-btn" id="removeFrontModel">&times;</button>
+          </div>
+        </div>
+        
+        <div>
+          <label>Back Model</label>
+          <div class="upload-zone sm" id="backModelDropZone" role="button" tabindex="0">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-text">Back Model</div>
+          </div>
+          <input type="file" id="backModelInput" accept="image/*">
+          <div class="file-info" id="backModelFileInfo">
+            <div class="file-meta">
+              <div class="file-name" id="backModelFileName"></div>
+              <div id="backModelPreviewWrap" style="display:none;margin-top:8px">
+                <img id="backModelPreview" class="logo-preview" src="" alt="Back Model Preview">
+              </div>
+            </div>
+            <button class="remove-btn" id="removeBackModel">&times;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Step 3: Process -->
     <div class="card">
       <div class="card-title">
@@ -274,7 +329,7 @@ footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-
         Process &amp; Download
       </div>
       <div class="divider"></div>
-      <button class="btn btn-primary" id="processBtn" disabled>Remove Watermark &amp; Stamp Logo</button>
+      <button class="btn btn-primary btn-block" id="processBtn" disabled>Remove Watermark &amp; Stamp Logo</button>
 
       <div class="status" id="status">
         <div class="status-row">
@@ -287,6 +342,10 @@ footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-
       <a class="download-btn" id="downloadLink" href="#" download>
         &#8595;&ensp;Download Processed PDF
       </a>
+
+      <div id="cloudSaveInfo" style="display:none;margin-top:12px;padding:10px 14px;background:var(--card);border:1px solid var(--accent-lt);border-radius:8px;font-size:0.8rem;color:var(--text-sec);">
+        <span id="cloudSaveText"></span>
+      </div>
     </div>
   </main>
 
@@ -295,6 +354,243 @@ footer{padding:28px 0 40px;text-align:center;font-size:0.65rem;color:var(--text-
 
 <script>
 const $=id=>document.getElementById(id);
+
+// Router
+const routes = {
+  'remove': 'Remove Watermark',
+  'extract': 'Extract Images',
+  'stamp': 'Add Stamp',
+  'listings': 'Listings',
+  'woocommerce': 'WooCommerce',
+  'settings': 'Settings'
+};
+
+let listingsData = null;
+
+function getRouteFromHash() {
+  const h = window.location.hash.slice(1).toLowerCase();
+  return routes[h] ? h : 'remove';
+}
+
+function navigate(route) {
+  console.log('Navigate to:', route);
+  window.location.hash = route;
+}
+
+function initRouter() {
+  const hash = getRouteFromHash();
+  console.log('Route:', hash);
+  
+  window.addEventListener('hashchange', () => {
+    const newRoute = getRouteFromHash();
+    console.log('Route changed:', newRoute);
+    renderRoute(newRoute);
+  });
+  
+  renderRoute(hash);
+}
+
+function renderRoute(route) {
+  // Update active nav button
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.route === route);
+  });
+  
+  // Hide all content sections
+  const main = document.querySelector('main');
+  if(main) main.style.display = 'none';
+  const wooSection = document.getElementById('woocommerce-section');
+  if(wooSection) wooSection.style.display = 'none';
+  const settingsSection = document.getElementById('settings-section');
+  if(settingsSection) settingsSection.style.display = 'none';
+
+  // Show content based on route
+  if (route === 'listings') {
+    renderListingsPage();
+  } else if (route === 'woocommerce') {
+    if(wooSection) wooSection.style.display = 'block';
+  } else if (route === 'settings') {
+    renderSettingsPage();
+  } else {
+    // Show default main content for other routes
+    if(main) main.style.display = 'block';
+  }
+}
+
+async function renderListingsPage() {
+  const appContainer = document.querySelector('.container');
+  
+  // Check if listings section already exists
+  let listingsSection = document.getElementById('listings-section');
+  if (listingsSection) {
+    listingsSection.style.display = 'block';
+    return;
+  }
+  
+  // Create listings section
+  listingsSection = document.createElement('div');
+  listingsSection.id = 'listings-section';
+  listingsSection.style.cssText = 'padding:20px 0';
+  
+  // Header
+  listingsSection.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:4px">📋 Listings</h2>
+        <p style="font-size:0.8rem;color:var(--text-sec)">Sewing pattern pipeline from Google Sheets</p>
+      </div>
+      <button onclick="loadListings()" style="padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.75rem;cursor:pointer">🔄 Refresh</button>
+    </div>
+    <div id="listings-loading" style="text-align:center;padding:40px;color:var(--text-sec)">Loading listings...</div>
+    <div id="listings-content" style="display:none"></div>
+  `;
+  
+  // Insert after nav, before main
+  const nav = document.querySelector('nav');
+  if (nav && nav.nextSibling) {
+    nav.parentNode.insertBefore(listingsSection, nav.nextSibling);
+  } else if (appContainer) {
+    appContainer.appendChild(listingsSection);
+  }
+  
+  // Fetch listings data
+  await loadListings();
+}
+
+async function loadListings() {
+  try {
+    const loading = document.getElementById('listings-loading');
+    const content = document.getElementById('listings-content');
+    
+    if (loading) loading.style.display = 'block';
+    if (content) content.style.display = 'none';
+    
+    const resp = await fetch('/api/listings');
+    const data = await resp.json();
+    
+    listingsData = data;
+    
+    if (loading) loading.style.display = 'none';
+    if (content) {
+      content.style.display = 'block';
+      content.innerHTML = renderListingsTable(data.listings || []);
+    }
+  } catch (e) {
+    console.error('Failed to load listings:', e);
+    const loading = document.getElementById('listings-loading');
+    if (loading) loading.innerHTML = 'Failed to load listings. Check Google Sheets configuration.';
+  }
+}
+
+function renderListingsTable(listings) {
+  if (!listings || listings.length === 0) {
+    return '<div style="text-align:center;padding:40px;color:var(--text-sec)">No listings found</div>';
+  }
+  
+  // KPI cards
+  const total = listings.length;
+  const published = listings.filter(l => (l['Statut Etsy'] || '').includes('✅')).length;
+  const toPublish = listings.filter(l => (l['Statut Etsy'] || '').includes('📤')).length;
+  
+  // Get key columns from first listing
+  const keys = Object.keys(listings[0] || {});
+  const keyColumns = ['#', 'Nom du Patron', 'Catégorie', 'Sous-catégorie', 'Priorité', 'Statut Etsy', 'Prix (USD)', '✅ Match'];
+  
+  return `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+      <div style="background:var(--surface2);padding:16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:0.6rem;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Total Patterns</div>
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent)">${total}</div>
+      </div>
+      <div style="background:var(--surface2);padding:16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:0.6rem;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Published</div>
+        <div style="font-size:1.5rem;font-weight:700;color:#22c55e">${published}</div>
+      </div>
+      <div style="background:var(--surface2);padding:16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:0.6rem;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">To Publish</div>
+        <div style="font-size:1.5rem;font-weight:700;color:#f59e0b">${toPublish}</div>
+      </div>
+    </div>
+    
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse;font-size:0.78rem">
+        <thead>
+          <tr style="background:var(--surface2)">
+            ${keyColumns.map(k => `<th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-sec);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)">${k}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${listings.slice(0,50).map((l, i) => `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+              <td style="padding:10px 12px;color:var(--text-sec)">${l['#'] || (i+1)}</td>
+              <td style="padding:10px 12px;font-weight:500">${l['Nom du Patron'] || '—'}</td>
+              <td style="padding:10px 12px">${l['Catégorie'] || '—'}</td>
+              <td style="padding:10px 12px;color:var(--text-sec)">${l['Sous-catégorie'] || '—'}</td>
+              <td style="padding:10px 12px">
+                <span style="padding:2px 6px;border-radius:4px;font-size:0.65rem;background:${(l['Priorité']||'').includes('⭐')?'rgba(132,204,22,0.15)':(l['Priorité']||'').includes('📌')?'rgba(245,158,11,0.15)':'rgba(14,165,233,0.15)'};color:${(l['Priorité']||'').includes('⭐')?'#84cc16':(l['Priorité']||'').includes('📌')?'#f59e0b':'#0ea5e9'}">${(l['Priorité']||'—').replace(/⭐|📌/g,'').trim()}</span>
+              </td>
+              <td style="padding:10px 12px">
+                <span style="padding:2px 6px;border-radius:4px;font-size:0.65rem;background:${(l['Statut Etsy']||'').includes('✅')?'rgba(132,204,22,0.15)':(l['Statut Etsy']||'').includes('📤')?'rgba(14,165,233,0.15)':'rgba(245,158,11,0.15)'};color:${(l['Statut Etsy']||'').includes('✅')?'#84cc16':(l['Statut Etsy']||'').includes('📤')?'#0ea5e9':'#f59e0b'}">${(l['Statut Etsy']||'—').replace(/📤|✅/g,'').trim()}</span>
+              </td>
+              <td style="padding:10px 12px;font-family:var(--mono)">${l['Prix (USD)'] || '—'}</td>
+              <td style="padding:10px 12px">${(l['✅ Match'] || '') === '✅' ? '✅' : ''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="text-align:center;margin-top:12px;color:var(--text-sec);font-size:0.75rem">
+      Showing ${Math.min(50, listings.length)} of ${listings.length} patterns
+    </div>
+  `;
+}
+
+let settingsCache = null;
+
+async function renderSettingsPage() {
+  console.log('renderSettingsPage called');
+  const settingsSection = document.getElementById('settings-section');
+  if (!settingsSection) {
+    console.log('No settings section in DOM');
+    return;
+  }
+  
+  try {
+    const r = await fetch('/api/settings');
+    if (!r.ok) throw new Error('Failed to load settings');
+    const data = await r.json();
+    settingsCache = data;
+    
+    const input = document.getElementById('pexels-api-key');
+    if (input) {
+      input.value = data.pexels_api_key || '';
+    }
+  } catch (e) {
+    console.error('Error loading settings:', e);
+  }
+}
+
+async function saveSettings() {
+  const pexelsKey = document.getElementById('pexels-api-key').value;
+  const statusEl = document.getElementById('settings-save-status');
+  statusEl.textContent = 'Saving...';
+  statusEl.style.color = 'var(--text-sec)';
+  
+  try {
+    const r = await fetch('/api/settings', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({pexels_api_key: pexelsKey})
+    });
+    if (!r.ok) throw new Error('Failed to save');
+    statusEl.textContent = 'Saved!';
+    statusEl.style.color = '#22c55e';
+    setTimeout(() => { statusEl.textContent = ''; }, 2000);
+  } catch (e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.style.color = 'var(--danger)';
+  }
+}
 
 const dropZone=$('dropZone'),fileInput=$('fileInput'),fileInfo=$('fileInfo'),
   fileName=$('fileName'),fileSize=$('fileSize'),removeFile=$('removeFile'),
@@ -308,9 +604,31 @@ const logoDropZone=$('logoDropZone'),logoInput=$('logoInput'),logoFileInfo=$('lo
 const scaleRange=$('scaleRange'),opacityRange=$('opacityRange'),marginRange=$('marginRange'),
   scaleVal=$('scaleValue'),opacityVal=$('opacityValue'),marginVal=$('marginValue');
 
-let selectedFile=null,selectedLogo=null,selectedPosition='bottom-right';
+const frontModelDropZone=$('frontModelDropZone'),frontModelInput=$('frontModelInput'),
+  frontModelFileInfo=$('frontModelFileInfo'),frontModelFileName=$('frontModelFileName'),
+  removeFrontModel=$('removeFrontModel');
+
+const backModelDropZone=$('backModelDropZone'),backModelInput=$('backModelInput'),
+  backModelFileInfo=$('backModelFileInfo'),backModelFileName=$('backModelFileName'),
+  removeBackModel=$('removeBackModel');
+
+let selectedFile=null,selectedLogo=null,selectedPosition='bottom-right',
+  selectedFrontModel=null,selectedBackModel=null;
 
 const fmtB=b=>b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(1)+' MB';
+
+async function puterUpload(file,path){
+  try{
+    const result=await puter.fs.write(path,file,{createMissingParents:true});
+    const url=await puter.fs.getReadURL(result.path);
+    $('cloudSaveInfo').style.display='block';
+    $('cloudSaveText').innerHTML=`&#9745; <strong>${file.name}</strong> saved to cloud`;
+    console.log('Puter upload:',result.path,'URL:',url);
+    return url;
+  }catch(e){
+    console.warn('Puter upload failed:',e);
+  }
+}
 
 function setPdf(f){
   if(!f||!f.name.toLowerCase().endsWith('.pdf'))return;
@@ -318,12 +636,15 @@ function setPdf(f){
   fileInfo.classList.add('visible');processBtn.disabled=false;
   downloadLink.classList.remove('visible');status.classList.remove('visible','done','error');
   renderPdfThumb(f);
+  updateProcessBtn();
+  puterUpload(f,'watermarkremover/'+f.name);
 }
 function clearPdf(){
   selectedFile=null;fileInput.value='';fileInfo.classList.remove('visible');
   processBtn.disabled=true;downloadLink.classList.remove('visible');
   status.classList.remove('visible','done','error');
   $('pdfPreview').style.display='none';
+  updateProcessBtn();
 }
 async function renderPdfThumb(f){
   const preview=$('pdfPreview');
@@ -352,11 +673,44 @@ function setLogo(f){
   logoFileInfo.classList.add('visible');
   downloadLink.classList.remove('visible');status.classList.remove('visible','done','error');
   const r=new FileReader();r.onload=e=>{logoPreview.src=e.target.result;$('logoPreviewWrap').style.display='block'};r.readAsDataURL(f);
+  updateProcessBtn();
+  puterUpload(f,'watermarkremover/logos/'+f.name);
 }
 function clearLogo(){
   selectedLogo=null;logoInput.value='';logoFileInfo.classList.remove('visible');
   logoPreview.src='';$('logoPreviewWrap').style.display='none';
   downloadLink.classList.remove('visible');status.classList.remove('visible','done','error');
+  updateProcessBtn();
+}
+
+function setFrontModel(f){
+  if(!f)return;
+  selectedFrontModel=f;frontModelFileName.textContent=f.name;
+  frontModelFileInfo.classList.add('visible');
+  const r=new FileReader();r.onload=e=>{frontModelPreview.src=e.target.result;$('frontModelPreviewWrap').style.display='block'};r.readAsDataURL(f);
+  updateProcessBtn();
+  puterUpload(f,'watermarkremover/models/'+f.name);
+}
+function clearFrontModel(){
+  selectedFrontModel=null;frontModelInput.value='';
+  frontModelFileInfo.classList.remove('visible');
+  frontModelPreview.src='';$('frontModelPreviewWrap').style.display='none';
+  updateProcessBtn();
+}
+
+function setBackModel(f){
+  if(!f)return;
+  selectedBackModel=f;backModelFileName.textContent=f.name;
+  backModelFileInfo.classList.add('visible');
+  const r=new FileReader();r.onload=e=>{backModelPreview.src=e.target.result;$('backModelPreviewWrap').style.display='block'};r.readAsDataURL(f);
+  updateProcessBtn();
+  puterUpload(f,'watermarkremover/models/'+f.name);
+}
+function clearBackModel(){
+  selectedBackModel=null;backModelInput.value='';
+  backModelFileInfo.classList.remove('visible');
+  backModelPreview.src='';$('backModelPreviewWrap').style.display='none';
+  updateProcessBtn();
 }
 
 function wireDrop(zone,counter,clickFn,setFn){
@@ -368,13 +722,21 @@ function wireDrop(zone,counter,clickFn,setFn){
   zone.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();counter.v=0;zone.classList.remove('drag-over');if(e.dataTransfer.files[0])setFn(e.dataTransfer.files[0])});
 }
 
-let pdfC={v:0},logoC={v:0};
+let pdfC={v:0},logoC={v:0},frontC={v:0},backC={v:0};
 wireDrop(dropZone,pdfC,()=>fileInput.click(),setPdf);
 wireDrop(logoDropZone,logoC,()=>logoInput.click(),setLogo);
+wireDrop(frontModelDropZone,frontC,()=>frontModelInput.click(),setFrontModel);
+wireDrop(backModelDropZone,backC,()=>backModelInput.click(),setBackModel);
+
 fileInput.addEventListener('change',e=>{if(e.target.files[0])setPdf(e.target.files[0])});
 logoInput.addEventListener('change',e=>{if(e.target.files[0])setLogo(e.target.files[0])});
+frontModelInput.addEventListener('change',e=>{if(e.target.files[0])setFrontModel(e.target.files[0])});
+backModelInput.addEventListener('change',e=>{if(e.target.files[0])setBackModel(e.target.files[0])});
+
 removeFile.addEventListener('click',clearPdf);
 removeLogo.addEventListener('click',clearLogo);
+removeFrontModel.addEventListener('click',clearFrontModel);
+removeBackModel.addEventListener('click',clearBackModel);
 
 document.querySelectorAll('.pos-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
@@ -384,18 +746,44 @@ document.querySelectorAll('.pos-btn').forEach(btn=>{
 });
 scaleRange.addEventListener('input',()=>scaleVal.textContent=scaleRange.value+'%');
 opacityRange.addEventListener('input',()=>opacityVal.textContent=opacityRange.value+'%');
+function updateProcessBtn(){
+  if(!selectedFile){
+    processBtn.disabled=true;
+    processBtn.textContent='Select a PDF to start';
+    return;
+  }
+  processBtn.disabled=false;
+  let txt='Remove Watermark';
+  if(selectedLogo && (selectedFrontModel || selectedBackModel)) txt='Remove Watermark, Stamp Logo & Replace Models';
+  else if(selectedLogo) txt='Remove Watermark & Stamp Logo';
+  else if(selectedFrontModel || selectedBackModel) txt='Remove Watermark & Replace Models';
+  processBtn.textContent=txt;
+}
+
 marginRange.addEventListener('input',()=>marginVal.textContent=marginRange.value+' px');
+
+// Call updateProcessBtn whenever state changes
+[fileInput, logoInput, frontModelInput, backModelInput].forEach(inp => inp.addEventListener('change', updateProcessBtn));
+[removeFile, removeLogo, removeFrontModel, removeBackModel].forEach(btn => btn.addEventListener('click', updateProcessBtn));
+updateProcessBtn();
 
 processBtn.addEventListener('click',async()=>{
   if(!selectedFile)return;
   processBtn.disabled=true;downloadLink.classList.remove('visible');
   status.className='status visible';
-  statusText.textContent=selectedLogo?'Removing watermark & stamping logo\u2026':'Removing watermark\u2026';
+  let statusMsg = 'Removing watermark\u2026';
+  if(selectedLogo && (selectedFrontModel || selectedBackModel)) statusMsg = 'Removing watermark, stamping logo & replacing models\u2026';
+  else if(selectedLogo) statusMsg = 'Removing watermark & stamping logo\u2026';
+  else if(selectedFrontModel || selectedBackModel) statusMsg = 'Removing watermark & replacing models\u2026';
+  
+  statusText.textContent = statusMsg;
   spinner.style.display='';progressBar.parentElement.style.display='';
 
   const fd=new FormData();
   fd.append('file',selectedFile);
   if(selectedLogo) fd.append('logo',selectedLogo);
+  if(selectedFrontModel) fd.append('front_model',selectedFrontModel);
+  if(selectedBackModel) fd.append('back_model',selectedBackModel);
   fd.append('position',selectedPosition);
   fd.append('scale',(parseInt(scaleRange.value)/100).toString());
   fd.append('opacity',(parseInt(opacityRange.value)/100).toString());
@@ -423,11 +811,16 @@ processBtn.addEventListener('click',async()=>{
     downloadLink.href=url;downloadLink.download=m?m[1]:'processed.pdf';
     downloadLink.classList.add('visible');
     if(typeof posthog!=='undefined'){posthog.capture('pdf_download',{has_logo:!!selectedLogo})}
+    const outputName=m?m[1]:'processed.pdf';
+    puterUpload(new File([blob],outputName,{type:'application/pdf'}),'watermarkremover/processed/'+outputName);
   }catch(err){
     status.classList.add('error');statusText.textContent=err.message;
     spinner.style.display='none';progressBar.parentElement.style.display='none';
   }finally{processBtn.disabled=false}
 });
+
+// Initialize router
+initRouter();
 </script>
 </body>
 </html>

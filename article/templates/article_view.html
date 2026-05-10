@@ -1,0 +1,91 @@
+{% extends "article_base.html" %}
+
+{% block title %}Article View — PatternsLab{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-body">
+  <div style="font-size:12px;color:#94a3b8;margin-bottom:12px;">View, export, and publish this article.</div>
+  <a href="{{ article_base }}/history" class="btn btn-secondary w-full" style="justify-content:center;">← Back to History</a>
+  <a href="{{ article_base }}/" class="btn btn-primary w-full" style="justify-content:center;margin-top:8px;">+ New Article</a>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if not_found %}
+  <div class="page-title">Article not found</div>
+  <div class="card">The requested article does not exist.</div>
+{% else %}
+  <div class="page-title">📝 {{ article.seo_title or article.keyword or 'Untitled' }}</div>
+
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <div style="font-size:12px;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;">
+      <span>🔑 {{ article.keyword }}</span>
+      <span>📝 {{ article.word_count or 0 }} words</span>
+      <span>📊 SEO {{ article.seo_score or 0 }}</span>
+      <span>📅 {{ article.created_at[:10] if article.created_at else '' }}</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" onclick="publishToWordPress({{ article.id }}, 'draft', this)">🚀 Send to WP</button>
+      <button class="btn btn-secondary btn-sm" onclick="publishToWordPress({{ article.id }}, 'publish', this)">✅ Publish</button>
+      <a href="{{ article_base }}/api/export/{{ article.id }}?format=html" class="btn btn-secondary btn-sm">⬇ HTML</a>
+      <a href="{{ article_base }}/api/export/{{ article.id }}?format=markdown" class="btn btn-secondary btn-sm">⬇ MD</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Meta Description</div>
+    <div>{{ article.meta_description or '' }}</div>
+  </div>
+
+  {% for s in article.sections %}
+  <div class="card">
+    <h3 style="margin-bottom:10px;">{{ s.heading or 'Section' }}</h3>
+    {% if s.image_url %}
+      <img src="{{ s.image_url }}" alt="{{ s.heading or 'Section image' }}" style="max-width:100%;border-radius:8px;margin-bottom:12px;" />
+    {% endif %}
+    <div style="white-space:pre-wrap;line-height:1.7;">{{ s.body or '' }}</div>
+  </div>
+  {% endfor %}
+
+  {% if article.faq %}
+  <div class="card">
+    <div class="card-title">FAQ</div>
+    {% for item in article.faq %}
+      <div style="margin-bottom:10px;">
+        <div style="font-weight:600;">{{ item.question }}</div>
+        <div style="color:var(--text-muted);">{{ item.answer }}</div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function publishToWordPress(articleId, status, btn) {
+  const old = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending...';
+  try {
+    const r = await fetch(`${ARTICLE_BASE}/api/publish-wordpress/${articleId}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({status})
+    });
+    const d = await r.json();
+    if (!r.ok || d.error) {
+      toast(d.error || 'Failed to send article to WordPress', 'error');
+      return;
+    }
+    toast(`Sent to WordPress (#${d.post_id})`, 'success');
+    if (d.edit_url) window.open(d.edit_url, '_blank');
+  } catch (e) {
+    toast('Publish failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = old;
+  }
+}
+</script>
+{% endblock %}

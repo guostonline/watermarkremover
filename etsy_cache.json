@@ -1,0 +1,55 @@
+{
+  "shop_name": "PatternsLabCo",
+  "shop_url": "https://www.etsy.com/shop/PatternsLabCo",
+  "scraped_at": "2026-05-10T06:13:28.475601Z",
+  "stats": {
+    "total_items": 6,
+    "sales": 0,
+    "reviews": 0,
+    "admirers": 0
+  },
+  "listings": [
+    {
+      "id": "4480683112",
+      "title": "Summer Slip Dress Sewing Pattern | Beginner Friendly PDF (Instant Download)",
+      "price": "€9.76",
+      "url": "https://www.etsy.com/listing/4480683112/summer-slip-dress-sewing-pattern",
+      "img": "https://i.etsystatic.com/65183353/r/il/d86c15/7910327635/il_340x270.7910327635_itel.jpg"
+    },
+    {
+      "id": "4496051766",
+      "title": "Thalia Maxi Dress Sewing Pattern | Beginner Friendly Slit Dress (PDF Download)",
+      "price": "€8.87",
+      "url": "https://www.etsy.com/listing/4496051766/thalia-maxi-dress-sewing-pattern",
+      "img": "https://i.etsystatic.com/65183353/c/1023/1537/0/0/il/607336/8009103805/il_340x270.8009103805_i5sr.jpg"
+    },
+    {
+      "id": "4487873004",
+      "title": "Boho Wrap Mini Dress Sewing Pattern | V-Neck Flutter Sleeve (Digital Download)",
+      "price": "€9.76",
+      "url": "https://www.etsy.com/listing/4487873004/boho-wrap-mini-dress-sewing-pattern-pdf",
+      "img": "https://i.etsystatic.com/65183353/r/il/4c0d52/7960244178/il_340x270.7960244178_kq6w.jpg"
+    },
+    {
+      "id": "4491064434",
+      "title": "Alyssa Dress Sewing Pattern PDF | Beginner Friendly | Sizes XS-XXL | A4 us Letter A0 | Instant Download",
+      "price": "€9.76",
+      "url": "https://www.etsy.com/listing/4491064434/alyssa-dress-sewing-pattern-pdf",
+      "img": "https://i.etsystatic.com/65183353/r/il/7a1f57/7969503068/il_340x270.7969503068_8yps.jpg"
+    },
+    {
+      "id": "4496440618",
+      "title": "Slip Dress Sewing Pattern | Beginner Friendly, Sizes XS-XL (Instant Download)",
+      "price": "€9.76",
+      "url": "https://www.etsy.com/listing/4496440618/slip-dress-sewing-pattern-beginner",
+      "img": "https://i.etsystatic.com/65183353/r/il/9b0a55/8022523279/il_340x270.8022523279_kfj3.jpg"
+    },
+    {
+      "id": "4507272566",
+      "title": "Kaftan Sewing Pattern PDF | Beginner Friendly, Sizes XS-5XL | A4, Letter, A0 (Instant Download)",
+      "price": "€9.76",
+      "url": "https://www.etsy.com/listing/4507272566/kaftan-sewing-pattern-pdf-beginner",
+      "img": "https://i.etsystatic.com/65183353/r/il/7e6e7e/8058823401/il_340x270.8058823401_i2vl.jpg"
+    }
+  ]
+}

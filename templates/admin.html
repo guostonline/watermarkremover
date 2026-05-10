@@ -404,7 +404,6 @@ ${currentSection==='overview'?`
 `}
 }
 catch(e){console.error('Render error:',e);document.getElementById('app').innerHTML='<div class="wrap"><h2 style="color:var(--rose)">Error: '+e.message+'</h2><button onclick="load()">Retry</button></div>'}
-}
 
 }
 async function load(){const btn=document.getElementById('rbtn');if(btn)btn.disabled=true;const r=await api('/stats');if(!r){login();return}d=r;const invData=await api('/invites');if(invData)inv=invData;render();if(btn)btn.disabled=false}

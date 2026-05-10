@@ -1,0 +1,3484 @@
+{
+  "total": 497,
+  "patterns": [
+    {
+      "name": "Apron",
+      "slug": "apron",
+      "folder": "0- Apron",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\apron.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Dress",
+      "slug": "summer-dress",
+      "folder": "1- Summer Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Shorts",
+      "slug": "comfy-shorts",
+      "folder": "10- Comfy Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Boho Jumpsuit",
+      "slug": "boho-jumpsuit",
+      "folder": "100 - Boho Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\boho-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Pants",
+      "slug": "comfy-pants",
+      "folder": "101 - Comfy Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Trendy Pants",
+      "slug": "trendy-pants",
+      "folder": "102- Trendy Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\trendy-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Milkmaid Dress",
+      "slug": "milkmaid-dress",
+      "folder": "103- Milkmaid Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\milkmaid-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Jumpsuit",
+      "slug": "summer-jumpsuit",
+      "folder": "104 - Summer Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Romper",
+      "slug": "summer-romper",
+      "folder": "105 - Summer Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Off Shoulder Romper",
+      "slug": "off-shoulder-romper",
+      "folder": "106 - Off Shoulder Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\off-shoulder-romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vintage Dress",
+      "slug": "vintage-dress",
+      "folder": "108 - Vintage Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vintage-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Long Vest",
+      "slug": "long-vest",
+      "folder": "109 - Long Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\long-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jumper",
+      "slug": "jumper",
+      "folder": "11- Jumper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jumper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cardigan",
+      "slug": "cardigan",
+      "folder": "110 - Cardigan",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cardigan.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Drawstring Coat",
+      "slug": "drawstring-coat",
+      "folder": "111 - Drawstring Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\drawstring-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Blouse",
+      "slug": "comfy-blouse",
+      "folder": "112 - Comfy Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tiered Skirt",
+      "slug": "tiered-skirt",
+      "folder": "113- Tiered Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tiered-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Nina Dress",
+      "slug": "nina-dress",
+      "folder": "114 - Nina Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\nina-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Dress",
+      "slug": "slit-dress",
+      "folder": "115 - Slit Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overall Dress",
+      "slug": "overall-dress",
+      "folder": "116 - Overall Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overall-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Shorts-Swimwear",
+      "slug": "men-s-shorts-swimwear",
+      "folder": "117 - Men_s Shorts-Swimwear",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-shorts-swimwear.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Crop Shirt",
+      "slug": "crop-shirt",
+      "folder": "118 - Crop Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\crop-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Flare leg pants",
+      "slug": "flare-leg-pants",
+      "folder": "119 - Flare leg pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\flare-leg-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overalls",
+      "slug": "overalls",
+      "folder": "12- Overalls",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overalls.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Long Sleeved Sumer Top",
+      "slug": "long-sleeved-sumer-top",
+      "folder": "120 - Long Sleeved Sumer Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\long-sleeved-sumer-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Pants",
+      "slug": "summer-pants",
+      "folder": "121 - Summer Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Pants",
+      "slug": "men-pants",
+      "folder": "122- Men Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vintage Apron Dress",
+      "slug": "vintage-apron-dress",
+      "folder": "123 - Vintage Apron Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vintage-apron-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Back Top",
+      "slug": "tie-back-top",
+      "folder": "124- Tie Back Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-back-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "VNeck Romper",
+      "slug": "vneck-romper",
+      "folder": "125 - VNeck Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vneck-romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Backless Bodysuit",
+      "slug": "backless-bodysuit",
+      "folder": "126 - Backless Bodysuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\backless-bodysuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Slit Pants",
+      "slug": "summer-slit-pants",
+      "folder": "127 - Summer Slit Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-slit-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Backless Top",
+      "slug": "backless-top",
+      "folder": "128 - Backless Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\backless-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Celia Corset",
+      "slug": "celia-corset",
+      "folder": "129 -Celia Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\celia-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Midi Skirt",
+      "slug": "midi-skirt",
+      "folder": "13- Midi Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\midi-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Shorts",
+      "slug": "easy-shorts",
+      "folder": "130 - Easy Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Skirt",
+      "slug": "summer-skirt",
+      "folder": "131 - Summer Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "djallab",
+      "slug": "djallab",
+      "folder": "133 - djallab",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\djallab.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "ALine Dress",
+      "slug": "aline-dress",
+      "folder": "134 - ALine Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\aline-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Maxi Slit Skirt",
+      "slug": "maxi-slit-skirt",
+      "folder": "135 - Maxi Slit Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\maxi-slit-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruffle Dress",
+      "slug": "ruffle-dress",
+      "folder": "136 - Ruffle Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruffle-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wrap Dress",
+      "slug": "wrap-dress",
+      "folder": "137 - Wrap Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wrap-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Maxi Dress",
+      "slug": "maxi-dress",
+      "folder": "138 - Maxi Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\maxi-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Backless Prom Dress",
+      "slug": "backless-prom-dress",
+      "folder": "139 - Backless Prom Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\backless-prom-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jumpsuit",
+      "slug": "jumpsuit",
+      "folder": "14- Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Off Shoulder Dress",
+      "slug": "off-shoulder-dress",
+      "folder": "140 - Off Shoulder Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\off-shoulder-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Strappy Dress",
+      "slug": "strappy-dress",
+      "folder": "141 - Strappy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\strappy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Front Tie Top",
+      "slug": "front-tie-top",
+      "folder": "142 - Front Tie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\front-tie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cottage Top",
+      "slug": "cottage-top",
+      "folder": "143 - Cottage Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cottage-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sunshine Dress",
+      "slug": "sunshine-dress",
+      "folder": "144 - Sunshine Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sunshine-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jane Dress",
+      "slug": "jane-dress",
+      "folder": "145- Jane Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jane-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Dress",
+      "slug": "slit-dress",
+      "folder": "146 - Slit Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sweetheart Dress",
+      "slug": "sweetheart-dress",
+      "folder": "147 - Sweetheart Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sweetheart-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Back Top",
+      "slug": "tie-back-top",
+      "folder": "148 - Tie Back Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-back-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Dress",
+      "slug": "easy-dress",
+      "folder": "149 - Easy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Shorts",
+      "slug": "shorts",
+      "folder": "15- Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slip Dress",
+      "slug": "slip-dress",
+      "folder": "150 - Slip Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slip-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Katia Jumpsuit",
+      "slug": "katia-jumpsuit",
+      "folder": "151 - Katia Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\katia-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "VNeck Blouse",
+      "slug": "vneck-blouse",
+      "folder": "152 - VNeck Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vneck-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Spring Dress",
+      "slug": "spring-dress",
+      "folder": "153 - Spring Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\spring-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruffled Top",
+      "slug": "ruffled-top",
+      "folder": "154 -Ruffled Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruffled-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Smock Dress",
+      "slug": "smock-dress",
+      "folder": "155- Smock Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\smock-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Laura Blouse",
+      "slug": "laura-blouse",
+      "folder": "156 - Laura Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\laura-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Puffer Vest",
+      "slug": "puffer-vest",
+      "folder": "157- Puffer Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\puffer-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sleeveless Shirt",
+      "slug": "sleeveless-shirt",
+      "folder": "158 - Sleeveless Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sleeveless-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hoodie & Joggers",
+      "slug": "hoodie-joggers",
+      "folder": "159 - Hoodie & Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hoodie-joggers.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Thalia Dress",
+      "slug": "thalia-dress",
+      "folder": "16- Thalia Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\thalia-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lounge Set",
+      "slug": "lounge-set",
+      "folder": "160 - Lounge Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lounge-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sweatshirt & Joggers",
+      "slug": "sweatshirt-joggers",
+      "folder": "161 - Sweatshirt & Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sweatshirt-joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Vest",
+      "slug": "halter-vest",
+      "folder": "162 - Halter Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Trendy Set",
+      "slug": "trendy-set",
+      "folder": "163 - Trendy Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\trendy-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Fall Dress",
+      "slug": "fall-dress",
+      "folder": "164 - Fall Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\fall-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cottage Dress",
+      "slug": "cottage-dress",
+      "folder": "165 - Cottage Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cottage-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pajama Set",
+      "slug": "pajama-set",
+      "folder": "166 -Pajama Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pajama-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cozy Hoodie",
+      "slug": "cozy-hoodie",
+      "folder": "167 - Cozy Hoodie",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cozy-hoodie.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Straight Leg Pants",
+      "slug": "straight-leg-pants",
+      "folder": "168 - Straight Leg Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\straight-leg-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jacket",
+      "slug": "jacket",
+      "folder": "169 - Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Dress",
+      "slug": "comfy-dress",
+      "folder": "17 - Comfy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Shirt Jacket",
+      "slug": "shirt-jacket",
+      "folder": "170 - Shirt Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\shirt-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overall Romper",
+      "slug": "overall-romper",
+      "folder": "171 - Overall Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overall-romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overall Dress",
+      "slug": "overall-dress",
+      "folder": "172 - Overall Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overall-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Boho Pants",
+      "slug": "boho-pants",
+      "folder": "173 - Boho Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\boho-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pinafore Dress",
+      "slug": "pinafore-dress",
+      "folder": "174 - Pinafore Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pinafore-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Shirt",
+      "slug": "summer-shirt",
+      "folder": "175 - Summer Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Button Jacket",
+      "slug": "men-button-jacket",
+      "folder": "176 - Men Button Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-button-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Short Sleeves Shirt",
+      "slug": "men-short-sleeves-shirt",
+      "folder": "177 - Men Short Sleeves Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-short-sleeves-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Underbust Corset",
+      "slug": "underbust-corset",
+      "folder": "178 - Underbust Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\underbust-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lia Skirt",
+      "slug": "lia-skirt",
+      "folder": "179 - Lia Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lia-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "T-Shirt Dress",
+      "slug": "t-shirt-dress",
+      "folder": "18- T-Shirt Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\t-shirt-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Midi Skirt",
+      "slug": "midi-skirt",
+      "folder": "180 - Midi Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\midi-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wide Leg Shorts",
+      "slug": "wide-leg-shorts",
+      "folder": "181 - Wide Leg Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wide-leg-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Blazer",
+      "slug": "blazer",
+      "folder": "182 - Blazer",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\blazer.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Classic Men Shirt",
+      "slug": "classic-men-shirt",
+      "folder": "183 - Classic Men Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\classic-men-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Daisy Skirt",
+      "slug": "daisy-skirt",
+      "folder": "184 - Daisy Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\daisy-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Pajama Pants",
+      "slug": "men-pajama-pants",
+      "folder": "185 -Men Pajama Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-pajama-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Joggers",
+      "slug": "men-joggers",
+      "folder": "186 - Men Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Palazzo Pants",
+      "slug": "palazzo-pants",
+      "folder": "187 - Palazzo Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\palazzo-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tiered Pants",
+      "slug": "tiered-pants",
+      "folder": "188 - Tiered Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tiered-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Sweatshirt",
+      "slug": "men-sweatshirt",
+      "folder": "189 - Men Sweatshirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-sweatshirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pencil Skirt",
+      "slug": "pencil-skirt",
+      "folder": "19- Pencil Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pencil-skirt.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "High Waist Pants",
+      "slug": "high-waist-pants",
+      "folder": "190 - High Waist Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\high-waist-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Classic Women Shirt",
+      "slug": "classic-women-shirt",
+      "folder": "191 - Classic Women Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\classic-women-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Hoodie",
+      "slug": "men-hoodie",
+      "folder": "192 - Men Hoodie",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-hoodie.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Sweatshirt and Joggers",
+      "slug": "men-sweatshirt-and-joggers",
+      "folder": "193 - Men Sweatshirt and Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-sweatshirt-and-joggers.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Mens Hoodie & Joggers",
+      "slug": "mens-hoodie-joggers",
+      "folder": "194 - Mens Hoodie & Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mens-hoodie-joggers.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Dog Jumper",
+      "slug": "dog-jumper",
+      "folder": "195 - Dog Jumper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-jumper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Skirt",
+      "slug": "summer-skirt",
+      "folder": "196 - Summer Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Classic Vest",
+      "slug": "classic-vest",
+      "folder": "197 - Classic Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\classic-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset Top",
+      "slug": "corset-top",
+      "folder": "198 - Corset Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Romantic Corset",
+      "slug": "romantic-corset",
+      "folder": "199 - Romantic Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\romantic-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Midi Dress",
+      "slug": "midi-dress",
+      "folder": "2 - Midi Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\midi-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Fitted Crop Top",
+      "slug": "fitted-crop-top",
+      "folder": "20- Fitted Crop Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\fitted-crop-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vest and Pants",
+      "slug": "vest-and-pants",
+      "folder": "200 - Vest and Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vest-and-pants.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Sweet Dress",
+      "slug": "sweet-dress",
+      "folder": "201 - Sweet Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sweet-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tube Corset",
+      "slug": "tube-corset",
+      "folder": "202 - Tube Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tube-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cozy Playsuit",
+      "slug": "cozy-playsuit",
+      "folder": "203 - Cozy Playsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cozy-playsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Backless Jumpsuit",
+      "slug": "backless-jumpsuit",
+      "folder": "204 - Backless Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\backless-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Jacket",
+      "slug": "dog-jacket",
+      "folder": "205 - Dog Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Short Cape",
+      "slug": "short-cape",
+      "folder": "206 - Short Cape",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\short-cape.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Shirt",
+      "slug": "dog-shirt",
+      "folder": "207 - Dog Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hooded Capelet",
+      "slug": "hooded-capelet",
+      "folder": "208 - Hooded Capelet",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hooded-capelet.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Frenchy Dress",
+      "slug": "frenchy-dress",
+      "folder": "209 - Frenchy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\frenchy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Crop Top",
+      "slug": "crop-top",
+      "folder": "21- Crop Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\crop-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Short Dress",
+      "slug": "short-dress",
+      "folder": "210 - Short Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\short-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "V-Neck Jumpsuit",
+      "slug": "v-neck-jumpsuit",
+      "folder": "211- V-Neck Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\v-neck-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Belted Dress",
+      "slug": "belted-dress",
+      "folder": "212 - Belted Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\belted-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mock Neck Top",
+      "slug": "mock-neck-top",
+      "folder": "213 - Mock Neck Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mock-neck-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hooded Coat",
+      "slug": "hooded-coat",
+      "folder": "214 - Hooded Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hooded-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Turtleneck Sweater",
+      "slug": "turtleneck-sweater",
+      "folder": "215 - Turtleneck Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\turtleneck-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Scoop Neck Top",
+      "slug": "scoop-neck-top",
+      "folder": "216 - Scoop Neck Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\scoop-neck-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Zip Sweater",
+      "slug": "zip-sweater",
+      "folder": "217 - Zip Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\zip-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Off Shoulder Sweater",
+      "slug": "off-shoulder-sweater",
+      "folder": "218 -  Off Shoulder Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\off-shoulder-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overall Dress",
+      "slug": "overall-dress",
+      "folder": "219 -  Overall Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overall-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Top",
+      "slug": "halter-top",
+      "folder": "22- Halter Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-top.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Tiered Dress",
+      "slug": "tiered-dress",
+      "folder": "220 - Tiered Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tiered-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Skort",
+      "slug": "skort",
+      "folder": "221 - Skort",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\skort.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Dress",
+      "slug": "halter-dress",
+      "folder": "222 - Halter Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Pj Set",
+      "slug": "men-pj-set",
+      "folder": "223- Men Pj Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-pj-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Tshirt",
+      "slug": "men-tshirt",
+      "folder": "224 - Men Tshirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-tshirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Luna Dress",
+      "slug": "luna-dress",
+      "folder": "225 - Luna Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\luna-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Straight Pants",
+      "slug": "straight-pants",
+      "folder": "226 - Straight Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\straight-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emma Pants",
+      "slug": "emma-pants",
+      "folder": "227 - Emma Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emma-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Relaxed Pants",
+      "slug": "relaxed-pants",
+      "folder": "228 - Relaxed Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\relaxed-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Knot Skort",
+      "slug": "knot-skort",
+      "folder": "229 - Knot Skort",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\knot-skort.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wide Leg Pants",
+      "slug": "wide-leg-pants",
+      "folder": "23- Wide Leg Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wide-leg-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Button Skirt",
+      "slug": "button-skirt",
+      "folder": "230 - Button Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\button-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog TShirt",
+      "slug": "dog-tshirt",
+      "folder": "231 - Dog TShirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-tshirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Baggy Pants",
+      "slug": "baggy-pants",
+      "folder": "232 - Baggy Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\baggy-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Zip Up Hoodie",
+      "slug": "zip-up-hoodie",
+      "folder": "233 - Zip Up Hoodie",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\zip-up-hoodie.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Shirred Blouse",
+      "slug": "shirred-blouse",
+      "folder": "234 - Shirred Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\shirred-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Milkmaid Blouse",
+      "slug": "milkmaid-blouse",
+      "folder": "235 - Milkmaid Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\milkmaid-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cargo Pants",
+      "slug": "cargo-pants",
+      "folder": "236 - Cargo Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cargo-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Teddy Vest",
+      "slug": "teddy-vest",
+      "folder": "237 - Teddy Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\teddy-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Teddy Jacket",
+      "slug": "teddy-jacket",
+      "folder": "238 - Teddy Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\teddy-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "High Waisted Leggings",
+      "slug": "high-waisted-leggings",
+      "folder": "239 - High Waisted Leggings",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\high-waisted-leggings.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mock Neck Top",
+      "slug": "mock-neck-top",
+      "folder": "24- Mock Neck Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mock-neck-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Button Coat",
+      "slug": "button-coat",
+      "folder": "240 - Button Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\button-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Men Shorts",
+      "slug": "easy-men-shorts",
+      "folder": "241 -  Easy Men Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-men-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruffle Skirt",
+      "slug": "ruffle-skirt",
+      "folder": "242 - Ruffle Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruffle-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Billie Jacket",
+      "slug": "billie-jacket",
+      "folder": "243 - Billie Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\billie-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cat Hoodie",
+      "slug": "cat-hoodie",
+      "folder": "244 - Cat Hoodie",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cat-hoodie.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Coat",
+      "slug": "dog-coat",
+      "folder": "245 - Dog Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bucket Hat",
+      "slug": "bucket-hat",
+      "folder": "246 - Bucket Hat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bucket-hat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hooded Puffer Vest",
+      "slug": "hooded-puffer-vest",
+      "folder": "247 - Hooded Puffer Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hooded-puffer-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Dress",
+      "slug": "slit-dress",
+      "folder": "248 - Slit Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bustier Corset",
+      "slug": "bustier-corset",
+      "folder": "249 - Bustier Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bustier-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Fairy dress",
+      "slug": "fairy-dress",
+      "folder": "25 -Fairy dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\fairy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Back Lace Corset",
+      "slug": "back-lace-corset",
+      "folder": "250- Back Lace Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\back-lace-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset Dress",
+      "slug": "corset-dress",
+      "folder": "251- Corset Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Dress",
+      "slug": "halter-dress",
+      "folder": "252- Halter Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset Belt",
+      "slug": "corset-belt",
+      "folder": "253 - Corset Belt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset-belt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bustier Dress",
+      "slug": "bustier-dress",
+      "folder": "254 - Bustier Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bustier-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bustier Top",
+      "slug": "bustier-top",
+      "folder": "255 - Bustier Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bustier-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Capri Set",
+      "slug": "capri-set",
+      "folder": "256 - Capri Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\capri-set.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Suit Set",
+      "slug": "suit-set",
+      "folder": "257 - Suit Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\suit-set.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Céline Dress",
+      "slug": "c-line-dress",
+      "folder": "258 - Céline Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\c-line-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Long Skirt",
+      "slug": "long-skirt",
+      "folder": "259 - Long Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\long-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruffled Blouse",
+      "slug": "ruffled-blouse",
+      "folder": "26 - Ruffled Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruffled-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Fleur Dress",
+      "slug": "fleur-dress",
+      "folder": "260 - Fleur Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\fleur-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Julie Dress",
+      "slug": "julie-dress",
+      "folder": "261 - Julie Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\julie-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wide Leg Jumpsuit",
+      "slug": "wide-leg-jumpsuit",
+      "folder": "262 - Wide Leg Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wide-leg-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Backless Bodysuit",
+      "slug": "backless-bodysuit",
+      "folder": "263 - Backless Bodysuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\backless-bodysuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Olivia Dress",
+      "slug": "olivia-dress",
+      "folder": "264 - Olivia Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\olivia-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wrap Skirt",
+      "slug": "wrap-skirt",
+      "folder": "265 - Wrap Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wrap-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Peplum Blouse",
+      "slug": "peplum-blouse",
+      "folder": "266 - Peplum Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\peplum-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruby Blouse",
+      "slug": "ruby-blouse",
+      "folder": "267 - Ruby Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruby-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ava Pants",
+      "slug": "ava-pants",
+      "folder": "268 - Ava Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ava-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Belted Pants",
+      "slug": "belted-pants",
+      "folder": "269 - Belted Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\belted-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Playsuit",
+      "slug": "playsuit",
+      "folder": "27 - Playsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\playsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Blouse",
+      "slug": "tie-blouse",
+      "folder": "270 - Tie Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vicky Skirt",
+      "slug": "vicky-skirt",
+      "folder": "271 - Vicky Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vicky-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Belted Shorts",
+      "slug": "belted-shorts",
+      "folder": "272 - Belted Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\belted-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Jumpsuit",
+      "slug": "halter-jumpsuit",
+      "folder": "273 - Halter Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Serene Blouse",
+      "slug": "serene-blouse",
+      "folder": "274 - Serene Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\serene-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emma Apron",
+      "slug": "emma-apron",
+      "folder": "275 - Emma Apron",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emma-apron.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Apron",
+      "slug": "apron",
+      "folder": "276 - Apron",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\apron.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Juliet Dress",
+      "slug": "juliet-dress",
+      "folder": "277 - Juliet Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\juliet-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Boho Skirt",
+      "slug": "boho-skirt",
+      "folder": "278 - Boho Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\boho-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emily Shorts",
+      "slug": "emily-shorts",
+      "folder": "279 - Emily Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emily-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "V-Neck Dress",
+      "slug": "v-neck-dress",
+      "folder": "28- V-Neck Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\v-neck-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Paola Romper",
+      "slug": "paola-romper",
+      "folder": "280 - Paola Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\paola-romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Selene Dress",
+      "slug": "selene-dress",
+      "folder": "281 - Selene Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\selene-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wrap Top",
+      "slug": "wrap-top",
+      "folder": "282 - Wrap Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wrap-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Harem Pants",
+      "slug": "slit-harem-pants",
+      "folder": "283 - Slit Harem Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-harem-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lily Top",
+      "slug": "lily-top",
+      "folder": "284 - Lily Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lily-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Knot Skirt",
+      "slug": "knot-skirt",
+      "folder": "285 - Knot Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\knot-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Vest",
+      "slug": "men-s-vest",
+      "folder": "286 - Men_s Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Neck Top",
+      "slug": "halter-neck-top",
+      "folder": "287 - Halter Neck Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-neck-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mystic Cloak",
+      "slug": "mystic-cloak",
+      "folder": "288 - Mystic Cloak",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mystic-cloak.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sunny Set",
+      "slug": "sunny-set",
+      "folder": "289 - Sunny Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sunny-set.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Fitted Dress",
+      "slug": "fitted-dress",
+      "folder": "29- Fitted Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\fitted-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Blouse",
+      "slug": "easy-blouse",
+      "folder": "290 - Easy Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Palazzo Trousers",
+      "slug": "palazzo-trousers",
+      "folder": "291 - Palazzo Trousers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\palazzo-trousers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Trendy Shorts",
+      "slug": "trendy-shorts",
+      "folder": "292 - Trendy Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\trendy-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Batwing Blouse",
+      "slug": "batwing-blouse",
+      "folder": "293 - Batwing Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\batwing-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mini Shorts",
+      "slug": "mini-shorts",
+      "folder": "294 - Mini Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mini-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ella Dress",
+      "slug": "ella-dress",
+      "folder": "295 - Ella Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ella-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sybil Dress",
+      "slug": "sybil-dress",
+      "folder": "296 - Sybil Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sybil-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Iris Skirt",
+      "slug": "iris-skirt",
+      "folder": "297 - Iris Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\iris-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Blazer",
+      "slug": "men-blazer",
+      "folder": "298 - Men Blazer",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-blazer.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dirndl Dress",
+      "slug": "dirndl-dress",
+      "folder": "299 - Dirndl Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dirndl-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Skirt",
+      "slug": "skirt",
+      "folder": "3- Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset",
+      "slug": "corset",
+      "folder": "30- Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Chloé Dress",
+      "slug": "chlo-dress",
+      "folder": "300 - Chloé Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\chlo-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Milkmaid Set",
+      "slug": "milkmaid-set",
+      "folder": "301 - Milkmaid Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\milkmaid-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset & Blouse",
+      "slug": "corset-blouse",
+      "folder": "302 - Corset & Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cargo Pants",
+      "slug": "cargo-pants",
+      "folder": "303 - Cargo Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cargo-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Clara Sweater",
+      "slug": "clara-sweater",
+      "folder": "304 - Clara Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\clara-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Denise Jacket",
+      "slug": "denise-jacket",
+      "folder": "305 - Denise Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\denise-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Amelie Top",
+      "slug": "amelie-top",
+      "folder": "306 - Amelie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\amelie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vivian Blouse",
+      "slug": "vivian-blouse",
+      "folder": "307 - Vivian Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vivian-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wide Trousers",
+      "slug": "wide-trousers",
+      "folder": "308 - Wide Trousers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wide-trousers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Elise Vest",
+      "slug": "elise-vest",
+      "folder": "309 - Elise Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\elise-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Joggers",
+      "slug": "joggers",
+      "folder": "31- Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jane Blouse",
+      "slug": "jane-blouse",
+      "folder": "310 - Jane Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jane-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emily Coat",
+      "slug": "emily-coat",
+      "folder": "311 - Emily Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emily-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Anne Jacket",
+      "slug": "anne-jacket",
+      "folder": "312- Anne Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\anne-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Celeste Dress",
+      "slug": "celeste-dress",
+      "folder": "313 - Celeste Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\celeste-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Adele Vest",
+      "slug": "adele-vest",
+      "folder": "314- Adele Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\adele-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Louise Dress",
+      "slug": "louise-dress",
+      "folder": "315- Louise Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\louise-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Classic Pants",
+      "slug": "men-classic-pants",
+      "folder": "316 - Men Classic Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-classic-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Shirt Jacket",
+      "slug": "men-shirt-jacket",
+      "folder": "317 - Men Shirt Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-shirt-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Elise Jacket",
+      "slug": "elise-jacket",
+      "folder": "318 - Elise Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\elise-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Claudia Top",
+      "slug": "claudia-top",
+      "folder": "319 - Claudia Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\claudia-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Crop Sweatshirt",
+      "slug": "crop-sweatshirt",
+      "folder": "32- Crop Sweatshirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\crop-sweatshirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Oversized Hoodie",
+      "slug": "oversized-hoodie",
+      "folder": "320- Oversized Hoodie",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\oversized-hoodie.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pajama Set",
+      "slug": "pajama-set",
+      "folder": "321 - Pajama Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pajama-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Diane Vest",
+      "slug": "diane-vest",
+      "folder": "322 - Diane Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\diane-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Autumn Dress",
+      "slug": "autumn-dress",
+      "folder": "323- Autumn Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\autumn-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Fitted Shirt",
+      "slug": "fitted-shirt",
+      "folder": "324 - Fitted Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\fitted-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Coat",
+      "slug": "men-s-coat",
+      "folder": "325 - Men_s Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Bomber",
+      "slug": "men-s-bomber",
+      "folder": "326 - Men_s Bomber",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-bomber.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ellie Skort",
+      "slug": "ellie-skort",
+      "folder": "327 - Ellie Skort",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ellie-skort.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Side Tie Vest",
+      "slug": "side-tie-vest",
+      "folder": "328 - Side Tie Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\side-tie-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Freya Coat",
+      "slug": "freya-coat",
+      "folder": "329 - Freya Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\freya-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Short Jacket",
+      "slug": "short-jacket",
+      "folder": "33- Short Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\short-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lara Dress",
+      "slug": "lara-dress",
+      "folder": "330 - Lara Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lara-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Rosie Sweater",
+      "slug": "rosie-sweater",
+      "folder": "331 - Rosie Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\rosie-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lena Coat",
+      "slug": "lena-coat",
+      "folder": "332 - Lena Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lena-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Oversized Sweater",
+      "slug": "oversized-sweater",
+      "folder": "333 - Oversized Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\oversized-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cape Shawl",
+      "slug": "cape-shawl",
+      "folder": "334 - Cape Shawl",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cape-shawl.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Chic Jacket",
+      "slug": "chic-jacket",
+      "folder": "335 - Chic Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\chic-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Coat",
+      "slug": "easy-coat",
+      "folder": "336 - Easy Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Vest",
+      "slug": "tie-vest",
+      "folder": "337 - Tie Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Joggers",
+      "slug": "men-s-joggers",
+      "folder": "338 - Men_s Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Poncho Cape",
+      "slug": "poncho-cape",
+      "folder": "339 - Poncho Cape",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\poncho-cape.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Crop Tee",
+      "slug": "crop-tee",
+      "folder": "34- Crop Tee",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\crop-tee.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Vest",
+      "slug": "men-s-vest",
+      "folder": "340 - Men_s Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Sweater",
+      "slug": "men-s-sweater",
+      "folder": "341 - Men_s Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ellie Sweater",
+      "slug": "ellie-sweater",
+      "folder": "342 - Ellie Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ellie-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Cargo Joggers",
+      "slug": "men-s-cargo-joggers",
+      "folder": "343 - Men_s Cargo Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-cargo-joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ginny Vest",
+      "slug": "ginny-vest",
+      "folder": "344 - Ginny Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ginny-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Katia Top",
+      "slug": "katia-top",
+      "folder": "345 - Katia Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\katia-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emma Top",
+      "slug": "emma-top",
+      "folder": "346 - Emma Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emma-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Oversized Sweatshirt",
+      "slug": "oversized-sweatshirt",
+      "folder": "347 - Oversized Sweatshirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\oversized-sweatshirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Margot Jacket",
+      "slug": "margot-jacket",
+      "folder": "348 - Margot Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\margot-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Puffer Vest",
+      "slug": "men-puffer-vest",
+      "folder": "349 - Men Puffer Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-puffer-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Party Dress",
+      "slug": "party-dress",
+      "folder": "35- Party Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\party-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Pajama",
+      "slug": "dog-pajama",
+      "folder": "350 - Dog Pajama",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-pajama.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Flare Trousers",
+      "slug": "flare-trousers",
+      "folder": "351 - Flare Trousers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\flare-trousers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Chic Pants",
+      "slug": "chic-pants",
+      "folder": "352 - Chic Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\chic-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Sweater",
+      "slug": "dog-sweater",
+      "folder": "353 - Dog Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Taylor Pants",
+      "slug": "taylor-pants",
+      "folder": "354 - Taylor Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\taylor-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Vest",
+      "slug": "dog-vest",
+      "folder": "355 - Dog Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Alice Vest",
+      "slug": "alice-vest",
+      "folder": "356 - Alice Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\alice-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Avril Vest",
+      "slug": "avril-vest",
+      "folder": "357 -Avril Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\avril-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bonnie Apron",
+      "slug": "bonnie-apron",
+      "folder": "358 - Bonnie Apron",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bonnie-apron.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Puffer Jacket",
+      "slug": "men-s-puffer-jacket",
+      "folder": "359 - Men_s Puffer Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-puffer-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Prom Dress",
+      "slug": "prom-dress",
+      "folder": "36- Prom Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\prom-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Liam Jacket",
+      "slug": "liam-jacket",
+      "folder": "360 - Liam Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\liam-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Niki Vest",
+      "slug": "niki-vest",
+      "folder": "361 - Niki Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\niki-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ellen Pants",
+      "slug": "ellen-pants",
+      "folder": "362 - Ellen Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ellen-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Relaxed Pants",
+      "slug": "men-relaxed-pants",
+      "folder": "363 - Men Relaxed Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-relaxed-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Giulia Vest",
+      "slug": "giulia-vest",
+      "folder": "364 - Giulia Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\giulia-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vicky Shorts",
+      "slug": "vicky-shorts",
+      "folder": "365 - Vicky Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vicky-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Trousers",
+      "slug": "men-trousers",
+      "folder": "366 - Men Trousers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-trousers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Zip Sweater",
+      "slug": "men-s-zip-sweater",
+      "folder": "367 - Men_s Zip Sweater",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-zip-sweater.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Amelia Pants",
+      "slug": "amelia-pants",
+      "folder": "368 - Amelia Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\amelia-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lily Vest",
+      "slug": "lily-vest",
+      "folder": "369 - Lily Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lily-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pinafore Dress",
+      "slug": "pinafore-dress",
+      "folder": "37- Pinafore Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pinafore-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Louis Jacket",
+      "slug": "louis-jacket",
+      "folder": "370 - Louis Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\louis-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Rose Pants",
+      "slug": "rose-pants",
+      "folder": "371 - Rose Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\rose-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wrap Crop Top",
+      "slug": "wrap-crop-top",
+      "folder": "372 - Wrap Crop Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wrap-crop-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dani Top",
+      "slug": "dani-top",
+      "folder": "373 - Dani Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dani-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Short Shacket",
+      "slug": "short-shacket",
+      "folder": "374 - Short Shacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\short-shacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cat Top",
+      "slug": "cat-top",
+      "folder": "375 - Cat Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cat-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Elastic Shorts",
+      "slug": "men-elastic-shorts",
+      "folder": "376 - Men Elastic Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-elastic-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bali Pants",
+      "slug": "bali-pants",
+      "folder": "377 - Bali Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bali-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Allegra Top",
+      "slug": "allegra-top",
+      "folder": "378 - Allegra Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\allegra-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Belle Top",
+      "slug": "belle-top",
+      "folder": "379 - Belle Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\belle-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset Belt",
+      "slug": "corset-belt",
+      "folder": "38- Corset Belt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset-belt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bell Sleeves Shirt",
+      "slug": "bell-sleeves-shirt",
+      "folder": "380 - Bell Sleeves Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bell-sleeves-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Side Tie Top",
+      "slug": "side-tie-top",
+      "folder": "381 - Side Tie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\side-tie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mila Shirt",
+      "slug": "mila-shirt",
+      "folder": "382 - Mila Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mila-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lola Blouse",
+      "slug": "lola-blouse",
+      "folder": "383 - Lola Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lola-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Esme Dress",
+      "slug": "esme-dress",
+      "folder": "384 - Esme Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\esme-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Elodie Dress",
+      "slug": "elodie-dress",
+      "folder": "385 - Elodie Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\elodie-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Side Tie Blouse",
+      "slug": "side-tie-blouse",
+      "folder": "386 - Side Tie Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\side-tie-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lily Skort",
+      "slug": "lily-skort",
+      "folder": "387 - Lily Skort",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lily-skort.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Daisy Top",
+      "slug": "daisy-top",
+      "folder": "388 - Daisy Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\daisy-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jenny Pants",
+      "slug": "jenny-pants",
+      "folder": "389 - Jenny Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jenny-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Milkmaid Blouse",
+      "slug": "milkmaid-blouse",
+      "folder": "39 -  Milkmaid Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\milkmaid-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Laura Skirt",
+      "slug": "laura-skirt",
+      "folder": "390 - Laura Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\laura-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Rosa Skort",
+      "slug": "rosa-skort",
+      "folder": "391 - Rosa Skort",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\rosa-skort.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Paul Shirt",
+      "slug": "paul-shirt",
+      "folder": "392 - Paul Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\paul-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "June Pants",
+      "slug": "june-pants",
+      "folder": "393- June Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\june-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Annie Dress",
+      "slug": "annie-dress",
+      "folder": "394- Annie Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\annie-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Keira Top",
+      "slug": "keira-top",
+      "folder": "395 - Keira Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\keira-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Paula Skirt",
+      "slug": "paula-skirt",
+      "folder": "396 - Paula Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\paula-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Olivia Top",
+      "slug": "olivia-top",
+      "folder": "397 - Olivia Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\olivia-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Grace Blouse",
+      "slug": "grace-blouse",
+      "folder": "398 - Grace Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\grace-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Kimono",
+      "slug": "men-s-kimono",
+      "folder": "399 - Men_s Kimono",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-kimono.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Dress",
+      "slug": "easy-dress",
+      "folder": "4- Easy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Waistcoat",
+      "slug": "waistcoat",
+      "folder": "40- Waistcoat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\waistcoat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sara Pants",
+      "slug": "sara-pants",
+      "folder": "400 - Sara Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sara-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Cargo Shorts",
+      "slug": "men-cargo-shorts",
+      "folder": "401 - Men Cargo Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-cargo-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jason Vest",
+      "slug": "jason-vest",
+      "folder": "402 - Jason Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jason-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pam Overalls",
+      "slug": "pam-overalls",
+      "folder": "403 - Pam Overalls",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pam-overalls.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Straight Pants",
+      "slug": "men-straight-pants",
+      "folder": "404- Men Straight Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-straight-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Clara Top",
+      "slug": "clara-top",
+      "folder": "405 - Clara Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\clara-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Kylie Top",
+      "slug": "kylie-top",
+      "folder": "406 - Kylie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\kylie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Kiara Dress",
+      "slug": "kiara-dress",
+      "folder": "407 - Kiara Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\kiara-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Giselle Top",
+      "slug": "giselle-top",
+      "folder": "408 - Giselle Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\giselle-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sidney Top",
+      "slug": "sidney-top",
+      "folder": "409 - Sidney Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sidney-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Milkmaid Top",
+      "slug": "milkmaid-top",
+      "folder": "41- Milkmaid Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\milkmaid-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mini Skort",
+      "slug": "mini-skort",
+      "folder": "410 - Mini Skort",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mini-skort.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Side Tie Top",
+      "slug": "side-tie-top",
+      "folder": "411- Side Tie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\side-tie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wendy Top",
+      "slug": "wendy-top",
+      "folder": "412 - Wendy Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wendy-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Alba Top",
+      "slug": "alba-top",
+      "folder": "413 - Alba Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\alba-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Abby Top",
+      "slug": "abby-top",
+      "folder": "414 - Abby Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\abby-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lola Dress",
+      "slug": "lola-dress",
+      "folder": "415 - Lola Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lola-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emily Top",
+      "slug": "emily-top",
+      "folder": "416 - Emily Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emily-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruby Dress",
+      "slug": "ruby-dress",
+      "folder": "417 - Ruby Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruby-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lena Skirt",
+      "slug": "lena-skirt",
+      "folder": "418 - Lena Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lena-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Roxy Top",
+      "slug": "roxy-top",
+      "folder": "419 - Roxy Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\roxy-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Flare Pants",
+      "slug": "flare-pants",
+      "folder": "42 -Flare Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\flare-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Elle Dress",
+      "slug": "elle-dress",
+      "folder": "420 - Elle Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\elle-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ellie Top",
+      "slug": "ellie-top",
+      "folder": "421 - Ellie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ellie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mindy Dress",
+      "slug": "mindy-dress",
+      "folder": "422 - Mindy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mindy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ada Blouse",
+      "slug": "ada-blouse",
+      "folder": "423 - Ada Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ada-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Billie Shirt",
+      "slug": "billie-shirt",
+      "folder": "424 - Billie Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\billie-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Linda Top",
+      "slug": "linda-top",
+      "folder": "425 - Linda Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\linda-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Louise Blouse",
+      "slug": "louise-blouse",
+      "folder": "426 - Louise Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\louise-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Ruffled Pants",
+      "slug": "ruffled-pants",
+      "folder": "427 - Ruffled Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\ruffled-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Leah Dress",
+      "slug": "leah-dress",
+      "folder": "428 - Leah Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\leah-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vienna Vest",
+      "slug": "vienna-vest",
+      "folder": "429 - Vienna Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vienna-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vintage Dress",
+      "slug": "vintage-dress",
+      "folder": "43- Vintage Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vintage-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Skirt",
+      "slug": "easy-skirt",
+      "folder": "430 - Easy Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bermuda Shorts",
+      "slug": "bermuda-shorts",
+      "folder": "431 - Bermuda Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bermuda-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Holly Top",
+      "slug": "holly-top",
+      "folder": "432 - Holly Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\holly-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Julio Shirt",
+      "slug": "julio-shirt",
+      "folder": "433 - Julio Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\julio-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Polo Shirt",
+      "slug": "polo-shirt",
+      "folder": "434- Polo Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\polo-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Alyssa Dress",
+      "slug": "alyssa-dress",
+      "folder": "435 - Alyssa Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\alyssa-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "David Pants",
+      "slug": "david-pants",
+      "folder": "436 - David Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\david-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "The Summer Tote",
+      "slug": "the-summer-tote",
+      "folder": "437 - The Summer Tote",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\the-summer-tote.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Eve Mini Shorts",
+      "slug": "eve-mini-shorts",
+      "folder": "438 - Eve Mini Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\eve-mini-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Josie Dress",
+      "slug": "josie-dress",
+      "folder": "439 - Josie Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\josie-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vichy Dress",
+      "slug": "vichy-dress",
+      "folder": "44- Vichy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vichy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lucy Top",
+      "slug": "lucy-top",
+      "folder": "440 - Lucy Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lucy-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Kate Overalls",
+      "slug": "kate-overalls",
+      "folder": "441 - Kate Overalls",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\kate-overalls.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Micro Shorts",
+      "slug": "micro-shorts",
+      "folder": "442 - Micro Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\micro-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Nina Pants",
+      "slug": "nina-pants",
+      "folder": "443 - Nina Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\nina-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Kayla Skirt",
+      "slug": "kayla-skirt",
+      "folder": "444 - Kayla Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\kayla-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Medieval Tunic",
+      "slug": "medieval-tunic",
+      "folder": "445 - Medieval Tunic",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\medieval-tunic.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Nellie Skirt",
+      "slug": "nellie-skirt",
+      "folder": "446 - Nellie Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\nellie-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Jenna Skirt",
+      "slug": "jenna-skirt",
+      "folder": "447 - Jenna Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\jenna-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Drawstring Pants",
+      "slug": "drawstring-pants",
+      "folder": "448 - Drawstring Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\drawstring-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sally Shorts",
+      "slug": "sally-shorts",
+      "folder": "449 - Sally Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sally-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Corset Top",
+      "slug": "corset-top",
+      "folder": "45- Corset Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\corset-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Amelie Pants",
+      "slug": "amelie-pants",
+      "folder": "450 - Amelie Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\amelie-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dani Pants",
+      "slug": "dani-pants",
+      "folder": "451 - Dani Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dani-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Leila Top",
+      "slug": "leila-top",
+      "folder": "452 - Leila Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\leila-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lana Dress",
+      "slug": "lana-dress",
+      "folder": "453 - Lana Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lana-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Robe",
+      "slug": "comfy-robe",
+      "folder": "454 - Comfy Robe",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-robe.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Daisy Bag",
+      "slug": "daisy-bag",
+      "folder": "455 - Daisy Bag",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\daisy-bag.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Carly Dress",
+      "slug": "carly-dress",
+      "folder": "456 - Carly Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\carly-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Helen Pants",
+      "slug": "helen-pants",
+      "folder": "457 - Helen Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\helen-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Medieval Shirt",
+      "slug": "medieval-shirt",
+      "folder": "458 - Medieval Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\medieval-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Enzo Jacket",
+      "slug": "enzo-jacket",
+      "folder": "459 - Enzo Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\enzo-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Underbust Corset",
+      "slug": "underbust-corset",
+      "folder": "46-Underbust Corset",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\underbust-corset.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Wide Pajama Pants",
+      "slug": "wide-pajama-pants",
+      "folder": "460 - Wide Pajama Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\wide-pajama-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Emma Jacket",
+      "slug": "emma-jacket",
+      "folder": "461 - Emma Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\emma-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Siena Skirt",
+      "slug": "siena-skirt",
+      "folder": "462 - Siena Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\siena-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Lara Top",
+      "slug": "lara-top",
+      "folder": "463 - Lara Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\lara-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Julie Blouse",
+      "slug": "julie-blouse",
+      "folder": "464 - Julie Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\julie-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Chloe Pants",
+      "slug": "chloe-pants",
+      "folder": "465 - Chloe Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\chloe-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Nora Dress",
+      "slug": "nora-dress",
+      "folder": "466 -Nora Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\nora-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Noah Jacket",
+      "slug": "noah-jacket",
+      "folder": "467 - Noah Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\noah-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hooded Vest",
+      "slug": "hooded-vest",
+      "folder": "468 - Hooded Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hooded-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Baggy Joggers",
+      "slug": "baggy-joggers",
+      "folder": "469 - Baggy Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\baggy-joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pajama Pants",
+      "slug": "pajama-pants",
+      "folder": "47-Pajama Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pajama-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Helen Jacket",
+      "slug": "helen-jacket",
+      "folder": "470 - Helen Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\helen-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cloak",
+      "slug": "cloak",
+      "folder": "471 - Cloak",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cloak.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Kaia Vest",
+      "slug": "kaia-vest",
+      "folder": "472 - Kaia Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\kaia-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Henry Coat",
+      "slug": "henry-coat",
+      "folder": "473 - Henry Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\henry-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Flare Pants",
+      "slug": "flare-pants",
+      "folder": "474 - Flare Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\flare-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Zoe Jacket",
+      "slug": "zoe-jacket",
+      "folder": "475 - Zoe Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\zoe-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Joyce Coat",
+      "slug": "joyce-coat",
+      "folder": "476 - Joyce Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\joyce-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Drawstring Coat",
+      "slug": "drawstring-coat",
+      "folder": "477 - Drawstring Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\drawstring-coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Blouse",
+      "slug": "comfy-blouse",
+      "folder": "478 - Comfy Blouse",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-blouse.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Trendy Set",
+      "slug": "trendy-set",
+      "folder": "479 - Trendy Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\trendy-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Bowling Shirt",
+      "slug": "bowling-shirt",
+      "folder": "48-Bowling Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\bowling-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Halter Vest",
+      "slug": "halter-vest",
+      "folder": "480 - Halter Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\halter-vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hoodie & Joggers",
+      "slug": "hoodie-joggers",
+      "folder": "481 - Hoodie & Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hoodie-joggers.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Spring Dress",
+      "slug": "spring-dress",
+      "folder": "482 - Spring Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\spring-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "candora",
+      "slug": "candora",
+      "folder": "483 - candora",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\candora.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Easy Dress",
+      "slug": "easy-dress",
+      "folder": "484 - Easy Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\easy-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Back Top",
+      "slug": "tie-back-top",
+      "folder": "485 - Tie Back Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-back-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sweetheart Dress",
+      "slug": "sweetheart-dress",
+      "folder": "486 - Sweetheart Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sweetheart-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Dress",
+      "slug": "slit-dress",
+      "folder": "487 - Slit Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cottage Top",
+      "slug": "cottage-top",
+      "folder": "488 - Cottage Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cottage-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Front Tie Top",
+      "slug": "front-tie-top",
+      "folder": "489 - Front Tie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\front-tie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Maxi Slit Skirt",
+      "slug": "maxi-slit-skirt",
+      "folder": "490 - Maxi Slit Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\maxi-slit-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "High Waist Shorts",
+      "slug": "high-waist-shorts",
+      "folder": "491 - High Waist Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\high-waist-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Skirt",
+      "slug": "summer-skirt",
+      "folder": "492 - Summer Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Backless Top",
+      "slug": "backless-top",
+      "folder": "493 - Backless Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\backless-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Pants",
+      "slug": "men-pants",
+      "folder": "494 - Men Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Pants",
+      "slug": "summer-pants",
+      "folder": "495 - Summer Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Long Sleeved Sumer Top",
+      "slug": "long-sleeved-sumer-top",
+      "folder": "496 - Long Sleeved Sumer Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\long-sleeved-sumer-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Flare leg pants",
+      "slug": "flare-leg-pants",
+      "folder": "497 - Flare leg pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\flare-leg-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Shorts-Swimwear",
+      "slug": "men-s-shorts-swimwear",
+      "folder": "498 - Men_s Shorts-Swimwear",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-shorts-swimwear.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "High Waist Shorts",
+      "slug": "high-waist-shorts",
+      "folder": "499 - High Waist Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\high-waist-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Romper",
+      "slug": "romper",
+      "folder": "5- Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "caftan",
+      "slug": "caftan",
+      "folder": "50 - caftan",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\caftan.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overall Dress",
+      "slug": "overall-dress",
+      "folder": "500- Overall Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overall-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "caftan book pdf",
+      "slug": "caftan-book-pdf",
+      "folder": "501 - caftan book pdf",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\caftan-book-pdf.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Overall Dress",
+      "slug": "overall-dress",
+      "folder": "502 - Overall Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\overall-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Dress",
+      "slug": "slit-dress",
+      "folder": "502 - Slit Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Shoulder Tie Top",
+      "slug": "shoulder-tie-top",
+      "folder": "505 - Shoulder Tie Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\shoulder-tie-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Swimsuit",
+      "slug": "swimsuit",
+      "folder": "52- Swimsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\swimsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Oversized Dress",
+      "slug": "oversized-dress",
+      "folder": "53- Oversized Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\oversized-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Jumpsuit",
+      "slug": "comfy-jumpsuit",
+      "folder": "54-Comfy Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Nighty Set",
+      "slug": "nighty-set",
+      "folder": "55-Nighty Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\nighty-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Nora Skirt",
+      "slug": "nora-skirt",
+      "folder": "56-Nora Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\nora-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Pinafore Skirt",
+      "slug": "pinafore-skirt",
+      "folder": "57-Pinafore Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pinafore-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Back Top",
+      "slug": "tie-back-top",
+      "folder": "58-Tie Back Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-back-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tie Back Top 2",
+      "slug": "tie-back-top-2",
+      "folder": "59- Tie Back Top 2",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tie-back-top-2.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Robe",
+      "slug": "robe",
+      "folder": "6- Robe",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\robe.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Loungewear SET",
+      "slug": "loungewear-set",
+      "folder": "60 -Loungewear SET",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\loungewear-set.jpg",
+      "has_cover": false
+    },
+    {
+      "name": "Pinafore Dress",
+      "slug": "pinafore-dress",
+      "folder": "61 - Pinafore Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\pinafore-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Long Sleeve Tee",
+      "slug": "long-sleeve-tee",
+      "folder": "62- Long Sleeve Tee",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\long-sleeve-tee.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Shirt",
+      "slug": "men-s-shirt",
+      "folder": "63 - Men_s Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men Shorts",
+      "slug": "men-shorts",
+      "folder": "64 - Men Shorts",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-shorts.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Tank Top",
+      "slug": "tank-top",
+      "folder": "65 - Tank Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\tank-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Men_s Zipped Jacket",
+      "slug": "men-s-zipped-jacket",
+      "folder": "66 - Men_s Zipped Jacket",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\men-s-zipped-jacket.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Cargo Joggers",
+      "slug": "cargo-joggers",
+      "folder": "67 - Cargo Joggers",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\cargo-joggers.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Hoodie",
+      "slug": "dog-hoodie",
+      "folder": "68- Dog Hoodie",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-hoodie.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Dog Top",
+      "slug": "dog-top",
+      "folder": "69- Dog Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\dog-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "One Shoulder Top",
+      "slug": "one-shoulder-top",
+      "folder": "7- One Shoulder Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\one-shoulder-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mini Slit Skirt",
+      "slug": "mini-slit-skirt",
+      "folder": "70 - Mini Slit Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mini-slit-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "caftan book pdf",
+      "slug": "caftan-book-pdf",
+      "folder": "70 - caftan book pdf",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\caftan-book-pdf.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Coat",
+      "slug": "coat",
+      "folder": "71 - Coat",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\coat.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Dress",
+      "slug": "summer-dress",
+      "folder": "72 - Summer Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "SweatPants",
+      "slug": "sweatpants",
+      "folder": "73 - SweatPants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sweatpants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Slit Pants",
+      "slug": "slit-pants",
+      "folder": "74- Slit Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\slit-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sleeve Crop Top",
+      "slug": "sleeve-crop-top",
+      "folder": "75- Sleeve Crop Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sleeve-crop-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Shorts and Top Set",
+      "slug": "shorts-and-top-set",
+      "folder": "76- Shorts and Top Set",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\shorts-and-top-set.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Top",
+      "slug": "summer-top",
+      "folder": "77- Summer Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Vest",
+      "slug": "vest",
+      "folder": "78 - Vest",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\vest.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Boho Dress",
+      "slug": "boho-dress",
+      "folder": "8- Boho Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\boho-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Sundress",
+      "slug": "sundress",
+      "folder": "84- Sundress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\sundress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Chic Ruffle Dress",
+      "slug": "chic-ruffle-dress",
+      "folder": "85- Chic Ruffle Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\chic-ruffle-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Summer Pants",
+      "slug": "summer-pants",
+      "folder": "86- Summer Pants",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\summer-pants.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Mini Ruffle Skirt",
+      "slug": "mini-ruffle-skirt",
+      "folder": "87 - Mini Ruffle Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\mini-ruffle-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Maxi Skirt",
+      "slug": "maxi-skirt",
+      "folder": "88 - Maxi Skirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\maxi-skirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Puff Top",
+      "slug": "puff-top",
+      "folder": "89 - Puff Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\puff-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "A-Line Dress",
+      "slug": "a-line-dress",
+      "folder": "9- A-Line Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\a-line-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Hawaiian Shirt",
+      "slug": "hawaiian-shirt",
+      "folder": "90- Hawaiian Shirt",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\hawaiian-shirt.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Babydoll Dress",
+      "slug": "babydoll-dress",
+      "folder": "92- Babydoll Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\babydoll-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Milkmaid Crop Top",
+      "slug": "milkmaid-crop-top",
+      "folder": "93 - Milkmaid Crop Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\milkmaid-crop-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Knot Top",
+      "slug": "knot-top",
+      "folder": "94 - Knot Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\knot-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Prom Jumpsuit",
+      "slug": "prom-jumpsuit",
+      "folder": "95 - Prom Jumpsuit",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\prom-jumpsuit.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Comfy Romper",
+      "slug": "comfy-romper",
+      "folder": "96 - Comfy Romper",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\comfy-romper.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Short Dress",
+      "slug": "short-dress",
+      "folder": "97 - Short Dress",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\short-dress.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Crop Top",
+      "slug": "crop-top",
+      "folder": "98- Crop Top",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\crop-top.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "Trendy Blazer",
+      "slug": "trendy-blazer",
+      "folder": "99 - Trendy Blazer",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\trendy-blazer.jpg",
+      "has_cover": true
+    },
+    {
+      "name": "كتب توضيحية",
+      "slug": "",
+      "folder": "كتب توضيحية",
+      "cover": "C:\\Users\\DELL\\Dev\\watermarkremover\\covers\\.jpg",
+      "has_cover": true
+    }
+  ]
+}

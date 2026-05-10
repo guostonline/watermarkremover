@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Image Generator",
+  "version": "1.0.0",
+  "description": "Generate DALL-E images from article prompts and send them back to the editor.",
+  "permissions": ["tabs", "storage", "downloads", "scripting", "alarms"],
+  "host_permissions": [
+    "http://localhost:5001/*",
+    "https://chatgpt.com/*",
+    "https://files.oaiusercontent.com/*",
+    "https://*.oaiusercontent.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost:5001/*"],
+      "js": ["content-article.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content-chatgpt.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ],
+  "action": { "default_popup": "popup.html" }
+}
